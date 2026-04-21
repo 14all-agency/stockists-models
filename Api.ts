@@ -8,7 +8,7 @@
 
 import { z } from "zod";
 
-import { SettingsGroupsSchema } from "@/models/OrganisationSettings";
+import { SettingsGroupsSchema } from "./OrganisationSettings";
 
 //
 // ======================================================

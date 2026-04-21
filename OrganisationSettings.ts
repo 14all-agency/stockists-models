@@ -3,28 +3,28 @@ import { z } from "zod";
 import {
   AppearanceSettingsConverter,
   AppearanceSettingsSchema,
-} from "@/models/settings/appearance";
+} from "./settings/appearance";
 import {
   CustomFieldsSettingsConverter,
   CustomFieldsSettingsSchema,
-} from "@/models/settings/customFields";
+} from "./settings/customFields";
 import {
   FiltersSettingsConverter,
   FiltersSettingsSchema,
-} from "@/models/settings/filters";
+} from "./settings/filters";
 import {
   LanguageSettingsConverter,
   LanguageSettingsSchema,
-} from "@/models/settings/language";
+} from "./settings/language";
 import {
   ProviderSettingsConverter,
   ProviderSettingsSchema,
-} from "@/models/settings/provider";
+} from "./settings/provider";
 import {
   SearchBehaviourSettingsConverter,
   SearchBehaviourSettingsSchema,
-} from "@/models/settings/searchBehaviour";
-import { createSettingsConverter } from "@/models/settings/shared";
+} from "./settings/searchBehaviour";
+import { createSettingsConverter } from "./settings/shared";
 
 export const SettingsGroupsSchema = z.object({
   appearance: AppearanceSettingsSchema.optional().nullable().describe("Appearance settings for colors, map theme, pins, layout behavior, branding, and custom CSS."),
