@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { LocationCustomFieldTypeResult } from "@/models/Location";
+import { LocationCustomFieldTypeResult } from "../Location";
 
 import { createSettingsConverter, NullableBoolean, NullableString } from "./shared";
 
