@@ -1,7 +1,7 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
 
-import { SettingsConverter, SettingsResult } from "@/models/OrganisationSettings";
+import { SettingsConverter, SettingsResult } from "./OrganisationSettings";
 
 export const ShopifyConnectionResult = z.object({
   apiKey: z.string(),
