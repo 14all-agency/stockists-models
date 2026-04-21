@@ -1,6 +1,5 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
-import { RedditSearchEntityResult, RedditSearchModel, RedditSearchModelSchema } from "./RedditSearch";
 
 export const ShopifyConnectionResult = z.object({
   apiKey: z.string(),
@@ -64,10 +63,6 @@ export const OrganisationResult = z.object({
   shopCreatedAt: z.string().optional().nullable().describe("shop created at"),
   // Custom
   settings: SettingsResult,
-  redditSearchHistory: z.array(z.union([
-    z.instanceof(ObjectId),
-    RedditSearchEntityResult,
-  ])).optional().nullable().describe("Recent Reddit search history (most recent first). Stores search ids by default, but may contain populated RedditSearch entities after lookup/join. Should be capped (e.g. 100 items) at application level"),
   // Billing stuff
   billingPlanStatus: z.union([
     z.literal("INACTIVE"),
@@ -102,10 +97,6 @@ export const OrganisationModelSchema = z.object({
   shopifySite: z.string().nullable().optional(),
   // custom
   settings: OrganisationResult.shape.settings,
-  redditSearchHistory: z.array(z.union([
-    z.string(),
-    RedditSearchModelSchema,
-  ])).optional().nullable().describe("Recent Reddit search history (most recent first). Returns search ids by default, but may contain populated RedditSearch models after lookup/join. Should be capped (e.g. 100 items) at application level"),
   // billing
   billingPlanStatus: OrganisationResult.shape.billingPlanStatus,
   billingSubscriptionId: OrganisationResult.shape.billingSubscriptionId,
@@ -143,13 +134,6 @@ export const OrganisationModel = {
       shopifySite: entity?.shopifyConnection?.domain ?? null,
       // custom
       settings: entity.settings ?? null,
-
-      redditSearchHistory: entity.redditSearchHistory
-        ? entity.redditSearchHistory.map((item) =>
-            // @ts-ignore
-            ObjectId.isValid(item) ? item.toHexString() : RedditSearchModel.convertFromEntity(item)
-          )
-        : null,
       // billing
       billingPlanStatus: entity.billingPlanStatus ?? "INACTIVE",
       billingSubscriptionId: entity.billingSubscriptionId ?? null,

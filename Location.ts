@@ -1,0 +1,212 @@
+import { ObjectId } from "bson";
+import { z } from "zod";
+
+export const LocationStatusResult = z
+  .union([
+    z.literal("ACTIVE"),
+    z.literal("UNLISTED"),
+    z.literal("INACTIVE"),
+  ])
+  .optional()
+  .nullable();
+
+export type LocationStatus = z.infer<typeof LocationStatusResult>;
+
+export const LocationCustomFieldTypeResult = z
+  .union([
+    z.literal("text"),
+    z.literal("url"),
+    z.literal("email"),
+    z.literal("phone"),
+    z.literal("number"),
+    z.literal("boolean"),
+  ])
+  .optional()
+  .nullable();
+
+export type LocationCustomFieldType = z.infer<typeof LocationCustomFieldTypeResult>;
+
+export const LocationCustomFieldSchema = z.object({
+  key: z.string().optional().nullable(),
+  label: z.string().optional().nullable(),
+  type: LocationCustomFieldTypeResult.describe("Display/input type for this custom field"),
+  value: z.union([z.string(), z.number(), z.boolean()]).optional().nullable(),
+  public: z.boolean().optional().nullable().describe("Whether this field is visible to storefront users"),
+  filterable: z.boolean().optional().nullable().describe("Whether this field can be used as a filter"),
+}).superRefine((value, ctx) => {
+  if (value.value === null || value.value === undefined || !value.type) {
+    return;
+  }
+
+  if (value.type === "number" && typeof value.value !== "number") {
+    ctx.addIssue({
+      code: "custom",
+      message: "Custom field value must be a number",
+      path: ["value"],
+    });
+  }
+
+  if (value.type === "boolean" && typeof value.value !== "boolean") {
+    ctx.addIssue({
+      code: "custom",
+      message: "Custom field value must be a boolean",
+      path: ["value"],
+    });
+  }
+
+  if (["text", "url", "email", "phone"].includes(value.type) && typeof value.value !== "string") {
+    ctx.addIssue({
+      code: "custom",
+      message: "Custom field value must be a string",
+      path: ["value"],
+    });
+  }
+
+  if (value.type === "url" && typeof value.value === "string") {
+    const parsed = z.string().url().safeParse(value.value);
+
+    if (!parsed.success) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Custom field value must be a valid URL",
+        path: ["value"],
+      });
+    }
+  }
+
+  if (value.type === "email" && typeof value.value === "string") {
+    const parsed = z.string().email().safeParse(value.value);
+
+    if (!parsed.success) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Custom field value must be a valid email address",
+        path: ["value"],
+      });
+    }
+  }
+});
+
+export type LocationCustomField = z.infer<typeof LocationCustomFieldSchema>;
+
+export const LocationFilterSchema = z.object({
+  key: z.string().optional().nullable(),
+  value: z.string().optional().nullable(),
+});
+
+export type LocationFilter = z.infer<typeof LocationFilterSchema>;
+
+function validateCoordinates(
+  value: {
+    lat?: number | null;
+    lng?: number | null;
+  },
+  ctx: z.RefinementCtx,
+) {
+  const hasLat = value.lat !== null && value.lat !== undefined;
+  const hasLng = value.lng !== null && value.lng !== undefined;
+
+  if (hasLat !== hasLng) {
+    ctx.addIssue({
+      code: "custom",
+      message: "lat and lng must both be provided together",
+      path: hasLat ? ["lng"] : ["lat"],
+    });
+  }
+}
+
+export const CoordinatesSchema = z
+  .object({
+    lat: z.number().min(-90).max(90).optional().nullable(),
+    lng: z.number().min(-180).max(180).optional().nullable(),
+  })
+  .superRefine(validateCoordinates);
+
+export const LocationEntityResult = z
+  .object({
+    _id: z.instanceof(ObjectId),
+    org: z.instanceof(ObjectId).describe("Organisation that owns this location"),
+    status: LocationStatusResult.describe("Location visibility and publication state"),
+    name: z.string().optional().nullable(),
+    addressLine1: z.string().optional().nullable(),
+    addressLine2: z.string().optional().nullable(),
+    city: z.string().optional().nullable(),
+    postalCode: z.string().optional().nullable(),
+    stateProvince: z.string().optional().nullable(),
+    country: z.string().optional().nullable(),
+    phoneNumber: z.string().optional().nullable(),
+    website: z.string().url().optional().nullable(),
+    emailAddress: z.string().email().optional().nullable(),
+    logoUrl: z.string().url().optional().nullable(),
+    notes: z.string().optional().nullable(),
+    customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
+    filters: z.array(LocationFilterSchema).optional().nullable(),
+    priority: z.number().optional().nullable(),
+    lat: CoordinatesSchema.shape.lat,
+    lng: CoordinatesSchema.shape.lng,
+    createdAt: z.date().optional().nullable(),
+    updatedAt: z.date().optional().nullable(),
+  })
+  .superRefine(validateCoordinates);
+
+export type LocationEntity = z.infer<typeof LocationEntityResult>;
+
+export const LocationModelSchema = z
+  .object({
+    id: z.string(),
+    org: z.string(),
+    status: LocationEntityResult.shape.status,
+    name: LocationEntityResult.shape.name,
+    addressLine1: LocationEntityResult.shape.addressLine1,
+    addressLine2: LocationEntityResult.shape.addressLine2,
+    city: LocationEntityResult.shape.city,
+    postalCode: LocationEntityResult.shape.postalCode,
+    stateProvince: LocationEntityResult.shape.stateProvince,
+    country: LocationEntityResult.shape.country,
+    phoneNumber: LocationEntityResult.shape.phoneNumber,
+    website: LocationEntityResult.shape.website,
+    emailAddress: LocationEntityResult.shape.emailAddress,
+    logoUrl: LocationEntityResult.shape.logoUrl,
+    notes: LocationEntityResult.shape.notes,
+    customFields: LocationEntityResult.shape.customFields,
+    filters: LocationEntityResult.shape.filters,
+    priority: LocationEntityResult.shape.priority,
+    lat: LocationEntityResult.shape.lat,
+    lng: LocationEntityResult.shape.lng,
+    createdAt: LocationEntityResult.shape.createdAt,
+    updatedAt: LocationEntityResult.shape.updatedAt,
+  })
+  .superRefine(validateCoordinates);
+
+export type LocationModel = z.infer<typeof LocationModelSchema>;
+
+export const LocationModel = {
+  convertFromEntity(entity: LocationEntity): LocationModel {
+    const obj: LocationModel = {
+      id: entity._id.toHexString(),
+      org: entity.org.toHexString(),
+      status: entity.status ?? null,
+      name: entity.name ?? null,
+      addressLine1: entity.addressLine1 ?? null,
+      addressLine2: entity.addressLine2 ?? null,
+      city: entity.city ?? null,
+      postalCode: entity.postalCode ?? null,
+      stateProvince: entity.stateProvince ?? null,
+      country: entity.country ?? null,
+      phoneNumber: entity.phoneNumber ?? null,
+      website: entity.website ?? null,
+      emailAddress: entity.emailAddress ?? null,
+      logoUrl: entity.logoUrl ?? null,
+      notes: entity.notes ?? null,
+      customFields: entity.customFields ?? null,
+      filters: entity.filters ?? null,
+      priority: entity.priority ?? null,
+      lat: entity.lat ?? null,
+      lng: entity.lng ?? null,
+      createdAt: entity.createdAt ? new Date(entity.createdAt) : null,
+      updatedAt: entity.updatedAt ? new Date(entity.updatedAt) : null,
+    };
+
+    return LocationModelSchema.parse(obj);
+  },
+};

@@ -178,12 +178,12 @@ Arbitrary JSON payload. Common pattern:
 
 \---
 
-## Generate Draft
+## Create Location
 
 **Method:** `POST`  
-**Route:** `drafts/generateDraft`
+**Route:** `locations/createLocation`
 
-Generates Reddit-style draft comment for authenticated org, stores it in `drafts`, and returns full `DraftModel`. If `id` is provided, endpoint updates existing draft owned by org instead of creating new one.
+Creates one location owned by authenticated org and returns full `LocationModel`.
 
 ### Query parameters
 
@@ -191,28 +191,54 @@ Generates Reddit-style draft comment for authenticated org, stores it in `drafts
 
 ### Request body
 
-All fields are optional.
-
 ```json
 {
-  "id": "665f0d3f4f9a9b0012345678",
-  "customInstructions": "Keep it concise and sound like an actual Reddit user.",
-  "promotionLink": "https://example.com/products/widget",
-  "referenceId": "t3_abcdef",
-  "promotionTone": "extra_subtle"
+  "status": "ACTIVE",
+  "name": "Auckland Flagship",
+  "addressLine1": "123 Queen Street",
+  "addressLine2": "Level 2",
+  "city": "Auckland",
+  "postalCode": "1010",
+  "stateProvince": "Auckland",
+  "country": "New Zealand",
+  "phoneNumber": "+64 9 123 4567",
+  "website": "https://example.com/stores/auckland",
+  "emailAddress": "auckland@example.com",
+  "logoUrl": "https://cdn.example.com/logo.png",
+  "notes": "Main retail showroom.",
+  "customFields": [
+    {
+      "key": "wheelchair_access",
+      "label": "Wheelchair Access",
+      "type": "boolean",
+      "value": true,
+      "public": true,
+      "filterable": true
+    }
+  ],
+  "filters": [
+    {
+      "key": "region",
+      "value": "north-island"
+    }
+  ],
+  "priority": 100,
+  "lat": -36.8485,
+  "lng": 174.7633
 }
 ```
 
 ### Rules
 
-* if `promotionLink` is omitted, endpoint falls back to org website, then Shopify domain if available
-* if `referenceId` matches cached Reddit search result, model uses post title/content as reply context
-* if `id` is provided, draft must belong to authenticated org
-* `promotionTone` can be `subtle`, `direct`, or `extra_subtle`
-* `extra_subtle` hyperlinks a topic-related word or short phrase instead of using a callout
-* generation is throttled to `20` drafts per org per rolling hour
-* once an org has generated `50` drafts or more, `FREE` and `LIFETIME-FREE` plans use `gpt-5-nano`
-* generated output is concise Reddit-flavoured markdown
+* `name` is required
+* `status` can be `ACTIVE`, `UNLISTED`, or `INACTIVE`
+* `website` and `logoUrl` must be valid URLs when provided
+* `emailAddress` must be valid email when provided
+* `lat` must be between `-90` and `90`
+* `lng` must be between `-180` and `180`
+* `lat` and `lng` must either both be provided or both omitted
+* custom field values must match their declared `type`
+* location ownership is always set from authenticated org, not request body
 
 ### Success response
 
@@ -220,24 +246,51 @@ All fields are optional.
 {
   "id": "665f0d3f4f9a9b0012345678",
   "org": "665f0d3f4f9a9b0099999999",
-  "promotionTone": "subtle",
-  "content": "If you're comparing options, I had decent luck using [this](https://example.com/products/widget) because it solved X without much setup.",
-  "customInstructions": "Keep it concise and sound like an actual Reddit user.",
-  "promotionLink": "https://example.com/products/widget",
-  "referenceId": "t3_abcdef",
-  "createdAt": "2026-04-11T00:00:00.000Z",
-  "updatedAt": "2026-04-11T00:00:00.000Z"
+  "status": "ACTIVE",
+  "name": "Auckland Flagship",
+  "addressLine1": "123 Queen Street",
+  "addressLine2": "Level 2",
+  "city": "Auckland",
+  "postalCode": "1010",
+  "stateProvince": "Auckland",
+  "country": "New Zealand",
+  "phoneNumber": "+64 9 123 4567",
+  "website": "https://example.com/stores/auckland",
+  "emailAddress": "auckland@example.com",
+  "logoUrl": "https://cdn.example.com/logo.png",
+  "notes": "Main retail showroom.",
+  "customFields": [
+    {
+      "key": "wheelchair_access",
+      "label": "Wheelchair Access",
+      "type": "boolean",
+      "value": true,
+      "public": true,
+      "filterable": true
+    }
+  ],
+  "filters": [
+    {
+      "key": "region",
+      "value": "north-island"
+    }
+  ],
+  "priority": 100,
+  "lat": -36.8485,
+  "lng": 174.7633,
+  "createdAt": "2026-04-21T00:00:00.000Z",
+  "updatedAt": "2026-04-21T00:00:00.000Z"
 }
 ```
 
 \---
 
-## Update Draft
+## Update Location
 
 **Method:** `POST`  
-**Route:** `drafts/updateDraft`
+**Route:** `locations/updateLocation`
 
-Updates existing draft owned by authenticated org using provided values. Unlike `generateDraft`, this endpoint does not call OpenAI and instead persists caller-provided `content` directly.
+Updates one existing location owned by authenticated org and returns full `LocationModel`.
 
 ### Query parameters
 
@@ -250,59 +303,35 @@ Updates existing draft owned by authenticated org using provided values. Unlike 
 ```json
 {
   "id": "665f0d3f4f9a9b0012345678",
-  "content": "I ran into something similar. We had decent results with [this](https://example.com) because setup was quick.",
-  "customInstructions": "Keep it short.",
-  "promotionLink": "https://example.com",
-  "referenceId": "t3_abcdef",
-  "promotionTone": "subtle"
+  "status": "UNLISTED",
+  "name": "Auckland Flagship Updated",
+  "notes": "Temporarily available by appointment.",
+  "priority": 90,
+  "lat": -36.8485,
+  "lng": 174.7633
 }
 ```
 
 ### Rules
 
 * `id` must be valid ObjectId string
-* draft must belong to authenticated org
-* omitted optional fields keep existing stored values
-* `updatedAt` is refreshed on every successful update
+* location must belong to authenticated org
+* at least one field besides `id` must be provided
+* omitted fields keep existing stored values
+* merged result must still satisfy full location validation rules
 
 ### Success response
 
-Returns full `DraftModel` plus optional `referenceEntity` when `referenceId` resolves to a cached Reddit result.
-
-```json
-{
-  "id": "665f0d3f4f9a9b0012345678",
-  "org": "665f0d3f4f9a9b0099999999",
-  "promotionTone": "subtle",
-  "content": "I ran into something similar. We had decent results with [this](https://example.com) because setup was quick.",
-  "customInstructions": "Keep it short.",
-  "promotionLink": "https://example.com",
-  "referenceId": "t3_abcdef",
-  "referenceEntity": {
-    "authorName": "example_user",
-    "authorUrl": "https://www.reddit.com/user/example_user/",
-    "subreddit": "newzealand",
-    "entryId": "t3_abcdef",
-    "entryUrl": "https://www.reddit.com/comments/example_comment",
-    "updatedAt": "2026-04-11T00:00:00.000Z",
-    "publishedAt": "2026-04-11T00:00:00.000Z",
-    "title": "Game Kings mentioned here",
-    "content": "<p>Example HTML content</p>",
-    "fetchedAt": "2026-04-11T00:15:00.000Z"
-  },
-  "createdAt": "2026-04-11T00:00:00.000Z",
-  "updatedAt": "2026-04-11T01:00:00.000Z"
-}
-```
+Returns full `LocationModel`.
 
 \---
 
-## Get Draft
+## Get Location
 
 **Method:** `GET`  
-**Route:** `drafts/getDraft/{id}`
+**Route:** `locations/getLocation/{id}`
 
-Returns one draft owned by authenticated org.
+Returns one location owned by authenticated org.
 
 ### Query parameters
 
@@ -314,30 +343,16 @@ Returns one draft owned by authenticated org.
 
 ### Success response
 
-Returns full `DraftModel`.
-
-```json
-{
-  "id": "665f0d3f4f9a9b0012345678",
-  "org": "665f0d3f4f9a9b0099999999",
-  "promotionTone": "subtle",
-  "content": "I ran into something similar. We had decent results with [this](https://example.com) because setup was quick.",
-  "customInstructions": "Keep it short.",
-  "promotionLink": "https://example.com",
-  "referenceId": "t3_abcdef",
-  "createdAt": "2026-04-11T00:00:00.000Z",
-  "updatedAt": "2026-04-11T01:00:00.000Z"
-}
-```
+Returns full `LocationModel`.
 
 \---
 
-## Get Drafts
+## Get Locations
 
 **Method:** `GET`  
-**Route:** `drafts/getDrafts`
+**Route:** `locations/getLocations`
 
-Returns all drafts owned by authenticated org, sorted by most recently updated first.
+Returns all locations owned by authenticated org, sorted by `priority`, then `updatedAt`, then `createdAt` descending.
 
 ### Query parameters
 
@@ -347,17 +362,30 @@ Returns all drafts owned by authenticated org, sorted by most recently updated f
 
 ```json
 {
-  "drafts": [
+  "locations": [
     {
       "id": "665f0d3f4f9a9b0012345678",
       "org": "665f0d3f4f9a9b0099999999",
-      "promotionTone": "subtle",
-      "content": "I ran into something similar. We had decent results with [this](https://example.com) because setup was quick.",
-      "customInstructions": "Keep it short.",
-      "promotionLink": "https://example.com",
-      "referenceId": "t3_abcdef",
-      "createdAt": "2026-04-11T00:00:00.000Z",
-      "updatedAt": "2026-04-11T01:00:00.000Z"
+      "status": "ACTIVE",
+      "name": "Auckland Flagship",
+      "addressLine1": "123 Queen Street",
+      "addressLine2": "Level 2",
+      "city": "Auckland",
+      "postalCode": "1010",
+      "stateProvince": "Auckland",
+      "country": "New Zealand",
+      "phoneNumber": "+64 9 123 4567",
+      "website": "https://example.com/stores/auckland",
+      "emailAddress": "auckland@example.com",
+      "logoUrl": "https://cdn.example.com/logo.png",
+      "notes": "Main retail showroom.",
+      "customFields": [],
+      "filters": [],
+      "priority": 100,
+      "lat": -36.8485,
+      "lng": 174.7633,
+      "createdAt": "2026-04-21T00:00:00.000Z",
+      "updatedAt": "2026-04-21T00:00:00.000Z"
     }
   ]
 }
@@ -365,12 +393,12 @@ Returns all drafts owned by authenticated org, sorted by most recently updated f
 
 \---
 
-## Delete Draft
+## Delete Location
 
 **Method:** `POST`  
-**Route:** `drafts/deleteDraft/{id}`
+**Route:** `locations/deleteLocation/{id}`
 
-Deletes one draft owned by authenticated org.
+Deletes one location owned by authenticated org.
 
 ### Query parameters
 
@@ -391,12 +419,12 @@ Deletes one draft owned by authenticated org.
 
 \---
 
-## Create Search
+## Create Locations Bulk
 
 **Method:** `POST`  
-**Route:** `redditSearch/createSearch`
+**Route:** `locations/createLocationsBulk`
 
-Creates a canonical Reddit search record if one does not already exist for the generated `searchUrl`. If an identical `searchUrl` already exists, it returns that existing record id instead of creating a duplicate.
+Creates many locations for authenticated org in one request.
 
 ### Query parameters
 
@@ -406,228 +434,59 @@ Creates a canonical Reddit search record if one does not already exist for the g
 
 ```json
 {
-  "input": "Game Kings",
-  "filters": {
-    "searchMode": "combined",
-    "includeTextPosts": true,
-    "includeLinkPosts": true,
-    "textMatchMode": "exact",
-    "textTarget": "title_or_body",
-    "linkTarget": "domain",
-    "includeSubreddits": "",
-    "excludeSubreddits": "",
-    "excludeTerms": "",
-    "advancedOpen": false
-  }
-}
-```
-
-### Success response
-
-```json
-{
-  "id": "665f0d3f4f9a9b0012345678",
-  "created": true
-}
-```
-
-### Alternate success response when an identical search already exists
-
-```json
-{
-  "id": "665f0d3f4f9a9b0012345678",
-  "created": false
-}
-```
-
-\---
-
-## Get Search
-
-**Method:** `GET`  
-**Route:** `redditSearch/getSearch/{id}`
-
-Retrieves a single search by id for the authenticated org. This endpoint also records the search in the org's search history. If cached results are still fresh, it returns those. Otherwise it fetches the Reddit RSS feed, updates the stored search record, and returns the refreshed result.
-
-### Query parameters
-
-* `shop: string` (required)
-
-### Path parameters
-
-* `id: string` (required, must be a valid ObjectId string)
-
-### Success response
-
-Returns a full `RedditSearchModel`.
-
-Example:
-
-```json
-{
-  "id": "665f0d3f4f9a9b0012345678",
-  "query": "game kings",
-  "searchUrl": "https://www.reddit.com/search.rss?q=%28title%3A%22game+kings%22+OR+selftext%3A%22game+kings%22%29&sort=new&t=all",
-  "alternateUrl": "https://www.reddit.com/search/?q=%28title%3A%22game+kings%22+OR+selftext%3A%22game+kings%22%29&sort=new&t=all",
-  "filters": {
-    "searchMode": "combined",
-    "includeTextPosts": true,
-    "includeLinkPosts": true,
-    "textMatchMode": "exact",
-    "textTarget": "title_or_body",
-    "linkTarget": "domain",
-    "includeSubreddits": "",
-    "excludeSubreddits": "",
-    "excludeTerms": "",
-    "advancedOpen": false
-  },
-  "results": [
+  "locations": [
     {
-      "authorName": "example_user",
-      "authorUrl": "https://www.reddit.com/user/example_user/",
-      "entryUrl": "https://www.reddit.com/comments/example_comment",
-      "subreddit": "newzealand",
-      "entryId": "t3_abcdef",
-      "updatedAt": "2026-04-11T00:00:00.000Z",
-      "publishedAt": "2026-04-11T00:00:00.000Z",
-      "title": "Game Kings mentioned here",
-      "content": "<p>Example HTML content</p>",
-      "fetchedAt": "2026-04-11T00:15:00.000Z"
+      "status": "ACTIVE",
+      "name": "Auckland Flagship",
+      "addressLine1": "123 Queen Street",
+      "city": "Auckland",
+      "postalCode": "1010",
+      "stateProvince": "Auckland",
+      "country": "New Zealand",
+      "website": "https://example.com/stores/auckland",
+      "emailAddress": "auckland@example.com",
+      "priority": 100,
+      "lat": -36.8485,
+      "lng": 174.7633
+    },
+    {
+      "status": "ACTIVE",
+      "name": "Wellington Showroom",
+      "addressLine1": "50 Willis Street",
+      "city": "Wellington",
+      "postalCode": "6011",
+      "stateProvince": "Wellington",
+      "country": "New Zealand",
+      "priority": 80,
+      "lat": -41.2865,
+      "lng": 174.7762
     }
-  ],
-  "subscribers": null,
-  "mySubscription": {
-    "org": "665f0d3f4f9a9b0099999999",
-    "subscribedAt": "2026-04-01T00:00:00.000Z",
-    "frequency": "daily",
-    "lastNotificationSentAt": "2026-04-10T00:00:00.000Z",
-    "disabled": false
-  },
-  "createdAt": "2026-04-01T00:00:00.000Z",
-  "updatedAt": "2026-04-11T00:15:00.000Z",
-  "createdBy": "665f0d3f4f9a9b0099999999",
-  "disabled": false,
-  "lastSyncedAt": "2026-04-11T00:15:00.000Z",
-  "lastSuccessfulSyncAt": "2026-04-11T00:15:00.000Z",
-  "syncStatus": "SUCCESS",
-  "syncError": null,
-  "resultCount": 12,
-  "lastResultAt": "2026-04-11T00:00:00.000Z"
-}
-```
-
-\---
-
-## Update Subscription
-
-**Method:** `POST`  
-**Route:** `redditSearch/updateSubscription`
-
-Creates, updates, disables, or re-enables the authenticated org's subscription for a given search.
-
-### Query parameters
-
-* `shop: string` (required)
-
-### Request body
-
-```json
-{
-  "searchId": "665f0d3f4f9a9b0012345678",
-  "frequency": "daily",
-  "disabled": false
+  ]
 }
 ```
 
 ### Rules
 
-* `frequency` is required when `disabled` is `false`
-* `frequency` can be omitted when `disabled` is `true`
-* only one subscription per org per search is allowed
-* disabled subscriptions are preserved in the array rather than removed
-* if enabling a brand new or previously disabled subscription would exceed the org's plan limit, the request fails
-
-### Success response
-
-Returns the requesting org's subscription only:
-
-```json
-{
-  "org": "665f0d3f4f9a9b0099999999",
-  "subscribedAt": "2026-04-01T00:00:00.000Z",
-  "frequency": "daily",
-  "lastNotificationSentAt": null,
-  "disabled": false
-}
-```
-
-\---
-
-## Get Searches
-
-**Method:** `GET`  
-**Route:** `redditSearch/getSearches`
-
-Returns a combined list of the org's subscribed searches and search-history searches. Each search appears only once. Subscriptions come first, then remaining history items.
-
-### Query parameters
-
-* `shop: string` (required)
-
-### Optional headers
-
-* `subscriptions-only: "true"`  
-When set, only subscription-backed searches are returned.
-
-### Filtering
-
-* disabled search records are excluded
-* missing search-history records are ignored
-* `mySubscription` is populated
-* `subscribers` is omitted
-* `results` is always returned as `null`
+* `locations` array must contain at least one item
+* every item must pass same validation as `createLocation`
+* request is all-or-nothing; no partial inserts on validation failure
 
 ### Success response
 
 ```json
 {
-  "searches": [
+  "locations": [
     {
       "id": "665f0d3f4f9a9b0012345678",
-      "query": "game kings",
-      "searchUrl": "https://www.reddit.com/search.rss?...",
-      "alternateUrl": "https://www.reddit.com/search/?q=...",
-      "filters": {
-        "searchMode": "combined",
-        "includeTextPosts": true,
-        "includeLinkPosts": true,
-        "textMatchMode": "exact",
-        "textTarget": "title_or_body",
-        "linkTarget": "domain",
-        "includeSubreddits": "",
-        "excludeSubreddits": "",
-        "excludeTerms": "",
-        "advancedOpen": false
-      },
-      "results": null,
-      "subscribers": null,
-      "mySubscription": {
-        "org": "665f0d3f4f9a9b0099999999",
-        "subscribedAt": "2026-04-01T00:00:00.000Z",
-        "frequency": "daily",
-        "lastNotificationSentAt": "2026-04-10T00:00:00.000Z",
-        "disabled": false
-      },
-      "createdAt": "2026-04-01T00:00:00.000Z",
-      "updatedAt": "2026-04-11T00:15:00.000Z",
-      "createdBy": "665f0d3f4f9a9b0099999999",
-      "disabled": false,
-      "lastSyncedAt": "2026-04-11T00:15:00.000Z",
-      "lastSuccessfulSyncAt": "2026-04-11T00:15:00.000Z",
-      "syncStatus": "SUCCESS",
-      "syncError": null,
-      "resultCount": 12,
-      "lastResultAt": "2026-04-11T00:00:00.000Z"
+      "org": "665f0d3f4f9a9b0099999999",
+      "status": "ACTIVE",
+      "name": "Auckland Flagship"
+    },
+    {
+      "id": "665f0d3f4f9a9b0012345679",
+      "org": "665f0d3f4f9a9b0099999999",
+      "status": "ACTIVE",
+      "name": "Wellington Showroom"
     }
   ]
 }
@@ -635,12 +494,12 @@ When set, only subscription-backed searches are returned.
 
 \---
 
-## Get Related Searches
+## Update Locations Bulk
 
 **Method:** `POST`  
-**Route:** `redditSearch/getRelatedSearches`
+**Route:** `locations/updateLocationsBulk`
 
-Returns top related searches from other orgs that have at least one of the provided search ids in their search history. The authenticated org is excluded from the counts.
+Updates many locations owned by authenticated org in one request.
 
 ### Query parameters
 
@@ -650,7 +509,56 @@ Returns top related searches from other orgs that have at least one of the provi
 
 ```json
 {
-  "searchIds": [
+  "locations": [
+    {
+      "id": "665f0d3f4f9a9b0012345678",
+      "status": "ACTIVE",
+      "priority": 110,
+      "notes": "Recently renovated.",
+      "lat": -36.8485,
+      "lng": 174.7633
+    },
+    {
+      "id": "665f0d3f4f9a9b0012345679",
+      "status": "INACTIVE",
+      "notes": "Closed for winter.",
+      "lat": -41.2865,
+      "lng": 174.7762
+    }
+  ]
+}
+```
+
+### Rules
+
+* `locations` array must contain at least one item
+* every `id` must be valid ObjectId string
+* every targeted location must belong to authenticated org
+* every item must include at least one field besides `id`
+* request is all-or-nothing; if any id is missing or invalid, nothing is updated
+
+### Success response
+
+Returns updated `locations` array with full `LocationModel` items.
+
+\---
+
+## Delete Locations Bulk
+
+**Method:** `POST`  
+**Route:** `locations/deleteLocationsBulk`
+
+Deletes many locations owned by authenticated org in one request.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "ids": [
     "665f0d3f4f9a9b0012345678",
     "665f0d3f4f9a9b0012345679"
   ]
@@ -659,34 +567,23 @@ Returns top related searches from other orgs that have at least one of the provi
 
 ### Rules
 
-* invalid ids are ignored
-* if all ids are invalid, returns an empty array
-* each matching org contributes at most `1` count per search
-* searches with a count of `1` are excluded
-* the requesting org does not contribute to counts
-* at most `10` results are returned
-* disabled or missing search records are omitted from the response
+* `ids` array must contain at least one item
+* every `id` must be valid ObjectId string
+* every targeted location must belong to authenticated org
+* request is all-or-nothing; if any id is missing or invalid, nothing is deleted
 
 ### Success response
 
 ```json
 {
-  "searches": [
-    {
-      "id": "665f0d3f4f9a9b0012345680",
-      "query": "game kings",
-      "count": 3
-    },
-    {
-      "id": "665f0d3f4f9a9b0012345681",
-      "query": "board game cafe",
-      "count": 2
-    }
-  ]
+  "deleted": true,
+  "ids": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ],
+  "deletedCount": 2
 }
 ```
-
-\---
 
 ## Update Org
 
@@ -780,10 +677,6 @@ Example:
   "contactEmail": "alerts@example.com",
   "shopifyConnectionStatus": "ACTIVE",
   "billingPlanStatus": "ACTIVE",
-  "billingPlanHandle": "PRO",
-  "redditSearchHistory": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "billingPlanHandle": "PRO"
 }
 ```
