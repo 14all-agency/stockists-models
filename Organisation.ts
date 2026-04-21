@@ -1,6 +1,8 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { SettingsConverter, SettingsResult } from "@/models/OrganisationSettings";
+
 export const ShopifyConnectionResult = z.object({
   apiKey: z.string(),
   domain: z.string(),
@@ -35,12 +37,6 @@ export const ShopifyStatusResult = z.union([
   z.literal("INACTIVE"),
   z.literal("ERROR"),
 ]).optional().nullable();
-
-export const SettingsResult = z.object({
-  // todo
-}).optional().nullable().describe("Null infers not onboarded/saved");
-
-export type Settings = z.infer<typeof SettingsResult>;
 
 export const OrganisationResult = z.object({
   _id: z.instanceof(ObjectId),
@@ -133,7 +129,7 @@ export const OrganisationModel = {
       shopifyConnectionStatus: entity.shopifyConnectionStatus ?? "INACTIVE",
       shopifySite: entity?.shopifyConnection?.domain ?? null,
       // custom
-      settings: entity.settings ?? null,
+      settings: SettingsConverter.convertFromEntity(entity.settings),
       // billing
       billingPlanStatus: entity.billingPlanStatus ?? "INACTIVE",
       billingSubscriptionId: entity.billingSubscriptionId ?? null,

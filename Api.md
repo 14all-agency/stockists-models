@@ -590,7 +590,40 @@ Deletes many locations owned by authenticated org in one request.
 **Method:** `POST`  
 **Route:** `shopify/updateOrg`
 
-Updates organisation-level settings for the authenticated org. Currently only `contactEmail` is supported.
+Updates organisation-level fields and store locator settings for the authenticated org.
+
+This endpoint now accepts a structured `settings` object that maps directly to the organisation settings groups stored on `Organisation.settings`.
+
+### Settings groups
+
+The `settings` payload is grouped by feature area so frontend and backend can share the same Zod schemas and converters when parsing request input, storing entity data, and returning API output.
+
+Supported groups:
+
+* `appearance`
+  Covers locator colors, map theme, pin styles, desktop/mobile layout, branding visibility, locator version, and custom CSS.
+* `customFields`
+  Covers reusable location custom field definitions, their field types, and storefront visibility.
+* `filters`
+  Covers search filter definitions, how filters display in the UI, and whether multiple selections use AND or OR matching.
+* `language`
+  Covers primary language, translated languages, and all editable user-facing locator text.
+* `provider`
+  Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`) and any provider-specific credential or documentation fields. `LEAFLET` does not require an API key; the other providers do.
+* `searchBehaviour`
+  Covers initial map position, live vs fixed search, clustering, geolocation, distance rules, result limits, units, autocomplete, and country locking.
+
+### Converter behavior
+
+Each settings group has its own converter in `models/OrganisationSettings.ts` and `models/settings/*`.
+
+Those converters are used to:
+
+* parse unknown frontend/backend input with Zod
+* normalize entity data when reading from MongoDB
+* normalize API payloads before persisting organisation settings
+
+`shopify/updateOrg` performs a partial top-level merge on `settings`, so sending one group does not overwrite unrelated groups already stored on the organisation.
 
 ### Query parameters
 
@@ -600,9 +633,35 @@ Updates organisation-level settings for the authenticated org. Currently only `c
 
 ```json
 {
-  "contactEmail": "alerts@example.com"
+  "contactEmail": "alerts@example.com",
+  "settings": {
+    "provider": {
+      "provider": "LEAFLET",
+      "apiKeyRequired": false
+    },
+    "appearance": {
+      "featureColor": "#333333",
+      "geolocationIconColor": "#589bfb",
+      "desktopLayout": "LEFT",
+      "mobileLayout": "MAP_ABOVE_RESULTS"
+    },
+    "searchBehaviour": {
+      "startingPositionMode": "FIT_ALL_LOCATIONS",
+      "searchType": "LIVE",
+      "clusterLocationsWhenZoomedOut": true,
+      "distanceUnit": "KILOMETERS"
+    }
+  }
 }
 ```
+
+### Rules
+
+* `contactEmail` must be email-shaped when provided
+* `settings` is optional
+* every provided settings group must match its shared Zod schema
+* omitted top-level settings groups keep their existing stored values
+* the response returns the full `OrganisationModel` with normalized `settings`
 
 \---
 

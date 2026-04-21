@@ -8,6 +8,8 @@
 
 import { z } from "zod";
 
+import { SettingsGroupsSchema } from "@/models/OrganisationSettings";
+
 //
 // ======================================================
 // UPDATE ORG (POST /shopify/updateOrg)
@@ -25,6 +27,7 @@ export const UpdateOrgBodySchema = z.object({
       message: "Request body is not valid",
     })
     .optional(),
+  settings: SettingsGroupsSchema.partial().optional(),
 });
 
 export type UpdateOrgBody = z.infer<typeof UpdateOrgBodySchema>;
