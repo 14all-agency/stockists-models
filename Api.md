@@ -600,16 +600,14 @@ The `settings` payload is grouped by feature area so frontend and backend can sh
 
 Supported groups:
 
-* `appearance`
-  Covers locator colors, map theme, pin styles, desktop/mobile layout, branding visibility, locator version, and custom CSS.
+* `categoriesAndFilters`
+  Covers category/filter definitions, optional category-level pin style overrides, how categories/filters display in the UI, and whether multiple selections use AND or OR matching.
 * `customFields`
   Covers reusable location custom field definitions, their field types, and storefront visibility.
-* `filters`
-  Covers search filter definitions, how filters display in the UI, and whether multiple selections use AND or OR matching.
 * `language`
   Covers primary language, translated languages, and all editable user-facing locator text.
 * `provider`
-  Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`) and any provider-specific credential or documentation fields. `LEAFLET` does not require an API key; the other providers do.
+  Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`), provider-specific theme/style settings, and the required default map pin style. `LEAFLET` does not require an API key; the other providers do.
 * `searchBehaviour`
   Covers initial map position, clustering, geolocation, distance rules, result limits, units, autocomplete, and country locking.
 
@@ -637,13 +635,24 @@ Those converters are used to:
   "settings": {
     "provider": {
       "provider": "LEAFLET",
-      "apiKeyRequired": false
+      "apiKeyRequired": false,
+      "mapThemeMode": "PROVIDER_DEFAULT",
+      "defaultPinStyle": {
+          "name": "Default pin",
+          "pinType": "STANDARD_PIN_ICON",
+          "pinColor": "#EA4335"
+      }
     },
-    "appearance": {
-      "featureColor": "#333333",
-      "geolocationIconColor": "#589bfb",
-      "desktopLayout": "LEFT",
-      "mobileLayout": "MAP_ABOVE_RESULTS"
+    "categoriesAndFilters": {
+      "categories": [
+        {
+          "key": "retailer",
+          "label": "Retailer",
+          "pinStyle": null
+        }
+      ],
+      "displayMode": "STANDALONE",
+      "multipleSelectionMode": "MATCH_ANY"
     },
     "searchBehaviour": {
       "startingPositionMode": "FIT_ALL_LOCATIONS",
