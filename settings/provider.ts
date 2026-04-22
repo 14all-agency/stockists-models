@@ -26,6 +26,14 @@ export const MapPinTypeSchema = z
 		"How a map pin style is rendered: a standard pin icon with a chosen color, or a custom image URL.",
 	);
 
+export const CustomImageDisplayModeSchema = z
+	.enum(["IMAGE_ONLY", "IMAGE_IN_PIN"])
+	.optional()
+	.nullable()
+	.describe(
+		"When using a custom image, controls whether the image is displayed by itself or inside a colored pin shell.",
+	);
+
 export const MapPinStyleSchema = z
 	.object({
 		name: NullableString.describe(
@@ -38,6 +46,7 @@ export const MapPinStyleSchema = z
 		customImageUrl: NullableString.describe(
 			"Optional custom image URL used when the pin type is a custom image.",
 		),
+		customImageDisplayMode: CustomImageDisplayModeSchema,
 		retinaSupport: NullableBoolean.describe(
 			"Whether the custom map pin image should be treated as retina-ready for sharper rendering on high-density displays.",
 		),
@@ -55,15 +64,6 @@ export const ProviderSettingsSchema = z
 		apiKeyRequired: NullableBoolean.describe(
 			"Whether the selected provider requires an API key. This should be false for Leaflet and true for providers such as Mapbox or Google Maps.",
 		),
-		securityDocumentationUrl: NullableString.describe(
-			"Reference link for securing provider credentials, such as restricting a Google Maps or Mapbox key by domain or application.",
-		),
-		quickstartDocumentationUrl: NullableString.describe(
-			"Reference link or guided setup entry point for creating and configuring credentials for the selected provider.",
-		),
-		troubleshootingDocumentationUrl: NullableString.describe(
-			"Reference link for resolving provider-specific map issues such as missing billing, disabled APIs, or unauthorized domains.",
-		),
 		mapThemeMode: ProviderMapThemeModeSchema,
 		mapThemeId: NullableString.describe(
 			"Selected provider-specific map theme identifier. Available theme choices depend on the currently selected map provider.",
@@ -79,7 +79,7 @@ export const ProviderSettingsSchema = z
 			),
 	})
 	.describe(
-		"Map provider and style settings group for selecting Leaflet, Mapbox, or Google Maps, storing provider-specific credential metadata, choosing provider-dependent map themes, and managing the default map pin style.",
+		"Map provider and style settings group for selecting Leaflet, Mapbox, or Google Maps, storing any required credentials, choosing provider-dependent map themes, and managing the default map pin style.",
 	);
 
 export type ProviderSettings = z.infer<typeof ProviderSettingsSchema>;
