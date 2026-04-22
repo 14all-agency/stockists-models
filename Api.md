@@ -611,7 +611,7 @@ Supported groups:
 * `provider`
   Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`) and any provider-specific credential or documentation fields. `LEAFLET` does not require an API key; the other providers do.
 * `searchBehaviour`
-  Covers initial map position, live vs fixed search, clustering, geolocation, distance rules, result limits, units, autocomplete, and country locking.
+  Covers initial map position, clustering, geolocation, distance rules, result limits, units, autocomplete, and country locking.
 
 ### Converter behavior
 
@@ -647,9 +647,9 @@ Those converters are used to:
     },
     "searchBehaviour": {
       "startingPositionMode": "FIT_ALL_LOCATIONS",
-      "searchType": "LIVE",
       "clusterLocationsWhenZoomedOut": true,
-      "distanceUnit": "KILOMETERS"
+      "distanceUnit": "KILOMETERS",
+      "searchSuggestionMode": "REGIONS_AND_ADDRESSES"
     }
   }
 }

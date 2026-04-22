@@ -8,12 +8,6 @@ export const SearchStartingPositionModeSchema = z
   .nullable()
   .describe("Initial map loading strategy: fit the viewport to all locations or focus on an administrator-defined area.");
 
-export const SearchTypeSchema = z
-  .enum(["LIVE", "FIXED"])
-  .optional()
-  .nullable()
-  .describe("Search update mode: live search refreshes results as the map moves, while fixed search requires an explicit user action.");
-
 export const SearchGeolocationButtonModeSchema = z
   .enum(["SEARCH_FIELD", "STANDALONE", "HIDDEN"])
   .optional()
@@ -21,10 +15,10 @@ export const SearchGeolocationButtonModeSchema = z
   .describe("How visitors can manually trigger geolocation: inside the search field, with a standalone larger button, or not at all.");
 
 export const SearchDistanceModeSchema = z
-  .enum(["ENTIRE_SEARCHED_AREA", "SPECIFIC_RADIUS", "VISITOR_CHOOSES"])
+  .enum(["ENTIRE_SEARCHED_AREA", "SPECIFIC_RADIUS"])
   .optional()
   .nullable()
-  .describe("How typed-in searches define the search area: entire matched region, a fixed radius, or a visitor-selected radius.");
+  .describe("How typed-in searches define the search area: entire matched region or a fixed radius.");
 
 export const SearchDistanceUnitSchema = z
   .enum(["MILES", "KILOMETERS"])
@@ -33,10 +27,10 @@ export const SearchDistanceUnitSchema = z
   .describe("Distance measurement unit used for search radii, labels, and nearby result messaging.");
 
 export const SearchSuggestionModeSchema = z
-  .enum(["REGIONS", "ADDRESSES"])
+  .enum(["REGIONS", "ADDRESSES", "REGIONS_AND_ADDRESSES"])
   .optional()
   .nullable()
-  .describe("Autocomplete strategy for the search field: suggest broader regions such as cities or postcodes, or suggest exact street addresses.");
+  .describe("Autocomplete strategy for the search field: suggest broader regions, exact street addresses, or both.");
 
 export const SearchCountryLockModeSchema = z
   .enum(["DISABLED", "LIMITED_COUNTRIES"])
@@ -56,7 +50,6 @@ export type SearchStartingArea = z.infer<typeof SearchStartingAreaSchema>;
 export const SearchBehaviourSettingsSchema = z.object({
   startingPositionMode: SearchStartingPositionModeSchema,
   startingArea: SearchStartingAreaSchema.optional().nullable().describe("Preselected starting area details used only when the locator should focus on a specific area on first load."),
-  searchType: SearchTypeSchema,
   clusterLocationsWhenZoomedOut: NullableBoolean.describe("Whether nearby location markers should be grouped into cluster circles when visitors zoom out on the map."),
   clusteringZoomLevel: NullableNumber.describe("Zoom threshold at which grouped cluster markers begin replacing individual location pins."),
   clusterColor: NullableString.describe("Color used for grouped cluster circles when marker clustering is enabled."),
@@ -70,7 +63,7 @@ export const SearchBehaviourSettingsSchema = z.object({
   searchSuggestionMode: SearchSuggestionModeSchema,
   countryLockMode: SearchCountryLockModeSchema,
   countryCodes: z.array(z.string()).optional().nullable().describe("Allowed country codes when search is restricted to specific countries for accuracy and relevance."),
-}).describe("Search behavior settings group for initial map positioning, live or fixed search behavior, clustering, geolocation, distance rules, result limits, and search suggestion constraints.");
+}).describe("Search behavior settings group for initial map positioning, clustering, geolocation, distance rules, result limits, and search suggestion constraints.");
 
 export type SearchBehaviourSettings = z.infer<typeof SearchBehaviourSettingsSchema>;
 
