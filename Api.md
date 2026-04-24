@@ -210,10 +210,9 @@ Creates one location owned by authenticated org and returns full `LocationModel`
     {
       "key": "wheelchair_access",
       "label": "Wheelchair Access",
-      "type": "boolean",
-      "value": true,
-      "public": true,
-      "filterable": true
+      "type": "TEXT",
+      "value": "Wheelchair accessible entrance",
+      "showOnListing": true
     }
   ],
   "filters": [
@@ -263,10 +262,9 @@ Creates one location owned by authenticated org and returns full `LocationModel`
     {
       "key": "wheelchair_access",
       "label": "Wheelchair Access",
-      "type": "boolean",
-      "value": true,
-      "public": true,
-      "filterable": true
+      "type": "TEXT",
+      "value": "Wheelchair accessible entrance",
+      "showOnListing": true
     }
   ],
   "filters": [

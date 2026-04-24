@@ -14,12 +14,9 @@ export type LocationStatus = z.infer<typeof LocationStatusResult>;
 
 export const LocationCustomFieldTypeResult = z
   .union([
-    z.literal("text"),
-    z.literal("url"),
-    z.literal("email"),
-    z.literal("phone"),
-    z.literal("number"),
-    z.literal("boolean"),
+    z.literal("TEXT"),
+    z.literal("TEXT_MULTILINE"),
+    z.literal("LINK"),
   ])
   .optional()
   .nullable();
@@ -30,31 +27,14 @@ export const LocationCustomFieldSchema = z.object({
   key: z.string().optional().nullable(),
   label: z.string().optional().nullable(),
   type: LocationCustomFieldTypeResult.describe("Display/input type for this custom field"),
-  value: z.union([z.string(), z.number(), z.boolean()]).optional().nullable(),
-  public: z.boolean().optional().nullable().describe("Whether this field is visible to storefront users"),
-  filterable: z.boolean().optional().nullable().describe("Whether this field can be used as a filter"),
+  value: z.string().optional().nullable(),
+  showOnListing: z.boolean().optional().nullable().describe("Whether this field is visible in storefront location listings"),
 }).superRefine((value, ctx) => {
   if (value.value === null || value.value === undefined || !value.type) {
     return;
   }
 
-  if (value.type === "number" && typeof value.value !== "number") {
-    ctx.addIssue({
-      code: "custom",
-      message: "Custom field value must be a number",
-      path: ["value"],
-    });
-  }
-
-  if (value.type === "boolean" && typeof value.value !== "boolean") {
-    ctx.addIssue({
-      code: "custom",
-      message: "Custom field value must be a boolean",
-      path: ["value"],
-    });
-  }
-
-  if (["text", "url", "email", "phone"].includes(value.type) && typeof value.value !== "string") {
+  if (typeof value.value !== "string") {
     ctx.addIssue({
       code: "custom",
       message: "Custom field value must be a string",
@@ -62,25 +42,13 @@ export const LocationCustomFieldSchema = z.object({
     });
   }
 
-  if (value.type === "url" && typeof value.value === "string") {
+  if (value.type === "LINK" && typeof value.value === "string") {
     const parsed = z.string().url().safeParse(value.value);
 
     if (!parsed.success) {
       ctx.addIssue({
         code: "custom",
         message: "Custom field value must be a valid URL",
-        path: ["value"],
-      });
-    }
-  }
-
-  if (value.type === "email" && typeof value.value === "string") {
-    const parsed = z.string().email().safeParse(value.value);
-
-    if (!parsed.success) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Custom field value must be a valid email address",
         path: ["value"],
       });
     }
