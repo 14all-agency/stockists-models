@@ -350,11 +350,16 @@ Returns full `LocationModel`.
 **Method:** `GET`  
 **Route:** `locations/getLocations`
 
-Returns all locations owned by authenticated org, sorted by `priority`, then `updatedAt`, then `createdAt` descending.
+Returns locations owned by authenticated org, sorted by `priority`, then `updatedAt`, then `createdAt` descending.
 
 ### Query parameters
 
 * `shop: string` (required)
+* `limit: number` (optional, max `100`; enables pagination)
+* `page: number` (optional, defaults to `1`; when provided without `limit`, uses a default page size of `50`)
+* `search: string` (optional, case-insensitive partial match against location `name` and address fields)
+* `status: ACTIVE | UNLISTED | INACTIVE` (optional)
+* `categories: string | string[]` (optional, comma-separated or repeated query param; matches assigned location filter `value`s)
 
 ### Success response
 
@@ -385,7 +390,15 @@ Returns all locations owned by authenticated org, sorted by `priority`, then `up
       "createdAt": "2026-04-21T00:00:00.000Z",
       "updatedAt": "2026-04-21T00:00:00.000Z"
     }
-  ]
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 42,
+    "totalPages": 5,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  }
 }
 ```
 

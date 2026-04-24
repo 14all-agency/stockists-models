@@ -84,6 +84,31 @@ export const BulkDeleteLocationsBodySchema = z.object({
 
 export type BulkDeleteLocationsBody = z.infer<typeof BulkDeleteLocationsBodySchema>;
 
+const GetLocationsQuerySchema = z.object({
+  limit: z.number().int().positive().max(100).optional().nullable(),
+  page: z.number().int().positive().default(1),
+  search: z.string().optional().nullable(),
+  status: LocationStatusResult,
+  categories: z.array(z.string().min(1)).optional().nullable(),
+});
+
+export type GetLocationsQuery = z.infer<typeof GetLocationsQuerySchema>;
+
+function normaliseOptionalQueryString(value: string | null | undefined) {
+  const trimmed = value?.trim();
+
+  return trimmed ? trimmed : null;
+}
+
+function normaliseQueryStringList(values: Array<string | null | undefined>) {
+  const normalised = values
+    .flatMap((value) => (value ?? "").split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  return normalised.length ? [...new Set(normalised)] : null;
+}
+
 function parseBody<T>(
   body: string | null | undefined,
   schema: z.ZodType<T>,
@@ -135,4 +160,36 @@ export function parseBulkDeleteLocationsBody(
   body: string | null | undefined,
 ): BulkDeleteLocationsBody {
   return parseBody(body, BulkDeleteLocationsBodySchema);
+}
+
+export function parseGetLocationsQuery(input: {
+  queryStringParameters?: Record<string, string | null | undefined> | null;
+  multiValueQueryStringParameters?:
+    | Record<string, Array<string | null | undefined> | null | undefined>
+    | null;
+}): GetLocationsQuery {
+  const queryStringParameters = input.queryStringParameters ?? {};
+  const multiValueQueryStringParameters = input.multiValueQueryStringParameters ?? {};
+
+  const limitValue = normaliseOptionalQueryString(queryStringParameters.limit);
+  const pageValue = normaliseOptionalQueryString(queryStringParameters.page);
+
+  const parsed = GetLocationsQuerySchema.safeParse({
+    limit: limitValue === null ? null : Number(limitValue),
+    page: pageValue === null ? 1 : Number(pageValue),
+    search: normaliseOptionalQueryString(queryStringParameters.search),
+    status: normaliseOptionalQueryString(queryStringParameters.status),
+    categories: normaliseQueryStringList([
+      ...(multiValueQueryStringParameters.categories ?? []),
+      queryStringParameters.categories,
+    ]),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
+    );
+  }
+
+  return parsed.data;
 }
