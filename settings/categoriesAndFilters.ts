@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createSettingsConverter, NullableString } from "./shared";
+import { createSettingsConverter, NullableBoolean, NullableString } from "./shared";
 import { MapPinStyleSchema } from "./provider";
 
 export const CategoriesAndFiltersDisplayModeSchema = z
@@ -26,6 +26,12 @@ export const CategoryFilterDefinitionSchema = z
 		),
 		label: NullableString.describe(
 			"User-facing category/filter label shown in management lists and the locator interface, such as a store type, brand, or product category.",
+		),
+		showInSearch: NullableBoolean.describe(
+			"Whether this category/filter should appear as a selectable search option when visitors refine locator results.",
+		),
+		showOnListing: NullableBoolean.describe(
+			"Whether this category/filter should be shown on each assigned location listing in the locator results.",
 		),
 		pinStyle: MapPinStyleSchema.optional().nullable().describe(
 			"Optional category/filter-specific map pin style override. If omitted, the default map pin style from provider settings is used.",

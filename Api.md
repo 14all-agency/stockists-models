@@ -635,7 +635,6 @@ Those converters are used to:
   "settings": {
     "provider": {
       "provider": "LEAFLET",
-      "apiKeyRequired": false,
       "mapThemeMode": "PROVIDER_DEFAULT",
       "defaultPinStyle": {
           "name": "Default pin",

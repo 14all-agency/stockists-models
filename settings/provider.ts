@@ -61,9 +61,6 @@ export const ProviderSettingsSchema = z
 		apiKey: NullableString.describe(
 			"Provider API key used when the selected map service requires credentials. This should remain empty for Leaflet because Leaflet does not require a key.",
 		),
-		apiKeyRequired: NullableBoolean.describe(
-			"Whether the selected provider requires an API key. This should be false for Leaflet and true for providers such as Mapbox or Google Maps.",
-		),
 		mapThemeMode: ProviderMapThemeModeSchema,
 		mapThemeId: NullableString.describe(
 			"Selected provider-specific map theme identifier. Available theme choices depend on the currently selected map provider.",
