@@ -603,9 +603,9 @@ Supported groups:
 * `categoriesAndFilters`
   Covers category/filter definitions, optional category-level pin style overrides, how categories/filters display in the UI, and whether multiple selections use AND or OR matching.
 * `customFields`
-  Covers reusable location custom field definitions, their field types, and storefront visibility.
+  Covers reusable location custom field definitions, their names, field types (`TEXT`, `TEXT_MULTILINE`, `LINK`), and whether they appear in storefront listings.
 * `language`
-  Covers primary language, translated languages, and all editable user-facing locator text.
+  Covers primary language, translated languages, editable user-facing locator text, and per-language label overrides for categories/filters and custom fields.
 * `provider`
   Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`), provider-specific theme/style settings, and the required default map pin style. `LEAFLET` does not require an API key; the other providers do.
 * `searchBehaviour`
@@ -652,6 +652,16 @@ Those converters are used to:
       ],
       "displayMode": "STANDALONE",
       "multipleSelectionMode": "MATCH_ANY"
+    },
+    "customFields": {
+      "fields": [
+        {
+          "key": "opening-hours",
+          "label": "Opening Hours",
+          "type": "TEXT_MULTILINE",
+          "showOnListing": true
+        }
+      ]
     },
     "searchBehaviour": {
       "startingPositionMode": "FIT_ALL_LOCATIONS",
