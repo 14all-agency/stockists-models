@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  CoordinatesSchema,
   LocationCustomFieldSchema,
   LocationFilterSchema,
   LocationStatusResult,
@@ -26,8 +27,7 @@ export const CreateLocationBodySchema = z.object({
   customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
   filters: z.array(LocationFilterSchema).optional().nullable(),
   priority: NullableNumberInput,
-  lat: NullableNumberInput,
-  lng: NullableNumberInput,
+  coordinates: CoordinatesSchema.shape.coordinates,
 });
 
 export type CreateLocationBody = z.infer<typeof CreateLocationBodySchema>;
@@ -51,8 +51,7 @@ export const UpdateLocationBodySchema = z
     customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
     filters: z.array(LocationFilterSchema).optional().nullable(),
     priority: NullableNumberInput,
-    lat: NullableNumberInput,
-    lng: NullableNumberInput,
+    coordinates: CoordinatesSchema.shape.coordinates,
   })
   .superRefine((value, ctx) => {
     if (Object.keys(value).length === 1) {

@@ -64,29 +64,37 @@ export const LocationFilterSchema = z.object({
 
 export type LocationFilter = z.infer<typeof LocationFilterSchema>;
 
+type LegacyCoordinates = {
+  coordinates?: [number, number] | null;
+  lat?: number | null;
+  lng?: number | null;
+};
+
 function validateCoordinates(
   value: {
-    lat?: number | null;
-    lng?: number | null;
+    coordinates?: [number, number] | null;
   },
   ctx: z.RefinementCtx,
 ) {
-  const hasLat = value.lat !== null && value.lat !== undefined;
-  const hasLng = value.lng !== null && value.lng !== undefined;
-
-  if (hasLat !== hasLng) {
+  if (value.coordinates !== undefined && value.coordinates !== null && value.coordinates.length !== 2) {
     ctx.addIssue({
       code: "custom",
-      message: "lat and lng must both be provided together",
-      path: hasLat ? ["lng"] : ["lat"],
+      message: "coordinates must contain longitude and latitude",
+      path: ["coordinates"],
     });
   }
 }
 
 export const CoordinatesSchema = z
   .object({
-    lat: z.number().min(-90).max(90).optional().nullable(),
-    lng: z.number().min(-180).max(180).optional().nullable(),
+    coordinates: z
+      .tuple([
+        z.number().min(-180).max(180),
+        z.number().min(-90).max(90),
+      ])
+      .optional()
+      .nullable()
+      .describe("Coordinates pair in [longitude, latitude] order"),
   })
   .superRefine(validateCoordinates);
 
@@ -110,8 +118,7 @@ export const LocationEntityResult = z
     customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
     filters: z.array(LocationFilterSchema).optional().nullable(),
     priority: z.number().optional().nullable(),
-    lat: CoordinatesSchema.shape.lat,
-    lng: CoordinatesSchema.shape.lng,
+    coordinates: CoordinatesSchema.shape.coordinates,
     createdAt: z.date().optional().nullable(),
     updatedAt: z.date().optional().nullable(),
   })
@@ -139,8 +146,7 @@ export const LocationModelSchema = z
     customFields: LocationEntityResult.shape.customFields,
     filters: LocationEntityResult.shape.filters,
     priority: LocationEntityResult.shape.priority,
-    lat: LocationEntityResult.shape.lat,
-    lng: LocationEntityResult.shape.lng,
+    coordinates: LocationEntityResult.shape.coordinates,
     createdAt: LocationEntityResult.shape.createdAt,
     updatedAt: LocationEntityResult.shape.updatedAt,
   })
@@ -148,8 +154,23 @@ export const LocationModelSchema = z
 
 export type LocationModel = z.infer<typeof LocationModelSchema>;
 
+export function getLocationCoordinates(value: LegacyCoordinates) {
+  if (value.coordinates !== undefined) {
+    return value.coordinates ?? null;
+  }
+
+  const hasLat = value.lat !== null && value.lat !== undefined;
+  const hasLng = value.lng !== null && value.lng !== undefined;
+
+  if (hasLat && hasLng) {
+    return [value.lng as number, value.lat as number] as [number, number];
+  }
+
+  return null;
+}
+
 export const LocationModel = {
-  convertFromEntity(entity: LocationEntity): LocationModel {
+  convertFromEntity(entity: LocationEntity & LegacyCoordinates): LocationModel {
     const obj: LocationModel = {
       id: entity._id.toHexString(),
       org: entity.org.toHexString(),
@@ -169,8 +190,7 @@ export const LocationModel = {
       customFields: entity.customFields ?? null,
       filters: entity.filters ?? null,
       priority: entity.priority ?? null,
-      lat: entity.lat ?? null,
-      lng: entity.lng ?? null,
+      coordinates: getLocationCoordinates(entity),
       createdAt: entity.createdAt ? new Date(entity.createdAt) : null,
       updatedAt: entity.updatedAt ? new Date(entity.updatedAt) : null,
     };

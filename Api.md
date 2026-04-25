@@ -222,8 +222,7 @@ Creates one location owned by authenticated org and returns full `LocationModel`
     }
   ],
   "priority": 100,
-  "lat": -36.8485,
-  "lng": 174.7633
+  "coordinates": [174.7633, -36.8485]
 }
 ```
 
@@ -234,9 +233,9 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 * omitted `status` defaults to `ACTIVE`
 * `website` and `logoUrl` must be valid URLs when provided
 * `emailAddress` must be valid email when provided
-* `lat` must be between `-90` and `90`
-* `lng` must be between `-180` and `180`
-* `lat` and `lng` must either both be provided or both omitted
+* `coordinates` must be `[longitude, latitude]`
+* `coordinates[0]` must be between `-180` and `180`
+* `coordinates[1]` must be between `-90` and `90`
 * custom field values must match their declared `type`
 * location ownership is always set from authenticated org, not request body
 
@@ -275,8 +274,7 @@ Creates one location owned by authenticated org and returns full `LocationModel`
     }
   ],
   "priority": 100,
-  "lat": -36.8485,
-  "lng": 174.7633,
+  "coordinates": [174.7633, -36.8485],
   "createdAt": "2026-04-21T00:00:00.000Z",
   "updatedAt": "2026-04-21T00:00:00.000Z"
 }
@@ -306,8 +304,7 @@ Updates one existing location owned by authenticated org and returns full `Locat
   "name": "Auckland Flagship Updated",
   "notes": "Temporarily available by appointment.",
   "priority": 90,
-  "lat": -36.8485,
-  "lng": 174.7633
+  "coordinates": [174.7633, -36.8485]
 }
 ```
 
@@ -386,8 +383,7 @@ Returns locations owned by authenticated org, sorted by `priority`, then `update
       "customFields": [],
       "filters": [],
       "priority": 100,
-      "lat": -36.8485,
-      "lng": 174.7633,
+      "coordinates": [174.7633, -36.8485],
       "createdAt": "2026-04-21T00:00:00.000Z",
       "updatedAt": "2026-04-21T00:00:00.000Z"
     }
@@ -458,8 +454,7 @@ Creates many locations for authenticated org in one request.
       "website": "https://example.com/stores/auckland",
       "emailAddress": "auckland@example.com",
       "priority": 100,
-      "lat": -36.8485,
-      "lng": 174.7633
+      "coordinates": [174.7633, -36.8485]
     },
     {
       "status": "ACTIVE",
@@ -470,8 +465,7 @@ Creates many locations for authenticated org in one request.
       "stateProvince": "Wellington",
       "country": "New Zealand",
       "priority": 80,
-      "lat": -41.2865,
-      "lng": 174.7762
+      "coordinates": [174.7762, -41.2865]
     }
   ]
 }
@@ -527,15 +521,13 @@ Updates many locations owned by authenticated org in one request.
       "status": "ACTIVE",
       "priority": 110,
       "notes": "Recently renovated.",
-      "lat": -36.8485,
-      "lng": 174.7633
+      "coordinates": [174.7633, -36.8485]
     },
     {
       "id": "665f0d3f4f9a9b0012345679",
       "status": "INACTIVE",
       "notes": "Closed for winter.",
-      "lat": -41.2865,
-      "lng": 174.7762
+      "coordinates": [174.7762, -41.2865]
     }
   ]
 }
