@@ -85,7 +85,7 @@ export const BulkDeleteLocationsBodySchema = z.object({
 export type BulkDeleteLocationsBody = z.infer<typeof BulkDeleteLocationsBodySchema>;
 
 const GetLocationsQuerySchema = z.object({
-  limit: z.number().int().positive().max(100).optional().nullable(),
+  limit: z.number().int().positive().max(1000).optional().nullable(),
   page: z.number().int().positive().default(1),
   search: z.string().optional().nullable(),
   status: LocationStatusResult,
