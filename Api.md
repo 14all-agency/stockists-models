@@ -231,6 +231,7 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 
 * `name` is required
 * `status` can be `ACTIVE`, `UNLISTED`, or `INACTIVE`
+* omitted `status` defaults to `ACTIVE`
 * `website` and `logoUrl` must be valid URLs when provided
 * `emailAddress` must be valid email when provided
 * `lat` must be between `-90` and `90`
