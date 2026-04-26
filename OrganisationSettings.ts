@@ -20,6 +20,7 @@ import {
 import {
 	createSettingsConverter,
 } from "./settings/shared";
+import { resolveSettings } from "./settings/resolve";
 
 export const SettingsGroupsSchema = z.object({
 	categoriesAndFilters: CategoriesAndFiltersSettingsSchema.optional().nullable().describe(
@@ -56,6 +57,7 @@ export {
 	LanguageSettingsSchema,
 	ProviderSettingsConverter,
 	ProviderSettingsSchema,
+	resolveSettings,
 	SearchBehaviourSettingsConverter,
 	SearchBehaviourSettingsSchema,
 };
