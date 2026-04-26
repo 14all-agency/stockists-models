@@ -401,6 +401,121 @@ Returns locations owned by authenticated org, sorted by `priority`, then `update
 
 \---
 
+## Get Public Map
+
+**Method:** `GET`  
+**Route:** `getPublicMap`
+
+Public-facing map query endpoint. Resolves org from `shop` and returns either:
+
+* cached precomputed clusters
+* dynamic on-the-fly clusters when search/category filters are used
+* raw points when clustering is disabled or zoom is above org clustering threshold
+
+This endpoint does **not** require HMAC verification.
+
+### Query parameters
+
+* `shop: string` (required, must end with `myshopify.com`)
+* `zoom: number` (required)
+* `west: number` (required, longitude bound)
+* `south: number` (required, latitude bound)
+* `east: number` (required, longitude bound)
+* `north: number` (required, latitude bound)
+* `search: string` (optional; bypasses cluster cache and clusters matching locations dynamically)
+* `categories: string | string[]` (optional, comma-separated or repeated query param; bypasses cluster cache and clusters matching locations dynamically)
+
+### Notes
+
+* frontend makes one request even when viewport crosses dateline
+* backend handles dateline splitting internally
+* if `search` or `categories` are provided, precomputed cluster cache is skipped
+* at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
+
+### Success response using cached or dynamic clusters
+
+```json
+{
+  "mode": "cached_clusters",
+  "zoom": 6,
+  "items": [
+    {
+      "type": "cluster",
+      "count": 3,
+      "coordinates": [174.76, -36.84],
+      "pointIds": [
+        "665f0d3f4f9a9b0012345678",
+        "665f0d3f4f9a9b0012345679",
+        "665f0d3f4f9a9b0012345680"
+      ],
+      "singleLocationData": null
+    },
+    {
+      "type": "cluster",
+      "count": 1,
+      "coordinates": [174.7762, -41.2865],
+      "pointIds": ["665f0d3f4f9a9b0012345681"],
+      "singleLocationData": {
+        "id": "665f0d3f4f9a9b0012345681",
+        "name": "Wellington Showroom",
+        "addressLine1": "50 Willis Street",
+        "addressLine2": null,
+        "city": "Wellington",
+        "postalCode": "6011",
+        "stateProvince": "Wellington",
+        "country": "New Zealand",
+        "phoneNumber": null,
+        "website": "https://example.com/stores/wellington",
+        "emailAddress": null,
+        "logoUrl": null,
+        "notes": null,
+        "customFields": [],
+        "filters": [],
+        "priority": 80,
+        "coordinates": [174.7762, -41.2865]
+      }
+    }
+  ]
+}
+```
+
+### Success response using raw points
+
+```json
+{
+  "mode": "points",
+  "zoom": 12,
+  "items": [
+    {
+      "type": "point",
+      "id": "665f0d3f4f9a9b0012345678",
+      "coordinates": [174.7633, -36.8485],
+      "location": {
+        "id": "665f0d3f4f9a9b0012345678",
+        "name": "Auckland Flagship",
+        "addressLine1": "123 Queen Street",
+        "addressLine2": null,
+        "city": "Auckland",
+        "postalCode": "1010",
+        "stateProvince": "Auckland",
+        "country": "New Zealand",
+        "phoneNumber": "+64 9 123 4567",
+        "website": "https://example.com/stores/auckland",
+        "emailAddress": "auckland@example.com",
+        "logoUrl": "https://cdn.example.com/logo.png",
+        "notes": "Main retail showroom.",
+        "customFields": [],
+        "filters": [],
+        "priority": 100,
+        "coordinates": [174.7633, -36.8485]
+      }
+    }
+  ]
+}
+```
+
+\---
+
 ## Delete Location
 
 **Method:** `POST`  
