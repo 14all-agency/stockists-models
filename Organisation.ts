@@ -51,6 +51,7 @@ export const OrganisationResult = z.object({
   website: z.string().optional().nullable().describe("website URL"),
   settingsLastSynced: z.date().nullable().optional(),
   createdAt: z.date().nullable().optional(),
+  activeClusterVersion: z.string().optional().nullable().describe("Active precomputed cluster dataset version for public map queries"),
   shopifyConnection: ShopifyConnectionResult,
   shopifyConnectionStatus: ShopifyStatusResult,
   name: z.string().optional().nullable().describe("Org/brand name"),
@@ -90,6 +91,7 @@ export const OrganisationModelSchema = z.object({
   currency: OrganisationResult.shape.currency,
   createdAt: OrganisationResult.shape.createdAt,
   settingsLastSynced: OrganisationResult.shape.settingsLastSynced,
+  activeClusterVersion: OrganisationResult.shape.activeClusterVersion,
   shopifySite: z.string().nullable().optional(),
   // custom
   settings: OrganisationResult.shape.settings,
@@ -125,6 +127,7 @@ export const OrganisationModel = {
       currency: entity.currency ?? null,
       createdAt: entity.createdAt ? new Date(entity.createdAt) : null,
       settingsLastSynced: entity.settingsLastSynced ? new Date(entity.settingsLastSynced) : null,
+      activeClusterVersion: entity.activeClusterVersion ?? null,
       shopifyConnection: includeCredentials ? (entity.shopifyConnection ?? null) : null,
       shopifyConnectionStatus: entity.shopifyConnectionStatus ?? "INACTIVE",
       shopifySite: entity?.shopifyConnection?.domain ?? null,
