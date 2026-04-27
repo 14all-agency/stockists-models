@@ -7,11 +7,18 @@ const PublicMapBoundsSchema = z.object({
   north: z.number().min(-90).max(90),
 });
 
+const PublicMapCoordinatesSchema = z.object({
+  lng: z.number().min(-180).max(180),
+  lat: z.number().min(-90).max(90),
+});
+
 export const GetPublicMapQuerySchema = z.object({
   zoom: z.number().nonnegative(),
   search: z.string().optional().nullable(),
+  source: z.enum(["SEARCH", "GEOLOCATION"]).optional().nullable(),
   categories: z.array(z.string().min(1)).optional().nullable(),
   bounds: PublicMapBoundsSchema,
+  coordinates: PublicMapCoordinatesSchema.optional().nullable(),
 });
 
 export type GetPublicMapQuery = z.infer<typeof GetPublicMapQuerySchema>;
@@ -42,6 +49,7 @@ export function parseGetPublicMapQuery(input: {
   const parsed = GetPublicMapQuerySchema.safeParse({
     zoom: Number(normaliseOptionalQueryString(queryStringParameters.zoom)),
     search: normaliseOptionalQueryString(queryStringParameters.search),
+    source: normaliseOptionalQueryString(queryStringParameters.source),
     categories: normaliseQueryStringList([
       ...(multiValueQueryStringParameters.categories ?? []),
       queryStringParameters.categories,
@@ -52,6 +60,14 @@ export function parseGetPublicMapQuery(input: {
       east: Number(normaliseOptionalQueryString(queryStringParameters.east)),
       north: Number(normaliseOptionalQueryString(queryStringParameters.north)),
     },
+    coordinates:
+      normaliseOptionalQueryString(queryStringParameters.lng) === null ||
+      normaliseOptionalQueryString(queryStringParameters.lat) === null
+        ? null
+        : {
+            lng: Number(normaliseOptionalQueryString(queryStringParameters.lng)),
+            lat: Number(normaliseOptionalQueryString(queryStringParameters.lat)),
+          },
   });
 
   if (!parsed.success) {

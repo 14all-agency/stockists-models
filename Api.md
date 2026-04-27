@@ -411,6 +411,7 @@ Public-facing map query endpoint. Resolves org from `shop` and returns either:
 * cached precomputed clusters
 * dynamic on-the-fly clusters when search/category filters are used
 * raw points when clustering is disabled or zoom is above org clustering threshold
+* distance-sorted raw points when coordinates are supplied outside clustering zoom
 
 This endpoint does **not** require HMAC verification.
 
@@ -424,6 +425,9 @@ This endpoint does **not** require HMAC verification.
 * `north: number` (required, latitude bound)
 * `search: string` (optional; bypasses cluster cache and clusters matching locations dynamically)
 * `categories: string | string[]` (optional, comma-separated or repeated query param; bypasses cluster cache and clusters matching locations dynamically)
+* `source: SEARCH | GEOLOCATION` (optional; only used when `lng` and `lat` are also supplied)
+* `lng: number` (optional; longitude for distance-aware point sorting/filtering)
+* `lat: number` (optional; latitude for distance-aware point sorting/filtering)
 
 ### Notes
 
@@ -431,6 +435,14 @@ This endpoint does **not** require HMAC verification.
 * backend handles dateline splitting internally
 * if `search` or `categories` are provided, precomputed cluster cache is skipped
 * at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
+* if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
+* if request zoom is clustering, `source`/`lng`/`lat` are ignored and cluster behavior remains unchanged
+* distance-aware point mode ignores text-field regex matching from `search`; coordinates are the source of truth for ordering/filtering
+* in distance-aware point mode:
+  * `source=GEOLOCATION` uses org `geolocationRadius`
+  * `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `minimumDistance`
+  * `source=SEARCH` + `typedSearchDistanceMode=ENTIRE_SEARCHED_AREA` uses current viewport bounds, then sorts results by distance from supplied coordinates
+* distance is returned per point in the org's configured distance unit (`MILES` or `KILOMETERS`)
 
 ### Success response using cached or dynamic clusters
 
@@ -490,6 +502,42 @@ This endpoint does **not** require HMAC verification.
       "type": "point",
       "id": "665f0d3f4f9a9b0012345678",
       "coordinates": [174.7633, -36.8485],
+      "location": {
+        "id": "665f0d3f4f9a9b0012345678",
+        "name": "Auckland Flagship",
+        "addressLine1": "123 Queen Street",
+        "addressLine2": null,
+        "city": "Auckland",
+        "postalCode": "1010",
+        "stateProvince": "Auckland",
+        "country": "New Zealand",
+        "phoneNumber": "+64 9 123 4567",
+        "website": "https://example.com/stores/auckland",
+        "emailAddress": "auckland@example.com",
+        "logoUrl": "https://cdn.example.com/logo.png",
+        "notes": "Main retail showroom.",
+        "customFields": [],
+        "filters": [],
+        "priority": 100,
+        "coordinates": [174.7633, -36.8485]
+      }
+    }
+  ]
+}
+```
+
+### Success response using distance-sorted raw points
+
+```json
+{
+  "mode": "points",
+  "zoom": 12,
+  "items": [
+    {
+      "type": "point",
+      "id": "665f0d3f4f9a9b0012345678",
+      "coordinates": [174.7633, -36.8485],
+      "distance": 1.24,
       "location": {
         "id": "665f0d3f4f9a9b0012345678",
         "name": "Auckland Flagship",
