@@ -1032,6 +1032,46 @@ Those converters are used to:
 
 \---
 
+## Rebuild Storefront Cache
+
+**Method:** `POST`  
+**Route:** `shopify/rebuildStorefrontCache`
+
+Schedules a full org rebuild for authenticated shop. This rebuild refreshes derived public storefront data, including cluster data and storefront snapshot/metafield payloads.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* rebuild is scheduled asynchronously; endpoint does not wait for full rebuild completion
+* only one rebuild can run at a time per org
+* if rebuild is already running, endpoint returns success with `scheduled: false`
+* if a rebuild completed within last `2` minutes, request is rejected by cooldown protection
+
+### Success response when new rebuild is scheduled
+
+```json
+{
+  "scheduled": true,
+  "status": "scheduled"
+}
+```
+
+### Success response when rebuild is already running
+
+```json
+{
+  "scheduled": false,
+  "status": "already_running"
+}
+```
+
+\---
+
 ## Billing Webhook
 
 **Method:** `POST`  
