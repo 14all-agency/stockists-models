@@ -4,7 +4,7 @@ import { z } from "zod";
 import {
   CoordinatesSchema,
   LocationCustomFieldSchema,
-  LocationEntity,
+  type LocationEntity,
   LocationFilterSchema,
 } from "./Location";
 

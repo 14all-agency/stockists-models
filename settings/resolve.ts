@@ -1,12 +1,12 @@
-import { Settings } from "../OrganisationSettings";
+import { type Settings } from "../OrganisationSettings";
 import {
-  CategoriesAndFiltersSettings,
-  CategoryFilterDefinition,
+  type CategoriesAndFiltersSettings,
+  type CategoryFilterDefinition,
 } from "./categoriesAndFilters";
-import { CustomFieldDefinition, CustomFieldsSettings } from "./customFields";
-import { LanguageContent, LanguageSettings } from "./language";
-import { MapPinStyle, ProviderSettings } from "./provider";
-import { SearchBehaviourSettings, SearchStartingArea } from "./searchBehaviour";
+import { type CustomFieldDefinition, type CustomFieldsSettings } from "./customFields";
+import { type LanguageContent, type LanguageSettings } from "./language";
+import { type MapPinStyle, type ProviderSettings } from "./provider";
+import { type SearchBehaviourSettings, type SearchStartingArea } from "./searchBehaviour";
 
 type ResolvableSettingsInput = {
   searchBehaviour?: SearchBehaviourSettings | null;

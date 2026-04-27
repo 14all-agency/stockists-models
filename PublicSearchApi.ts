@@ -1,3 +1,4 @@
+/* @ts-ignore */
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { z } from "zod";
 
