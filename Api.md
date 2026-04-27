@@ -564,6 +564,50 @@ This endpoint does **not** require HMAC verification.
 
 \---
 
+## Save Search
+
+**Method:** `POST`  
+**Route:** `saveSearch`
+
+Public-facing analytics endpoint that stores a search record against an org. Intended for frontend `navigator.sendBeacon()` use and does **not** require HMAC verification.
+
+### Request body
+
+```json
+{
+  "org": "665f0d3f4f9a9b0099999999",
+  "formattedAddress": "123 Queen Street, Auckland 1010, New Zealand",
+  "addressLine1": "123 Queen Street",
+  "addressLine2": "Level 2",
+  "city": "Auckland",
+  "postalCode": "1010",
+  "stateProvince": "Auckland",
+  "country": "New Zealand",
+  "coordinates": [174.7633, -36.8485],
+  "nearestLocations": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+### Notes
+
+* endpoint accepts raw JSON string body as typically sent by `navigator.sendBeacon()`
+* `org` must be valid ObjectId string for an existing organisation
+* `coordinates` must be `[longitude, latitude]` when provided
+* `nearestLocations` may contain at most `10` ids
+* every `nearestLocations` id must belong to same org or event is dropped
+* payload must include meaningful search signal such as address text or coordinates plus nearest locations
+* duplicate submissions within short rolling window are ignored using normalized payload fingerprinting
+* endpoint intentionally returns `204` even when payload is invalid or dropped, to avoid giving abuse feedback
+
+### Success response
+
+HTTP `204` with empty body.
+
+\---
+
 ## Delete Location
 
 **Method:** `POST`  
