@@ -608,6 +608,144 @@ HTTP `204` with empty body.
 
 \---
 
+## Get Searches
+
+**Method:** `GET`  
+**Route:** `searches/getSearches`
+
+Returns search analytics records owned by authenticated org for a requested time period.
+
+### Query parameters
+
+* `shop: string` (required)
+* `from: string` (required, ISO date/datetime)
+* `to: string` (required, ISO date/datetime)
+* `nearestLocationsMode: BOTH | EMPTY | HAS_VALUES` (optional, defaults to `BOTH`)
+* `limit: number` (optional, max `100`; enables pagination)
+* `page: number` (optional, defaults to `1`; when provided without `limit`, uses default page size `50`)
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* `to` must be greater than or equal to `from`
+* requested time period must be `90` days or less
+* response includes only first nearest location from stored `nearestLocations` array
+* first nearest location is returned as `nearestLocation` with `id` and resolved location `name`
+* `nearestLocationsMode=EMPTY` returns only searches without any nearest locations
+* `nearestLocationsMode=HAS_VALUES` returns only searches with at least one nearest location
+
+### Success response
+
+```json
+{
+  "searches": [
+    {
+      "id": "68101d3f4f9a9b0012345000",
+      "org": "665f0d3f4f9a9b0099999999",
+      "formattedAddress": "123 Queen Street, Auckland 1010, New Zealand",
+      "addressLine1": "123 Queen Street",
+      "addressLine2": "Level 2",
+      "city": "Auckland",
+      "postalCode": "1010",
+      "stateProvince": "Auckland",
+      "country": "New Zealand",
+      "coordinates": [174.7633, -36.8485],
+      "nearestLocation": {
+        "id": "665f0d3f4f9a9b0012345678",
+        "name": "Auckland Flagship"
+      },
+      "createdAt": "2026-04-28T00:00:00.000Z",
+      "updatedAt": "2026-04-28T00:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 25,
+    "total": 42,
+    "totalPages": 2,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  }
+}
+```
+
+\---
+
+## Get Search Coordinates
+
+**Method:** `GET`  
+**Route:** `searches/getSearchCoordinates`
+
+Returns only coordinates for search records owned by authenticated org for a requested time period. This endpoint is not paginated.
+
+### Query parameters
+
+* `shop: string` (required)
+* `from: string` (required, ISO date/datetime)
+* `to: string` (required, ISO date/datetime)
+* `nearestLocationsMode: BOTH | EMPTY | HAS_VALUES` (optional, defaults to `BOTH`)
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* `to` must be greater than or equal to `from`
+* requested time period must be `90` days or less
+* results preserve stored search ordering by newest first
+
+### Success response
+
+```json
+{
+  "searches": [
+    {
+      "coordinates": [174.7633, -36.8485]
+    },
+    {
+      "coordinates": null
+    }
+  ]
+}
+```
+
+\---
+
+## Get Location Search Count
+
+**Method:** `GET`  
+**Route:** `searches/getLocationSearchCount/{id}`
+
+Returns how many searches for authenticated org include a given location inside their `nearestLocations` array within requested time period.
+
+### Query parameters
+
+* `shop: string` (required)
+* `from: string` (required, ISO date/datetime)
+* `to: string` (required, ISO date/datetime)
+
+### Path parameters
+
+* `id: string` (required, must be valid ObjectId string for location owned by authenticated org)
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* `to` must be greater than or equal to `from`
+* requested time period must be `90` days or less
+* location must belong to authenticated org
+
+### Success response
+
+```json
+{
+  "locationId": "665f0d3f4f9a9b0012345678",
+  "from": "2026-04-01T00:00:00.000Z",
+  "to": "2026-04-28T23:59:59.999Z",
+  "count": 18
+}
+```
+
+\---
+
 ## Delete Location
 
 **Method:** `POST`  
