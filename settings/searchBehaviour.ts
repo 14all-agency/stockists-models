@@ -56,7 +56,7 @@ export const SearchBehaviourSettingsSchema = z.object({
   automaticGeolocation: NullableBoolean.describe("Whether the locator should automatically attempt to detect the visitor's location and show nearby stores on load."),
   geolocationButtonMode: SearchGeolocationButtonModeSchema,
   typedSearchDistanceMode: SearchDistanceModeSchema,
-  minimumDistance: NullableNumber.describe("Minimum fallback distance used for typed searches, especially when a very small or precise search area would otherwise return too few results."),
+  searchRadius: NullableNumber.describe("Radius used for typed searches when search behavior is configured to show results in a specific radius."),
   geolocationRadius: NullableNumber.describe("Distance from the detected visitor location within which results should be shown after geolocation succeeds."),
   maximumResults: NullableNumber.describe("Maximum number of locations the locator should display at once to balance usefulness and performance."),
   distanceUnit: SearchDistanceUnitSchema,

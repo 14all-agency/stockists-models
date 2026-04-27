@@ -64,7 +64,7 @@ function resolveSearchBehaviourSettings(
     automaticGeolocation: settings?.automaticGeolocation ?? false,
     geolocationButtonMode: settings?.geolocationButtonMode ?? "SEARCH_FIELD",
     typedSearchDistanceMode: settings?.typedSearchDistanceMode ?? "ENTIRE_SEARCHED_AREA",
-    minimumDistance: settings?.minimumDistance ?? 25,
+    searchRadius: settings?.searchRadius ?? 25,
     geolocationRadius: settings?.geolocationRadius ?? 25,
     maximumResults: settings?.maximumResults ?? 100,
     distanceUnit: settings?.distanceUnit ?? "KILOMETERS",

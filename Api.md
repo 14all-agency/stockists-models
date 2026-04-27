@@ -440,7 +440,7 @@ This endpoint does **not** require HMAC verification.
 * distance-aware point mode ignores text-field regex matching from `search`; coordinates are the source of truth for ordering/filtering
 * in distance-aware point mode:
   * `source=GEOLOCATION` uses org `geolocationRadius`
-  * `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `minimumDistance`
+  * `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `searchRadius`
   * `source=SEARCH` + `typedSearchDistanceMode=ENTIRE_SEARCHED_AREA` uses current viewport bounds, then sorts results by distance from supplied coordinates
 * distance is returned per point in the org's configured distance unit (`MILES` or `KILOMETERS`)
 
