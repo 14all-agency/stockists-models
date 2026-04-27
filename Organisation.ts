@@ -50,6 +50,14 @@ export const OrganisationResult = z.object({
   plan: z.string().optional().nullable().describe("shopify plan"),
   website: z.string().optional().nullable().describe("website URL"),
   settingsLastSynced: z.date().nullable().optional(),
+  storefrontSnapshotChecksum: z.string().optional().nullable(),
+  storefrontSnapshotDirtyAt: z.date().nullable().optional(),
+  storefrontSnapshotLastSyncedAt: z.date().nullable().optional(),
+  orgRebuildRequestedAt: z.date().nullable().optional(),
+  orgRebuildStartedAt: z.date().nullable().optional(),
+  orgRebuildLeaseExpiresAt: z.date().nullable().optional(),
+  orgRebuildLastCompletedAt: z.date().nullable().optional(),
+  orgRebuildLeaseToken: z.string().optional().nullable(),
   createdAt: z.date().nullable().optional(),
   activeClusterVersion: z.string().optional().nullable().describe("Active precomputed cluster dataset version for public map queries"),
   shopifyConnection: ShopifyConnectionResult,
@@ -91,6 +99,14 @@ export const OrganisationModelSchema = z.object({
   currency: OrganisationResult.shape.currency,
   createdAt: OrganisationResult.shape.createdAt,
   settingsLastSynced: OrganisationResult.shape.settingsLastSynced,
+  storefrontSnapshotChecksum: OrganisationResult.shape.storefrontSnapshotChecksum,
+  storefrontSnapshotDirtyAt: OrganisationResult.shape.storefrontSnapshotDirtyAt,
+  storefrontSnapshotLastSyncedAt: OrganisationResult.shape.storefrontSnapshotLastSyncedAt,
+  orgRebuildRequestedAt: OrganisationResult.shape.orgRebuildRequestedAt,
+  orgRebuildStartedAt: OrganisationResult.shape.orgRebuildStartedAt,
+  orgRebuildLeaseExpiresAt: OrganisationResult.shape.orgRebuildLeaseExpiresAt,
+  orgRebuildLastCompletedAt: OrganisationResult.shape.orgRebuildLastCompletedAt,
+  orgRebuildLeaseToken: OrganisationResult.shape.orgRebuildLeaseToken,
   activeClusterVersion: OrganisationResult.shape.activeClusterVersion,
   shopifySite: z.string().nullable().optional(),
   // custom
@@ -127,6 +143,24 @@ export const OrganisationModel = {
       currency: entity.currency ?? null,
       createdAt: entity.createdAt ? new Date(entity.createdAt) : null,
       settingsLastSynced: entity.settingsLastSynced ? new Date(entity.settingsLastSynced) : null,
+      storefrontSnapshotChecksum: entity.storefrontSnapshotChecksum ?? null,
+      storefrontSnapshotDirtyAt: entity.storefrontSnapshotDirtyAt
+        ? new Date(entity.storefrontSnapshotDirtyAt)
+        : null,
+      storefrontSnapshotLastSyncedAt: entity.storefrontSnapshotLastSyncedAt
+        ? new Date(entity.storefrontSnapshotLastSyncedAt)
+        : null,
+      orgRebuildRequestedAt: entity.orgRebuildRequestedAt
+        ? new Date(entity.orgRebuildRequestedAt)
+        : null,
+      orgRebuildStartedAt: entity.orgRebuildStartedAt ? new Date(entity.orgRebuildStartedAt) : null,
+      orgRebuildLeaseExpiresAt: entity.orgRebuildLeaseExpiresAt
+        ? new Date(entity.orgRebuildLeaseExpiresAt)
+        : null,
+      orgRebuildLastCompletedAt: entity.orgRebuildLastCompletedAt
+        ? new Date(entity.orgRebuildLastCompletedAt)
+        : null,
+      orgRebuildLeaseToken: entity.orgRebuildLeaseToken ?? null,
       activeClusterVersion: entity.activeClusterVersion ?? null,
       shopifyConnection: includeCredentials ? (entity.shopifyConnection ?? null) : null,
       shopifyConnectionStatus: entity.shopifyConnectionStatus ?? "INACTIVE",
