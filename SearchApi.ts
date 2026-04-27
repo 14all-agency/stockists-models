@@ -33,7 +33,7 @@ const GetSearchesBaseQuerySchema = z
     }
   });
 
-export const GetSearchesQuerySchema = GetSearchesBaseQuerySchema.extend({
+export const GetSearchesQuerySchema = GetSearchesBaseQuerySchema.safeExtend({
   limit: z.number().int().positive().max(100).optional().nullable(),
   page: z.number().int().positive().default(1),
 });
