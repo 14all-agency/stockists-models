@@ -355,6 +355,7 @@ Returns locations owned by authenticated org, sorted by `priority`, then `update
 * `shop: string` (required)
 * `limit: number` (optional, max `100`; enables pagination)
 * `page: number` (optional, defaults to `1`; when provided without `limit`, uses a default page size of `50`)
+* `ids: string | string[]` (optional, comma-separated or repeated query param; when provided, returns all matching org-owned location ids and ignores pagination, search, status, and categories filters)
 * `search: string` (optional, case-insensitive partial match against location `name` and address fields)
 * `status: ACTIVE | UNLISTED | INACTIVE` (optional)
 * `categories: string | string[]` (optional, comma-separated or repeated query param; matches assigned location filter `value`s)

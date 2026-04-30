@@ -152,6 +152,7 @@ export type LocationGeocodeJobsSummaryResponse = z.infer<typeof LocationGeocodeJ
 const GetLocationsQuerySchema = z.object({
   limit: z.number().int().positive().max(1000).optional().nullable(),
   page: z.number().int().positive().default(1),
+  ids: z.array(z.string().min(1)).optional().nullable(),
   search: z.string().optional().nullable(),
   status: LocationStatusResult,
   categories: z.array(z.string().min(1)).optional().nullable(),
@@ -255,6 +256,10 @@ export function parseGetLocationsQuery(input: {
   const parsed = GetLocationsQuerySchema.safeParse({
     limit: limitValue === null ? null : Number(limitValue),
     page: pageValue === null ? 1 : Number(pageValue),
+    ids: normaliseQueryStringList([
+      ...(multiValueQueryStringParameters.ids ?? []),
+      queryStringParameters.ids,
+    ]),
     search: normaliseOptionalQueryString(queryStringParameters.search),
     status: normaliseOptionalQueryString(queryStringParameters.status),
     categories: normaliseQueryStringList([
