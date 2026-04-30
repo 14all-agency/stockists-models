@@ -121,6 +121,33 @@ export const BulkDeleteLocationsBodySchema = z.object({
 
 export type BulkDeleteLocationsBody = z.infer<typeof BulkDeleteLocationsBodySchema>;
 
+export const QueueLocationGeocodeBodySchema = z.object({
+  locationIds: z.array(z.string().min(1)).min(1),
+});
+
+export type QueueLocationGeocodeBody = z.infer<typeof QueueLocationGeocodeBodySchema>;
+
+export const RetryLocationGeocodeJobsBodySchema = z.object({
+  jobIds: z.array(z.string().min(1)).min(1),
+});
+
+export type RetryLocationGeocodeJobsBody = z.infer<typeof RetryLocationGeocodeJobsBodySchema>;
+
+export const LocationMaintenanceAuditResponseSchema = z.object({
+  missingAddressParts: z.array(z.string().min(1)),
+  missingCoordinates: z.array(z.string().min(1)),
+  duplicateLocationIds: z.array(z.string().min(1)),
+});
+
+export type LocationMaintenanceAuditResponse = z.infer<typeof LocationMaintenanceAuditResponseSchema>;
+
+export const LocationGeocodeJobsSummaryResponseSchema = z.object({
+  processing: z.number().int().nonnegative(),
+  failed: z.number().int().nonnegative(),
+});
+
+export type LocationGeocodeJobsSummaryResponse = z.infer<typeof LocationGeocodeJobsSummaryResponseSchema>;
+
 const GetLocationsQuerySchema = z.object({
   limit: z.number().int().positive().max(1000).optional().nullable(),
   page: z.number().int().positive().default(1),
@@ -203,6 +230,18 @@ export function parseBulkDeleteLocationsBody(
   body: string | null | undefined,
 ): BulkDeleteLocationsBody {
   return parseBody(body, BulkDeleteLocationsBodySchema);
+}
+
+export function parseQueueLocationGeocodeBody(
+  body: string | null | undefined,
+): QueueLocationGeocodeBody {
+  return parseBody(body, QueueLocationGeocodeBodySchema);
+}
+
+export function parseRetryLocationGeocodeJobsBody(
+  body: string | null | undefined,
+): RetryLocationGeocodeJobsBody {
+  return parseBody(body, RetryLocationGeocodeJobsBodySchema);
 }
 
 export function parseGetLocationsQuery(input: {

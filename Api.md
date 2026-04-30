@@ -911,6 +911,8 @@ Imports many locations for authenticated org in one request. Backend may create 
 * `options.resolveCoordinatesFromAddress=true` allows backend to geocode rows that have address data but no coordinates
 * `options.parseFormattedAddress=true` allows backend to split `formattedAddress` into `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, and `country`
 * when parsing `formattedAddress`, explicitly provided structured address fields should win and parsed values should only fill blanks
+* geocoding/parsing work runs asynchronously through backend geocode jobs; endpoint returns after create/update queueing, not after all geocoding is finished
+* queued geocode work is processed in batches of up to `50` location ids per job
 * request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
 
 ### Success response
@@ -939,6 +941,162 @@ Imports many locations for authenticated org in one request. Backend may create 
       "reason": "ambiguous_match"
     }
   ]
+}
+```
+
+\---
+
+## Queue Location Geocode
+
+**Method:** `POST`  
+**Route:** `locations/queueLocationGeocode`
+
+Queues existing locations for address parsing and coordinate resolution using the same asynchronous geocode worker used by bulk import.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "locationIds": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+### Rules
+
+* `locationIds` array must contain at least one item
+* every `locationId` must be a valid ObjectId string
+* every targeted location must belong to authenticated org
+* queueing creates async geocode job records and publishes SNS work in batches of up to `50` location ids per job
+* queued geocode work may fill missing `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, `country`, and `coordinates`
+* explicitly stored location fields still win; geocode data only fills blanks
+
+### Success response
+
+```json
+{
+  "queuedLocationIds": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+\---
+
+## Retry Location Geocode Jobs
+
+**Method:** `POST`  
+**Route:** `locations/retryLocationGeocodeJobs`
+
+Retries previously failed geocode jobs for authenticated org.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "jobIds": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+### Rules
+
+* `jobIds` array must contain at least one item
+* every `jobId` must be a valid ObjectId string
+* every targeted job must belong to authenticated org
+* only jobs currently in `FAILED` status may be retried
+* retry resets those jobs to `PENDING` and republishes their saved SNS payload
+* geocode job records are source of truth for status; organisation model does not expose separate geocode summary fields
+
+### Success response
+
+```json
+{
+  "retriedJobIds": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+\---
+
+## Get Location Maintenance Audit
+
+**Method:** `GET`  
+**Route:** `locations/getLocationMaintenanceAudit`
+
+Returns maintenance-oriented location issue lists for authenticated org.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Rules
+
+* `missingAddressParts` contains location ids that have some structured address data but are missing one or more of `addressLine1`, `city`, `postalCode`, `stateProvince`, or `country`
+* `missingCoordinates` contains location ids that have some structured address data but no `coordinates`
+* `duplicateLocationIds` contains only weaker duplicate ids, not both ids in each duplicate pair
+* duplicate detection uses:
+  * exact normalized structured address match
+  * or coordinate proximity within the same near-match threshold used by import matching
+* weaker duplicate means record with fewer filled information fields
+* if both duplicates have same filled-field count, older record is returned
+
+### Success response
+
+```json
+{
+  "missingAddressParts": [
+    "665f0d3f4f9a9b0012345678"
+  ],
+  "missingCoordinates": [
+    "665f0d3f4f9a9b0012345679"
+  ],
+  "duplicateLocationIds": [
+    "665f0d3f4f9a9b0012345680"
+  ]
+}
+```
+
+\---
+
+## Get Location Geocode Jobs Summary
+
+**Method:** `GET`  
+**Route:** `locations/getLocationGeocodeJobsSummary`
+
+Returns geocode job summary counts for authenticated org.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Rules
+
+* `processing` includes both `PENDING` and `PROCESSING` jobs
+* `failed` includes jobs currently in `FAILED` status
+* use this endpoint as source of truth for geocode queue status
+
+### Success response
+
+```json
+{
+  "processing": 3,
+  "failed": 1
 }
 ```
 
