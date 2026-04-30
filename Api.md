@@ -1001,23 +1001,9 @@ Retries previously failed geocode jobs for authenticated org.
 
 * `shop: string` (required)
 
-### Request body
-
-```json
-{
-  "jobIds": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
-}
-```
-
 ### Rules
 
-* `jobIds` array must contain at least one item
-* every `jobId` must be a valid ObjectId string
-* every targeted job must belong to authenticated org
-* only jobs currently in `FAILED` status may be retried
+* request retries all geocode jobs currently in `FAILED` status for authenticated org
 * retry resets those jobs to `PENDING` and republishes their saved SNS payload
 * geocode job records are source of truth for status; organisation model does not expose separate geocode summary fields
 

@@ -127,12 +127,6 @@ export const QueueLocationGeocodeBodySchema = z.object({
 
 export type QueueLocationGeocodeBody = z.infer<typeof QueueLocationGeocodeBodySchema>;
 
-export const RetryLocationGeocodeJobsBodySchema = z.object({
-  jobIds: z.array(z.string().min(1)).min(1),
-});
-
-export type RetryLocationGeocodeJobsBody = z.infer<typeof RetryLocationGeocodeJobsBodySchema>;
-
 export const LocationMaintenanceAuditResponseSchema = z.object({
   missingAddressParts: z.array(z.string().min(1)),
   missingCoordinates: z.array(z.string().min(1)),
@@ -238,11 +232,6 @@ export function parseQueueLocationGeocodeBody(
   return parseBody(body, QueueLocationGeocodeBodySchema);
 }
 
-export function parseRetryLocationGeocodeJobsBody(
-  body: string | null | undefined,
-): RetryLocationGeocodeJobsBody {
-  return parseBody(body, RetryLocationGeocodeJobsBodySchema);
-}
 
 export function parseGetLocationsQuery(input: {
   queryStringParameters?: Record<string, string | null | undefined> | null;
