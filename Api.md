@@ -1035,12 +1035,16 @@ Returns maintenance-oriented location issue lists for authenticated org.
 
 * `missingAddressParts` contains location ids that have some structured address data but are missing one or more of `addressLine1`, `city`, `postalCode`, `stateProvince`, or `country`
 * `missingCoordinates` contains location ids that have some structured address data but no `coordinates`
-* `duplicateLocationIds` contains only weaker duplicate ids, not both ids in each duplicate pair
+* `duplicateLocations` contains one object per duplicate pair with:
+  * `recommendedDelete`: weaker duplicate using existing scoring rules
+  * `recommendedKeep`: other location in that pair
+  * `oldestLocation`: older record by `createdAt`
+  * `newestLocation`: newer record by `createdAt`
 * duplicate detection uses:
   * exact normalized structured address match
   * or coordinate proximity within the same near-match threshold used by import matching
 * weaker duplicate means record with fewer filled information fields
-* if both duplicates have same filled-field count, older record is returned
+* if both duplicates have same filled-field count, older record becomes `recommendedDelete`
 
 ### Success response
 
@@ -1052,8 +1056,13 @@ Returns maintenance-oriented location issue lists for authenticated org.
   "missingCoordinates": [
     "665f0d3f4f9a9b0012345679"
   ],
-  "duplicateLocationIds": [
-    "665f0d3f4f9a9b0012345680"
+  "duplicateLocations": [
+    {
+      "recommendedKeep": "665f0d3f4f9a9b0012345681",
+      "recommendedDelete": "665f0d3f4f9a9b0012345680",
+      "oldestLocation": "665f0d3f4f9a9b0012345680",
+      "newestLocation": "665f0d3f4f9a9b0012345681"
+    }
   ]
 }
 ```

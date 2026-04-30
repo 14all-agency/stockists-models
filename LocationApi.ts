@@ -127,10 +127,17 @@ export const QueueLocationGeocodeBodySchema = z.object({
 
 export type QueueLocationGeocodeBody = z.infer<typeof QueueLocationGeocodeBodySchema>;
 
+export const DuplicateLocationAuditSchema = z.object({
+  recommendedKeep: z.string().min(1),
+  recommendedDelete: z.string().min(1),
+  oldestLocation: z.string().min(1),
+  newestLocation: z.string().min(1),
+});
+
 export const LocationMaintenanceAuditResponseSchema = z.object({
   missingAddressParts: z.array(z.string().min(1)),
   missingCoordinates: z.array(z.string().min(1)),
-  duplicateLocationIds: z.array(z.string().min(1)),
+  duplicateLocations: z.array(DuplicateLocationAuditSchema),
 });
 
 export type LocationMaintenanceAuditResponse = z.infer<typeof LocationMaintenanceAuditResponseSchema>;
