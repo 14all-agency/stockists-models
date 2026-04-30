@@ -4,6 +4,7 @@ import {
   CoordinatesSchema,
   LocationCustomFieldSchema,
   LocationFilterSchema,
+  LocationModelSchema,
   LocationStatusResult,
 } from "./Location";
 
@@ -70,6 +71,43 @@ export const BulkCreateLocationsBodySchema = z.object({
 });
 
 export type BulkCreateLocationsBody = z.infer<typeof BulkCreateLocationsBodySchema>;
+
+export const ImportLocationBodySchema = CreateLocationBodySchema.extend({
+  id: z.string().min(1).optional().nullable(),
+  formattedAddress: z.string().optional().nullable(),
+});
+
+export type ImportLocationBody = z.infer<typeof ImportLocationBodySchema>;
+
+export const ImportLocationsBulkOptionsSchema = z.object({
+  matchExistingByAddressOrCoordinates: z.boolean().optional().nullable(),
+  resolveCoordinatesFromAddress: z.boolean().optional().nullable(),
+  parseFormattedAddress: z.boolean().optional().nullable(),
+});
+
+export type ImportLocationsBulkOptions = z.infer<typeof ImportLocationsBulkOptionsSchema>;
+
+export const ImportLocationsBulkBodySchema = z.object({
+  locations: z.array(ImportLocationBodySchema).min(1),
+  options: ImportLocationsBulkOptionsSchema.optional().nullable(),
+});
+
+export type ImportLocationsBulkBody = z.infer<typeof ImportLocationsBulkBodySchema>;
+
+export const ImportLocationsBulkSkippedSchema = z.object({
+  row: z.number().int().positive(),
+  reason: z.string().min(1),
+});
+
+export type ImportLocationsBulkSkipped = z.infer<typeof ImportLocationsBulkSkippedSchema>;
+
+export const ImportLocationsBulkResponseSchema = z.object({
+  created: z.array(LocationModelSchema).optional().nullable(),
+  updated: z.array(LocationModelSchema).optional().nullable(),
+  skipped: z.array(ImportLocationsBulkSkippedSchema).optional().nullable(),
+});
+
+export type ImportLocationsBulkResponse = z.infer<typeof ImportLocationsBulkResponseSchema>;
 
 export const BulkUpdateLocationsBodySchema = z.object({
   locations: z.array(UpdateLocationBodySchema).min(1),
@@ -147,6 +185,12 @@ export function parseBulkCreateLocationsBody(
   body: string | null | undefined,
 ): BulkCreateLocationsBody {
   return parseBody(body, BulkCreateLocationsBodySchema);
+}
+
+export function parseImportLocationsBulkBody(
+  body: string | null | undefined,
+): ImportLocationsBulkBody {
+  return parseBody(body, ImportLocationsBulkBodySchema);
 }
 
 export function parseBulkUpdateLocationsBody(

@@ -845,6 +845,105 @@ Creates many locations for authenticated org in one request.
 
 \---
 
+## Import Locations Bulk
+
+**Method:** `POST`  
+**Route:** `locations/importLocationsBulk`
+
+Imports many locations for authenticated org in one request. Backend may create new records, update existing records, geocode missing coordinates from address data, and parse a formatted address into structured parts based on request options.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "locations": [
+    {
+      "id": "665f0d3f4f9a9b0012345678",
+      "status": "ACTIVE",
+      "name": "Auckland Flagship",
+      "formattedAddress": "123 Queen Street, Auckland 1010, New Zealand",
+      "addressLine1": null,
+      "addressLine2": null,
+      "city": null,
+      "postalCode": null,
+      "stateProvince": null,
+      "country": null,
+      "website": "https://example.com/stores/auckland",
+      "emailAddress": "auckland@example.com",
+      "priority": 100,
+      "coordinates": null
+    },
+    {
+      "status": "UNLISTED",
+      "name": "Wellington Showroom",
+      "addressLine1": "50 Willis Street",
+      "city": "Wellington",
+      "postalCode": "6011",
+      "stateProvince": "Wellington",
+      "country": "New Zealand",
+      "coordinates": null
+    }
+  ],
+  "options": {
+    "matchExistingByAddressOrCoordinates": true,
+    "resolveCoordinatesFromAddress": true,
+    "parseFormattedAddress": true
+  }
+}
+```
+
+### Rules
+
+* `locations` array must contain at least one item
+* every item must include `name`
+* `id`, when provided, must be valid ObjectId string and takes priority over non-id matching
+* `formattedAddress` is optional and may be used by backend to derive structured address fields
+* `options.matchExistingByAddressOrCoordinates=true` allows backend to update an existing location when no `id` is supplied and a unique existing match is found
+* backend matching priority should be:
+  * explicit `id`
+  * exact normalized address match
+  * unique coordinate proximity match
+* ambiguous non-id matches should be skipped rather than auto-updated
+* `options.resolveCoordinatesFromAddress=true` allows backend to geocode rows that have address data but no coordinates
+* `options.parseFormattedAddress=true` allows backend to split `formattedAddress` into `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, and `country`
+* when parsing `formattedAddress`, explicitly provided structured address fields should win and parsed values should only fill blanks
+* request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
+
+### Success response
+
+```json
+{
+  "created": [
+    {
+      "id": "665f0d3f4f9a9b0012345679",
+      "org": "665f0d3f4f9a9b0099999999",
+      "status": "UNLISTED",
+      "name": "Wellington Showroom"
+    }
+  ],
+  "updated": [
+    {
+      "id": "665f0d3f4f9a9b0012345678",
+      "org": "665f0d3f4f9a9b0099999999",
+      "status": "ACTIVE",
+      "name": "Auckland Flagship"
+    }
+  ],
+  "skipped": [
+    {
+      "row": 7,
+      "reason": "ambiguous_match"
+    }
+  ]
+}
+```
+
+\---
+
 ## Update Locations Bulk
 
 **Method:** `POST`  
