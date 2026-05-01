@@ -991,6 +991,49 @@ Queues existing locations for address parsing and coordinate resolution using th
 
 \---
 
+## Suppress Location Warnings
+
+**Method:** `POST`  
+**Route:** `locations/suppressLocationWarnings`
+
+Sets `suppressWarnings=true` on existing locations owned by authenticated org so they are ignored by maintenance audits.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "locationIds": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+### Rules
+
+* `locationIds` array must contain at least one item
+* every `locationId` must be a valid ObjectId string
+* every targeted location must belong to authenticated org
+* endpoint only sets `suppressWarnings` to `true`
+* suppressed locations are ignored by `getLocationMaintenanceAudit`, including missing address, missing coordinates, and duplicate-location checks
+
+### Success response
+
+```json
+{
+  "suppressedLocationIds": [
+    "665f0d3f4f9a9b0012345678",
+    "665f0d3f4f9a9b0012345679"
+  ]
+}
+```
+
+\---
+
 ## Retry Location Geocode Jobs
 
 **Method:** `POST`  
@@ -1036,6 +1079,7 @@ Returns maintenance-oriented location issue lists for authenticated org.
 
 * `missingAddressParts` contains location ids that have some structured address data but are missing one or more of `addressLine1`, `city`, `postalCode`, `stateProvince`, or `country`
 * `missingCoordinates` contains location ids that have some structured address data but no `coordinates`
+* locations with `suppressWarnings=true` are excluded from all audit result sets
 * `duplicateLocations` contains one object per duplicate pair with:
   * `recommendedDelete`: weaker duplicate using existing scoring rules
   * `recommendedKeep`: other location in that pair

@@ -28,6 +28,7 @@ export const CreateLocationBodySchema = z.object({
   customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
   filters: z.array(LocationFilterSchema).optional().nullable(),
   priority: NullableNumberInput,
+  suppressWarnings: z.boolean().optional().nullable(),
   coordinates: CoordinatesSchema.shape.coordinates,
 });
 
@@ -52,6 +53,7 @@ export const UpdateLocationBodySchema = z
     customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
     filters: z.array(LocationFilterSchema).optional().nullable(),
     priority: NullableNumberInput,
+    suppressWarnings: z.boolean().optional().nullable(),
     coordinates: CoordinatesSchema.shape.coordinates,
   })
   .superRefine((value, ctx) => {
@@ -126,6 +128,12 @@ export const QueueLocationGeocodeBodySchema = z.object({
 });
 
 export type QueueLocationGeocodeBody = z.infer<typeof QueueLocationGeocodeBodySchema>;
+
+export const SuppressLocationWarningsBodySchema = z.object({
+  locationIds: z.array(z.string().min(1)).min(1),
+});
+
+export type SuppressLocationWarningsBody = z.infer<typeof SuppressLocationWarningsBodySchema>;
 
 export const DuplicateLocationAuditSchema = z.object({
   recommendedKeep: z.string().min(1),
@@ -238,6 +246,12 @@ export function parseQueueLocationGeocodeBody(
   body: string | null | undefined,
 ): QueueLocationGeocodeBody {
   return parseBody(body, QueueLocationGeocodeBodySchema);
+}
+
+export function parseSuppressLocationWarningsBody(
+  body: string | null | undefined,
+): SuppressLocationWarningsBody {
+  return parseBody(body, SuppressLocationWarningsBodySchema);
 }
 
 
