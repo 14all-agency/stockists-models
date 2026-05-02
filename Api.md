@@ -572,11 +572,14 @@ This endpoint does **not** require HMAC verification.
 
 Public-facing analytics endpoint that stores a search record against an org. Intended for frontend `navigator.sendBeacon()` use and does **not** require HMAC verification.
 
+### Query parameters
+
+* `shop: string` (required, must end with `myshopify.com`)
+
 ### Request body
 
 ```json
 {
-  "org": "665f0d3f4f9a9b0099999999",
   "formattedAddress": "123 Queen Street, Auckland 1010, New Zealand",
   "addressLine1": "123 Queen Street",
   "addressLine2": "Level 2",
@@ -595,7 +598,7 @@ Public-facing analytics endpoint that stores a search record against an org. Int
 ### Notes
 
 * endpoint accepts raw JSON string body as typically sent by `navigator.sendBeacon()`
-* `org` must be valid ObjectId string for an existing organisation
+* org is resolved from `shop`
 * `coordinates` must be `[longitude, latitude]` when provided
 * `nearestLocations` may contain at most `10` ids
 * every `nearestLocations` id must belong to same org or event is dropped
@@ -606,6 +609,47 @@ Public-facing analytics endpoint that stores a search record against an org. Int
 ### Success response
 
 HTTP `204` with empty body.
+
+\---
+
+## Save Logs
+
+**Method:** `POST`  
+**Route:** `saveLogs`
+
+Public-facing support endpoint that emails internal team with storefront logs for a resolved `shop`. This endpoint does **not** require HMAC verification.
+
+### Query parameters
+
+* `shop: string` (required, must end with `myshopify.com`)
+
+### Request body
+
+```json
+{
+  "logs": [
+    {
+      "level": "error",
+      "code": "MAP_LOAD_FAILED"
+    }
+  ],
+  "message": "Store locator client logs",
+  "user_agent": "Mozilla/5.0",
+  "page": "https://example.com/pages/store-locator"
+}
+```
+
+### Notes
+
+* payload must be valid JSON object
+* `logs` must be JSON array
+* email is sent to internal `ADMIN_EMAIL`
+
+### Success response
+
+```json
+{}
+```
 
 \---
 

@@ -7,7 +7,6 @@ import { CoordinatesSchema } from "./Location";
 const NullableAddressField = z.string().max(250).optional().nullable();
 
 export const SaveSearchBodySchema = z.object({
-  org: z.string().min(1),
   formattedAddress: z.string().max(500).optional().nullable(),
   addressLine1: NullableAddressField,
   addressLine2: NullableAddressField,
