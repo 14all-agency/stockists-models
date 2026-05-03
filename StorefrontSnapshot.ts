@@ -47,6 +47,9 @@ export const StorefrontSnapshotIndexSchema = z.object({
   totalItems: z.number().int().nonnegative(),
   chunkCount: z.number().int().nonnegative().max(5),
   chunks: z.array(StorefrontSnapshotChunkReferenceSchema).max(5),
+  sidebarTotalItems: z.number().int().nonnegative(),
+  sidebarChunkCount: z.number().int().nonnegative().max(5),
+  sidebarChunks: z.array(StorefrontSnapshotChunkReferenceSchema).max(5),
 });
 
 export type StorefrontSnapshotBounds = z.infer<typeof StorefrontSnapshotBoundsSchema>;

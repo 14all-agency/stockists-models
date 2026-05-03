@@ -19,10 +19,17 @@ These metafields are installation-specific and are written by backend Shopify Gr
 - `storefront_snapshot_chunk_3`
 - `storefront_snapshot_chunk_4`
 - `storefront_snapshot_chunk_5`
+- `storefront_snapshot_sidebar_chunk_1`
+- `storefront_snapshot_sidebar_chunk_2`
+- `storefront_snapshot_sidebar_chunk_3`
+- `storefront_snapshot_sidebar_chunk_4`
+- `storefront_snapshot_sidebar_chunk_5`
 
 `storefront_snapshot_index` is control-plane metadata.
 
 `storefront_snapshot_chunk_*` metafields store item data pages for initial map state.
+
+`storefront_snapshot_sidebar_chunk_*` metafields store raw point data pages for sidebar bootstrap when initial map payload contains one or more clusters.
 
 Unused chunk keys are written as empty item arrays so Liquid/frontend code can treat key set as stable.
 
@@ -48,12 +55,19 @@ Exact schema definitions live in:
 - `totalItems`: total number of initial payload items
 - `chunkCount`: number of populated chunk metafields
 - `chunks`: ordered chunk references with key + item count
+- `sidebarTotalItems`: total number of initial sidebar point items
+- `sidebarChunkCount`: number of populated sidebar chunk metafields
+- `sidebarChunks`: ordered sidebar chunk references with key + item count
 
 ### Chunk Metafields
 
 Each `storefront_snapshot_chunk_*` stores:
 
 - `items`: array of initial map items
+
+Each `storefront_snapshot_sidebar_chunk_*` stores:
+
+- `items`: array of raw point items for sidebar bootstrap
 
 Each item is either:
 
@@ -78,8 +92,9 @@ Each item is either:
   - `FIT_ALL_LOCATIONS`: use bounds across all active locations
   - `SPECIFIC_AREA`: use configured center + zoom
 - Backend reuses public map runtime logic to generate initial items.
+- If initial items contain any clusters, backend also builds pins-only sidebar items from same bounds and caps them with `maximumResults`.
 - `maximumResults` is enforced before chunking.
-- Result items are split into chunks targeting under `120kb` each, with hard max `5` chunks.
+- Result items are split into chunks targeting under `120kb` each, with hard max `5` chunks per dataset.
 
 ## Refresh And Consistency Rules
 
@@ -96,7 +111,7 @@ Refresh pipeline:
 3. consumer rebuilds snapshot
 4. checksum compared against previous snapshot
 5. unchanged payload clears dirty flag without rewriting Shopify
-6. changed payload writes index + chunks to Shopify metafields
+6. changed payload writes index + map/sidebar chunks to Shopify metafields
 
 Cron runs every `15` minutes and stops processing near `10` minutes runtime, matching cluster-cron timeout guard style.
 
@@ -115,11 +130,12 @@ These fields are backend sync metadata only. Storefront Liquid does not read the
 Expected bootstrap flow:
 
 1. read `app.metafields.stockists.storefront_snapshot_index`
-2. inspect `chunks` from index
+2. inspect `chunks` and `sidebarChunks` from index
 3. read `app.metafields.stockists.storefront_snapshot_chunk_n` keys referenced by index
-4. merge chunk `items` in order
-5. hydrate initial map from index settings + item payload
-6. after first interaction, switch to live API requests
+4. read `app.metafields.stockists.storefront_snapshot_sidebar_chunk_n` keys referenced by index when sidebar data is needed
+5. merge chunk `items` in order
+6. hydrate initial map from index settings + item payload, and hydrate initial sidebar from sidebar point payload when present
+7. after first interaction, switch to live API requests
 
 If metafields are missing, malformed, or stale beyond acceptable tolerance, frontend should fall back to API bootstrapping.
 
