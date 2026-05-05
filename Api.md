@@ -437,18 +437,22 @@ This endpoint does **not** require HMAC verification.
 * if `search` or `categories` are provided, precomputed cluster cache is skipped
 * at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
 * if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
-* if request zoom is clustering, `source`/`lng`/`lat` are ignored and cluster behavior remains unchanged
+* if request zoom is clustering, `source`/`lng`/`lat` are ignored and cluster behavior remains unchanged, except for IP-based geolocation fallback described below
 * distance-aware point mode ignores text-field regex matching from `search`; coordinates are the source of truth for ordering/filtering
 * if `source=GEOLOCATION` and org `geolocationMethod=IP_ADDRESS`, backend resolves coordinates from request IP and ignores supplied `lng`/`lat`
 * if `source=GEOLOCATION` and `lng`/`lat` are omitted, backend resolves coordinates from request IP before applying distance mode
 * IP-based geolocation uses MongoDB cache keyed by request IP before calling IPGeolocation.io
 * if IP-based geolocation is required for `source=GEOLOCATION` and resolution fails, endpoint returns an error
+* if `source=GEOLOCATION` and backend is using IP-derived coordinates, clustering is bypassed so response uses distance-aware raw points even when zoom would normally cluster
 * in distance-aware point mode:
   * `source=GEOLOCATION` uses org `geolocationRadius`
   * `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `searchRadius`
   * `source=SEARCH` + `typedSearchDistanceMode=ENTIRE_SEARCHED_AREA` uses current viewport bounds, then sorts results by distance from supplied coordinates
   * `source=SEARCH` + `typedSearchDistanceMode=BOTH` combines viewport-bounded and radius-bounded results, then sorts merged results by distance from supplied coordinates
 * distance is returned per point in the org's configured distance unit (`MILES` or `KILOMETERS`)
+* every response now includes `centerCoordinates`
+* `centerCoordinates` returns resolved center point used for distance-aware mode; this includes IP-derived geolocation coordinates when applicable
+* when no center point is active, `centerCoordinates` is `null`
 
 ### Success response using cached or dynamic clusters
 
@@ -456,6 +460,7 @@ This endpoint does **not** require HMAC verification.
 {
   "mode": "cached_clusters",
   "zoom": 6,
+  "centerCoordinates": null,
   "items": [
     {
       "type": "cluster",
@@ -503,6 +508,7 @@ This endpoint does **not** require HMAC verification.
 {
   "mode": "points",
   "zoom": 12,
+  "centerCoordinates": null,
   "items": [
     {
       "type": "point",
@@ -538,6 +544,10 @@ This endpoint does **not** require HMAC verification.
 {
   "mode": "points",
   "zoom": 12,
+  "centerCoordinates": {
+    "lng": 174.7633,
+    "lat": -36.8485
+  },
   "items": [
     {
       "type": "point",
