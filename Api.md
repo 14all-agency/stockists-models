@@ -439,10 +439,15 @@ This endpoint does **not** require HMAC verification.
 * if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
 * if request zoom is clustering, `source`/`lng`/`lat` are ignored and cluster behavior remains unchanged
 * distance-aware point mode ignores text-field regex matching from `search`; coordinates are the source of truth for ordering/filtering
+* if `source=GEOLOCATION` and org `geolocationMethod=IP_ADDRESS`, backend resolves coordinates from request IP and ignores supplied `lng`/`lat`
+* if `source=GEOLOCATION` and `lng`/`lat` are omitted, backend resolves coordinates from request IP before applying distance mode
+* IP-based geolocation uses MongoDB cache keyed by request IP before calling IPGeolocation.io
+* if IP-based geolocation is required for `source=GEOLOCATION` and resolution fails, endpoint returns an error
 * in distance-aware point mode:
   * `source=GEOLOCATION` uses org `geolocationRadius`
   * `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `searchRadius`
   * `source=SEARCH` + `typedSearchDistanceMode=ENTIRE_SEARCHED_AREA` uses current viewport bounds, then sorts results by distance from supplied coordinates
+  * `source=SEARCH` + `typedSearchDistanceMode=BOTH` combines viewport-bounded and radius-bounded results, then sorts merged results by distance from supplied coordinates
 * distance is returned per point in the org's configured distance unit (`MILES` or `KILOMETERS`)
 
 ### Success response using cached or dynamic clusters
@@ -1299,7 +1304,7 @@ Supported groups:
 * `provider`
   Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`), provider-specific theme/style settings, and the required default map pin style. `LEAFLET` does not require an API key; the other providers do.
 * `searchBehaviour`
-  Covers initial map position, clustering, geolocation, distance rules, result limits, units, autocomplete, and country locking.
+  Covers initial map position, clustering, geolocation method/button/icon color, distance rules, result limits, units, autocomplete, and country locking.
 
 ### Converter behavior
 
@@ -1356,6 +1361,9 @@ Those converters are used to:
     "searchBehaviour": {
       "startingPositionMode": "FIT_ALL_LOCATIONS",
       "clusterLocationsWhenZoomedOut": true,
+      "geolocationMethod": "HIGH_ACCURACY",
+      "geolocationColour": "#589bfb",
+      "typedSearchDistanceMode": "BOTH",
       "distanceUnit": "KILOMETERS",
       "searchSuggestionMode": "REGIONS_AND_ADDRESSES"
     }

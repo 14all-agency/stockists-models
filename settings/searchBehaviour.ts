@@ -14,11 +14,17 @@ export const SearchGeolocationButtonModeSchema = z
   .nullable()
   .describe("How visitors can manually trigger geolocation: inside the search field, with a standalone larger button, or not at all.");
 
-export const SearchDistanceModeSchema = z
-  .enum(["ENTIRE_SEARCHED_AREA", "SPECIFIC_RADIUS"])
+export const SearchGeolocationMethodSchema = z
+  .enum(["HIGH_ACCURACY", "LOW_ACCURACY", "IP_ADDRESS"])
   .optional()
   .nullable()
-  .describe("How typed-in searches define the search area: entire matched region or a fixed radius.");
+  .describe("How visitor location should be resolved: high-accuracy device geolocation, lower-accuracy device geolocation, or IP-based lookup.");
+
+export const SearchDistanceModeSchema = z
+  .enum(["ENTIRE_SEARCHED_AREA", "SPECIFIC_RADIUS", "BOTH"])
+  .optional()
+  .nullable()
+  .describe("How typed-in searches define the search area: entire matched region, a fixed radius, or both combined.");
 
 export const SearchDistanceUnitSchema = z
   .enum(["MILES", "KILOMETERS"])
@@ -54,7 +60,9 @@ export const SearchBehaviourSettingsSchema = z.object({
   clusteringZoomLevel: NullableNumber.describe("Zoom threshold at which grouped cluster markers begin replacing individual location pins."),
   clusterColor: NullableString.describe("Color used for grouped cluster circles when marker clustering is enabled."),
   automaticGeolocation: NullableBoolean.describe("Whether the locator should automatically attempt to detect the visitor's location and show nearby stores on load."),
+  geolocationMethod: SearchGeolocationMethodSchema,
   geolocationButtonMode: SearchGeolocationButtonModeSchema,
+  geolocationColour: NullableString.describe("Color used for the geolocation icon or location-detection UI affordance."),
   typedSearchDistanceMode: SearchDistanceModeSchema,
   searchRadius: NullableNumber.describe("Radius used for typed searches when search behavior is configured to show results in a specific radius."),
   geolocationRadius: NullableNumber.describe("Distance from the detected visitor location within which results should be shown after geolocation succeeds."),
