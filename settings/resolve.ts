@@ -62,7 +62,7 @@ function resolveSearchBehaviourSettings(
     clusteringZoomLevel: settings?.clusteringZoomLevel ?? 8,
     clusterColor: settings?.clusterColor ?? "#e7000b",
     automaticGeolocation: settings?.automaticGeolocation ?? false,
-    geolocationButtonMode: settings?.geolocationButtonMode ?? "SEARCH_FIELD",
+    geolocationButtonMode: settings?.geolocationButtonMode ?? "STANDALONE",
     typedSearchDistanceMode: settings?.typedSearchDistanceMode ?? "ENTIRE_SEARCHED_AREA",
     searchRadius: settings?.searchRadius ?? 25,
     geolocationRadius: settings?.geolocationRadius ?? 25,
