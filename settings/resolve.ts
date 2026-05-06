@@ -33,9 +33,15 @@ const DEFAULT_PIN_STYLE: MapPinStyle = {
 };
 
 const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
+  searchPanelHeadingLabel: "Search & Filters",
+  resultsPanelHeadingLabel: "Results",
   searchPlaceholder: "Search by city, postcode, or address",
+  searchInputLabel: "Search by city, postcode, or address",
   searchButtonLabel: "Search",
+  loadingLabel: "Loading",
+  loadingLocationsLabel: "Loading locations...",
   geolocationButtonLabel: "Use my location",
+  geolocationLoadingLabel: "Finding your location...",
   filterDropdownButtonLabel: "Filter results",
   initialMessageHtml: "Enter your city or postcode to find nearby locations.",
   noResultsMessageHtml: "Sorry, we couldn’t find any matching locations.",
@@ -45,6 +51,23 @@ const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
   genericErrorMessageHtml: "Something went wrong. Please try again.",
   directionsLinkLabel: "Directions",
   websiteLinkLabel: "Website",
+  popupCloseLabel: "Close popup",
+  fullscreenToggleLabel: "Toggle fullscreen map",
+  locationLogoAltLabel: "Location logo",
+  debugReportBugLinkLabel: "report a bug",
+  debugReportBugCloseDialogLabel: "Close report bug popup",
+  debugReportBugDialogTitle: "Report bug",
+  debugReportBugDialogDescription:
+    "If you have encountered a bug with your map please leave a message describing your issue and our team will be notified.",
+  debugReportBugMessageLabel: "Message",
+  debugReportBugConsentPrefix:
+    "By submitting your bug you consent to your app usage logs and user agent details being shared with our team, see our",
+  privacyPolicyLinkLabel: "privacy policy",
+  debugReportBugSubmitLabel: "Submit",
+  debugReportBugSubmittingLabel: "Submitting...",
+  debugReportBugCopyLabel: "Copy logs to clipboard",
+  debugReportBugSuccessMessage: "Your bug report has been received.",
+  closeButtonLabel: "Close",
   categoryLabels: [],
   customFieldLabels: [],
 };
@@ -141,10 +164,20 @@ function createDefaultLanguageContent(locale: string): LanguageContent {
 function createLanguageContent(language?: LanguageContent | null): LanguageContent {
   return {
     locale: language?.locale ?? "en",
+    searchPanelHeadingLabel:
+      language?.searchPanelHeadingLabel ?? DEFAULT_LANGUAGE_CONTENT.searchPanelHeadingLabel,
+    resultsPanelHeadingLabel:
+      language?.resultsPanelHeadingLabel ?? DEFAULT_LANGUAGE_CONTENT.resultsPanelHeadingLabel,
     searchPlaceholder: language?.searchPlaceholder ?? DEFAULT_LANGUAGE_CONTENT.searchPlaceholder,
+    searchInputLabel: language?.searchInputLabel ?? DEFAULT_LANGUAGE_CONTENT.searchInputLabel,
     searchButtonLabel: language?.searchButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.searchButtonLabel,
+    loadingLabel: language?.loadingLabel ?? DEFAULT_LANGUAGE_CONTENT.loadingLabel,
+    loadingLocationsLabel:
+      language?.loadingLocationsLabel ?? DEFAULT_LANGUAGE_CONTENT.loadingLocationsLabel,
     geolocationButtonLabel:
       language?.geolocationButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.geolocationButtonLabel,
+    geolocationLoadingLabel:
+      language?.geolocationLoadingLabel ?? DEFAULT_LANGUAGE_CONTENT.geolocationLoadingLabel,
     filterDropdownButtonLabel:
       language?.filterDropdownButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.filterDropdownButtonLabel,
     initialMessageHtml: language?.initialMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.initialMessageHtml,
@@ -158,6 +191,39 @@ function createLanguageContent(language?: LanguageContent | null): LanguageConte
       language?.genericErrorMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.genericErrorMessageHtml,
     directionsLinkLabel: language?.directionsLinkLabel ?? DEFAULT_LANGUAGE_CONTENT.directionsLinkLabel,
     websiteLinkLabel: language?.websiteLinkLabel ?? DEFAULT_LANGUAGE_CONTENT.websiteLinkLabel,
+    popupCloseLabel: language?.popupCloseLabel ?? DEFAULT_LANGUAGE_CONTENT.popupCloseLabel,
+    fullscreenToggleLabel:
+      language?.fullscreenToggleLabel ?? DEFAULT_LANGUAGE_CONTENT.fullscreenToggleLabel,
+    locationLogoAltLabel:
+      language?.locationLogoAltLabel ?? DEFAULT_LANGUAGE_CONTENT.locationLogoAltLabel,
+    debugReportBugLinkLabel:
+      language?.debugReportBugLinkLabel ?? DEFAULT_LANGUAGE_CONTENT.debugReportBugLinkLabel,
+    debugReportBugCloseDialogLabel:
+      language?.debugReportBugCloseDialogLabel ??
+      DEFAULT_LANGUAGE_CONTENT.debugReportBugCloseDialogLabel,
+    debugReportBugDialogTitle:
+      language?.debugReportBugDialogTitle ?? DEFAULT_LANGUAGE_CONTENT.debugReportBugDialogTitle,
+    debugReportBugDialogDescription:
+      language?.debugReportBugDialogDescription ??
+      DEFAULT_LANGUAGE_CONTENT.debugReportBugDialogDescription,
+    debugReportBugMessageLabel:
+      language?.debugReportBugMessageLabel ?? DEFAULT_LANGUAGE_CONTENT.debugReportBugMessageLabel,
+    debugReportBugConsentPrefix:
+      language?.debugReportBugConsentPrefix ??
+      DEFAULT_LANGUAGE_CONTENT.debugReportBugConsentPrefix,
+    privacyPolicyLinkLabel:
+      language?.privacyPolicyLinkLabel ?? DEFAULT_LANGUAGE_CONTENT.privacyPolicyLinkLabel,
+    debugReportBugSubmitLabel:
+      language?.debugReportBugSubmitLabel ?? DEFAULT_LANGUAGE_CONTENT.debugReportBugSubmitLabel,
+    debugReportBugSubmittingLabel:
+      language?.debugReportBugSubmittingLabel ??
+      DEFAULT_LANGUAGE_CONTENT.debugReportBugSubmittingLabel,
+    debugReportBugCopyLabel:
+      language?.debugReportBugCopyLabel ?? DEFAULT_LANGUAGE_CONTENT.debugReportBugCopyLabel,
+    debugReportBugSuccessMessage:
+      language?.debugReportBugSuccessMessage ??
+      DEFAULT_LANGUAGE_CONTENT.debugReportBugSuccessMessage,
+    closeButtonLabel: language?.closeButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.closeButtonLabel,
     categoryLabels: language?.categoryLabels ?? [],
     customFieldLabels: language?.customFieldLabels ?? [],
   };
