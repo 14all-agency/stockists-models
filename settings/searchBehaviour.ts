@@ -8,12 +8,6 @@ export const SearchStartingPositionModeSchema = z
   .nullable()
   .describe("Initial map loading strategy: fit the viewport to all locations or focus on an administrator-defined area.");
 
-export const SearchGeolocationButtonModeSchema = z
-  .enum(["SEARCH_FIELD", "STANDALONE", "HIDDEN"])
-  .optional()
-  .nullable()
-  .describe("How visitors can manually trigger geolocation: inside the search field, with a standalone larger button, or not at all.");
-
 export const SearchGeolocationMethodSchema = z
   .enum(["HIGH_ACCURACY", "LOW_ACCURACY", "IP_ADDRESS"])
   .optional()
@@ -58,11 +52,8 @@ export const SearchBehaviourSettingsSchema = z.object({
   startingArea: SearchStartingAreaSchema.optional().nullable().describe("Preselected starting area details used only when the locator should focus on a specific area on first load."),
   clusterLocationsWhenZoomedOut: NullableBoolean.describe("Whether nearby location markers should be grouped into cluster circles when visitors zoom out on the map."),
   clusteringZoomLevel: NullableNumber.describe("Zoom threshold at which grouped cluster markers begin replacing individual location pins."),
-  clusterColor: NullableString.describe("Color used for grouped cluster circles when marker clustering is enabled."),
   automaticGeolocation: NullableBoolean.describe("Whether the locator should automatically attempt to detect the visitor's location and show nearby stores on load."),
   geolocationMethod: SearchGeolocationMethodSchema,
-  geolocationButtonMode: SearchGeolocationButtonModeSchema,
-  geolocationColour: NullableString.describe("Color used for the geolocation icon or location-detection UI affordance."),
   typedSearchDistanceMode: SearchDistanceModeSchema,
   searchRadius: NullableNumber.describe("Radius used for typed searches when search behavior is configured to show results in a specific radius."),
   geolocationRadius: NullableNumber.describe("Distance from the detected visitor location within which results should be shown after geolocation succeeds."),

@@ -1372,7 +1372,6 @@ Those converters are used to:
       "startingPositionMode": "FIT_ALL_LOCATIONS",
       "clusterLocationsWhenZoomedOut": true,
       "geolocationMethod": "HIGH_ACCURACY",
-      "geolocationColour": "#589bfb",
       "typedSearchDistanceMode": "BOTH",
       "distanceUnit": "KILOMETERS",
       "searchSuggestionMode": "REGIONS_AND_ADDRESSES"
