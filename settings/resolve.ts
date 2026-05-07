@@ -4,6 +4,7 @@ import {
   type CategoryFilterDefinition,
 } from "./categoriesAndFilters";
 import { type CustomFieldDefinition, type CustomFieldsSettings } from "./customFields";
+import { type DealerFormsSettings, type DealerFormFieldDefinition } from "./dealerForms";
 import { type LanguageContent, type LanguageSettings } from "./language";
 import { type MapPinStyle, type ProviderSettings } from "./provider";
 import { type SearchBehaviourSettings, type SearchStartingArea } from "./searchBehaviour";
@@ -13,6 +14,7 @@ type ResolvableSettingsInput = {
   provider?: ProviderSettings | null;
   categoriesAndFilters?: CategoriesAndFiltersSettings | null;
   customFields?: CustomFieldsSettings | null;
+  dealerForms?: DealerFormsSettings | null;
   language?: LanguageSettings | null;
 } | null | undefined;
 
@@ -31,6 +33,17 @@ const DEFAULT_PIN_STYLE: MapPinStyle = {
   customImageDisplayMode: "IMAGE_ONLY",
   retinaSupport: true,
 };
+
+const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
+  { key: "contact", label: "Contact", type: "CONTACT", required: true, locked: true, options: [] },
+  { key: "name", label: "Store name", type: "TEXT", required: true, locked: true, options: [] },
+  { key: "address", label: "Address", type: "ADDRESS", required: true, locked: true, options: [] },
+  { key: "phoneNumber", label: "Store phone", type: "PHONE", required: false, locked: false, options: [] },
+  { key: "website", label: "Website", type: "LINK", required: false, locked: false, options: [] },
+  { key: "emailAddress", label: "Store email", type: "EMAIL", required: false, locked: false, options: [] },
+  { key: "logoUrl", label: "Logo URL", type: "IMAGE_UPLOAD", required: false, locked: false, options: [] },
+  { key: "message", label: "Message", type: "TEXT_MULTILINE", required: false, locked: false, options: [] },
+];
 
 const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
   searchPanelHeadingLabel: "Search & Filters",
@@ -154,6 +167,30 @@ function resolveCustomFieldsSettings(
   };
 }
 
+function resolveDealerFormsSettings(
+  settings?: DealerFormsSettings | null,
+): DealerFormsSettings {
+  const fields = (settings?.fields || []).length
+    ? (settings?.fields || []).map((field): DealerFormFieldDefinition => ({
+        key: field.key ?? "",
+        label: field.label ?? "",
+        type: field.type ?? "TEXT",
+        required: field.required ?? false,
+        locked: field.locked ?? false,
+        options: (field.options || []).map((option) => ({
+          label: option.label ?? "",
+          value: option.value ?? "",
+        })),
+      }))
+    : DEFAULT_DEALER_FORM_FIELDS;
+
+  return {
+    fields,
+    notificationEnabled: settings?.notificationEnabled ?? true,
+    notificationEmail: settings?.notificationEmail ?? "",
+  };
+}
+
 function createDefaultLanguageContent(locale: string): LanguageContent {
   return {
     locale,
@@ -253,6 +290,7 @@ export function resolveSettings(settings?: ResolvableSettingsInput): NonNullable
     provider: resolveProviderSettings(settings?.provider),
     categoriesAndFilters: resolveCategoriesAndFiltersSettings(settings?.categoriesAndFilters),
     customFields: resolveCustomFieldsSettings(settings?.customFields),
+    dealerForms: resolveDealerFormsSettings(settings?.dealerForms),
     language: resolveLanguageSettings(settings?.language),
   };
 }

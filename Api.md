@@ -1309,6 +1309,8 @@ Supported groups:
   Covers category/filter definitions, optional category-level pin style overrides, how categories/filters display in the UI, and whether multiple selections use AND or OR matching.
 * `customFields`
   Covers reusable location custom field definitions, their names, field types (`TEXT`, `TEXT_MULTILINE`, `LINK`), and whether they appear in storefront listings.
+* `dealerForms`
+  Covers public dealer application form field definitions, supported field types (`TEXT`, `TEXT_MULTILINE`, `SELECT`, `CONTACT`, `EMAIL`, `PHONE`, `ADDRESS`, `CHECKBOX`, `FILE_UPLOAD`, `IMAGE_UPLOAD`, `NUMBER`, `LINK`), whether each field is required, whether core fields are `locked` in admin UI, structured object storage for `CONTACT` and `ADDRESS` fields, and admin notification email preferences.
 * `language`
   Covers primary language, translated languages, editable user-facing locator text, and per-language label overrides for categories/filters and custom fields.
 * `provider`
@@ -1368,6 +1370,53 @@ Those converters are used to:
         }
       ]
     },
+    "dealerForms": {
+      "notificationEnabled": true,
+      "notificationEmail": "dealer-alerts@example.com",
+      "fields": [
+        {
+          "key": "contact",
+          "label": "Contact",
+          "type": "CONTACT",
+          "required": true,
+          "locked": true,
+          "options": []
+        },
+        {
+          "key": "address",
+          "label": "Address",
+          "type": "ADDRESS",
+          "required": true,
+          "locked": true,
+          "options": []
+        },
+        {
+          "key": "name",
+          "label": "Store name",
+          "type": "TEXT",
+          "required": true,
+          "locked": true,
+          "options": []
+        },
+        {
+          "key": "businessType",
+          "label": "Business type",
+          "type": "SELECT",
+          "required": false,
+          "locked": false,
+          "options": [
+            {
+              "label": "Retailer",
+              "value": "retailer"
+            },
+            {
+              "label": "Distributor",
+              "value": "distributor"
+            }
+          ]
+        }
+      ]
+    },
     "searchBehaviour": {
       "startingPositionMode": "FIT_ALL_LOCATIONS",
       "clusterLocationsWhenZoomedOut": true,
@@ -1387,6 +1436,306 @@ Those converters are used to:
 * every provided settings group must match its shared Zod schema
 * omitted top-level settings groups keep their existing stored values
 * the response returns the full `OrganisationModel` with normalized `settings`
+
+\---
+
+## Get Dealer Form Submissions
+
+**Method:** `GET`  
+**Route:** `dealerForms/getDealerFormSubmissions`
+
+Returns paginated dealer form submissions owned by authenticated org, newest first.
+
+### Query parameters
+
+* `shop: string` (required)
+* `limit: number` (optional, max `100`, default `50`)
+* `page: number` (optional, default `1`)
+* `search: string` (optional, searches contact name, contact email, location name, and stored field values)
+* `status: SUBMITTED | APPROVED | REJECTED` (optional)
+* `published: "true" | "false"` (optional, filter by whether `publishedLocationId` is set)
+
+### Success response
+
+```json
+{
+  "submissions": [
+    {
+      "id": "6820adf54f9a9b0012345678",
+      "org": "665f0d3f4f9a9b0099999999",
+      "status": "SUBMITTED",
+      "publishedLocationId": null,
+      "contactName": "Jane Doe",
+      "contactEmail": "jane@example.com",
+      "locationName": "Downtown Bikes",
+      "fields": [
+        {
+          "key": "contact",
+          "label": "Contact",
+          "type": "CONTACT",
+          "required": true,
+          "value": {
+            "name": "Jane Doe",
+            "email": "jane@example.com"
+          }
+        }
+      ]
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  }
+}
+```
+
+\---
+
+## Update Dealer Form Submission Status
+
+**Method:** `POST`  
+**Route:** `dealerForms/updateDealerFormSubmissionStatus`
+
+Updates one dealer form submission status. Can optionally email dealer with custom subject/message.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "id": "6820adf54f9a9b0012345678",
+  "status": "APPROVED",
+  "sendEmail": true,
+  "emailSubject": "Your dealer application has been approved",
+  "emailMessage": "We will be in touch shortly with next steps."
+}
+```
+
+### Rules
+
+* `id` must be valid ObjectId string for submission owned by authenticated org
+* `status` must be `SUBMITTED`, `APPROVED`, or `REJECTED`
+* dealer email is only sent when `sendEmail` is truthy
+* dealer unsubscribe list suppresses optional status emails
+
+### Success response
+
+Returns updated `DealerFormSubmissionModel`.
+
+\---
+
+## Convert Dealer Form Submission To Location
+
+**Method:** `POST`  
+**Route:** `dealerForms/convertDealerFormSubmissionToLocation`
+
+Creates one location from a dealer form submission and stores resulting `publishedLocationId` back on submission.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "id": "6820adf54f9a9b0012345678",
+  "status": "ACTIVE"
+}
+```
+
+### Rules
+
+* `id` must be valid ObjectId string for submission owned by authenticated org
+* `status` must be `ACTIVE` or `UNLISTED`
+* each submission can only be converted once
+* mapped location fields use reserved dealer field keys:
+  `name`, `address`, `phoneNumber`, `website`, `emailAddress`, `logoUrl`
+* `contact` field stores structured contact parts inside one value object:
+  `name`, `email`
+* `address` field stores structured address parts inside one value object:
+  `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, `country`
+* all other populated dealer form fields are stored as location `customFields`
+* conversion also sets submission `status` to `APPROVED`
+
+### Success response
+
+```json
+{
+  "submission": {
+    "id": "6820adf54f9a9b0012345678",
+    "status": "APPROVED",
+    "publishedLocationId": "6820ae104f9a9b0012345679"
+  },
+  "location": {
+    "id": "6820ae104f9a9b0012345679",
+    "status": "ACTIVE",
+    "name": "Downtown Bikes"
+  }
+}
+```
+
+\---
+
+## Delete Dealer Form Submission
+
+**Method:** `POST`  
+**Route:** `dealerForms/deleteDealerFormSubmission`
+
+Deletes one dealer form submission owned by authenticated org.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "id": "6820adf54f9a9b0012345678"
+}
+```
+
+### Success response
+
+```json
+{
+  "deleted": true,
+  "id": "6820adf54f9a9b0012345678"
+}
+```
+
+\---
+
+## Submit Dealer Form
+
+**Method:** `POST`  
+**Route:** `dealerForms/submit`
+
+Public-facing dealer application endpoint. Validates submission against resolved org dealer form settings, stores new submission, emails dealer confirmation, and optionally emails org notification recipient.
+
+This endpoint does **not** require HMAC verification.
+
+### Query parameters
+
+* `shop: string` (required, must end with `myshopify.com`)
+
+### Request body
+
+```json
+{
+  "fields": [
+    {
+      "key": "name",
+      "value": "Downtown Bikes"
+    },
+    {
+      "key": "address",
+      "value": {
+        "addressLine1": "123 Queen Street",
+        "addressLine2": "Level 2",
+        "city": "Auckland",
+        "postalCode": "1010",
+        "stateProvince": "Auckland",
+        "country": "New Zealand"
+      }
+    },
+    {
+      "key": "contact",
+      "value": {
+        "name": "Jane Doe",
+        "email": "jane@example.com"
+      }
+    },
+    {
+      "key": "message",
+      "value": "We would love to stock your range."
+    },
+    {
+      "key": "logoUrl",
+      "value": "https://cdn.example.com/dealers/downtown-bikes.png"
+    }
+  ]
+}
+```
+
+### Rules
+
+* request body must include at least one field
+* submitted fields are validated against resolved org `dealerForms.fields`
+* `required` fields must be present and non-empty
+* `CONTACT` fields must be submitted as structured objects with `name` and `email` inside one field value
+* `ADDRESS` fields must be submitted as structured objects with address parts nested inside one field value
+* `EMAIL` fields must be email-shaped
+* `LINK`, `FILE_UPLOAD`, and `IMAGE_UPLOAD` fields currently store string URLs and must be valid URLs
+* `SELECT` fields must match one configured option value
+* dealer confirmation email is suppressed when dealer email is unsubscribed
+* org admin notification email is suppressed when org dealer notifications are disabled
+
+### Success response
+
+```json
+{
+  "submitted": true,
+  "id": "6820adf54f9a9b0012345678"
+}
+```
+
+\---
+
+## Unsubscribe Org Dealer Form Notifications
+
+**Method:** `GET`  
+**Route:** `dealerForms/unsubscribeOrg`
+
+Public unsubscribe link endpoint that disables organisation dealer form admin notifications.
+
+This endpoint does **not** require HMAC verification.
+
+### Query parameters
+
+* `orgId: string` (required)
+* `token: string` (required)
+
+### Success response
+
+Plain text response:
+
+```text
+Dealer form email notifications unsubscribed.
+```
+
+\---
+
+## Unsubscribe Dealer Form Email
+
+**Method:** `GET`  
+**Route:** `dealerForms/unsubscribeDealer`
+
+Public unsubscribe link endpoint that stores org-scoped dealer email unsubscribe record. Future dealer confirmation and optional status emails for that org+email are suppressed.
+
+This endpoint does **not** require HMAC verification.
+
+### Query parameters
+
+* `orgId: string` (required)
+* `email: string` (required)
+* `token: string` (required)
+
+### Success response
+
+Plain text response:
+
+```text
+Dealer email unsubscribed.
+```
 
 \---
 
