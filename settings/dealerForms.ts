@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import type { CustomFieldType } from "./customFields";
 import {
   createSettingsConverter,
   NullableBoolean,
@@ -50,6 +51,86 @@ export const DealerFormFieldDefinitionSchema = z.object({
 });
 
 export type DealerFormFieldDefinition = z.infer<typeof DealerFormFieldDefinitionSchema>;
+
+export const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
+  {
+    key: "contact",
+    label: "Contact Details",
+    type: "CONTACT",
+    required: true,
+    locked: true,
+    options: [],
+  },
+  { key: "name", label: "Store name", type: "TEXT", required: true, locked: true, options: [] },
+  { key: "address", label: "Address", type: "ADDRESS", required: true, locked: true, options: [] },
+  {
+    key: "phoneNumber",
+    label: "Store phone",
+    type: "PHONE",
+    required: false,
+    locked: false,
+    options: [],
+  },
+  {
+    key: "website",
+    label: "Website",
+    type: "LINK",
+    required: false,
+    locked: false,
+    options: [],
+  },
+  {
+    key: "emailAddress",
+    label: "Store email",
+    type: "EMAIL",
+    required: false,
+    locked: false,
+    options: [],
+  },
+  {
+    key: "logoUrl",
+    label: "Logo URL",
+    type: "IMAGE_UPLOAD",
+    required: false,
+    locked: false,
+    options: [],
+  },
+  {
+    key: "message",
+    label: "Message",
+    type: "TEXT_MULTILINE",
+    required: false,
+    locked: false,
+    options: [],
+  },
+];
+
+export const DEFAULT_DEALER_FORM_FIELD_KEYS = DEFAULT_DEALER_FORM_FIELDS.map(
+  (field) => field.key || "",
+).filter(Boolean);
+
+export function mapDealerFieldTypeToCustomFieldType(
+  type?: DealerFormFieldType | null,
+): CustomFieldType {
+  switch (type) {
+    case "LINK":
+    case "FILE_UPLOAD":
+    case "IMAGE_UPLOAD":
+      return "LINK";
+    case "TEXT_MULTILINE":
+    case "ADDRESS":
+    case "CONTACT":
+      return "TEXT_MULTILINE";
+    case "TEXT":
+    case "SELECT":
+    case "EMAIL":
+    case "PHONE":
+    case "CHECKBOX":
+    case "NUMBER":
+    default:
+      return "TEXT";
+  }
+}
 
 export const DealerFormsSettingsSchema = z.object({
   fields: z
