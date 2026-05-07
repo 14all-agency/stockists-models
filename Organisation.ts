@@ -52,6 +52,9 @@ export const OrganisationResult = z.object({
   settingsLastSynced: z.date().nullable().optional(),
   storefrontSnapshotChecksum: z.string().optional().nullable(),
   storefrontSnapshotDirtyAt: z.date().nullable().optional(),
+  storefrontSnapshotStartedAt: z.date().nullable().optional(),
+  storefrontSnapshotLeaseExpiresAt: z.date().nullable().optional(),
+  storefrontSnapshotLeaseToken: z.string().optional().nullable(),
   storefrontSnapshotLastSyncedAt: z.date().nullable().optional(),
   orgRebuildRequestedAt: z.date().nullable().optional(),
   orgRebuildStartedAt: z.date().nullable().optional(),
@@ -101,6 +104,9 @@ export const OrganisationModelSchema = z.object({
   settingsLastSynced: OrganisationResult.shape.settingsLastSynced,
   storefrontSnapshotChecksum: OrganisationResult.shape.storefrontSnapshotChecksum,
   storefrontSnapshotDirtyAt: OrganisationResult.shape.storefrontSnapshotDirtyAt,
+  storefrontSnapshotStartedAt: OrganisationResult.shape.storefrontSnapshotStartedAt,
+  storefrontSnapshotLeaseExpiresAt: OrganisationResult.shape.storefrontSnapshotLeaseExpiresAt,
+  storefrontSnapshotLeaseToken: OrganisationResult.shape.storefrontSnapshotLeaseToken,
   storefrontSnapshotLastSyncedAt: OrganisationResult.shape.storefrontSnapshotLastSyncedAt,
   orgRebuildRequestedAt: OrganisationResult.shape.orgRebuildRequestedAt,
   orgRebuildStartedAt: OrganisationResult.shape.orgRebuildStartedAt,
@@ -147,6 +153,13 @@ export const OrganisationModel = {
       storefrontSnapshotDirtyAt: entity.storefrontSnapshotDirtyAt
         ? new Date(entity.storefrontSnapshotDirtyAt)
         : null,
+      storefrontSnapshotStartedAt: entity.storefrontSnapshotStartedAt
+        ? new Date(entity.storefrontSnapshotStartedAt)
+        : null,
+      storefrontSnapshotLeaseExpiresAt: entity.storefrontSnapshotLeaseExpiresAt
+        ? new Date(entity.storefrontSnapshotLeaseExpiresAt)
+        : null,
+      storefrontSnapshotLeaseToken: entity.storefrontSnapshotLeaseToken ?? null,
       storefrontSnapshotLastSyncedAt: entity.storefrontSnapshotLastSyncedAt
         ? new Date(entity.storefrontSnapshotLastSyncedAt)
         : null,
