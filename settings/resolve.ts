@@ -79,9 +79,9 @@ const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
 };
 
 const DEFAULT_DEALER_NOTIFICATION_ACCENT_COLOR = "#2563eb";
-const DEFAULT_DEALER_NOTIFICATION_SUBJECT = "Dealer submission received";
+const DEFAULT_DEALER_NOTIFICATION_SUBJECT = "Your submission has been received";
 const DEFAULT_DEALER_NOTIFICATION_BODY = "Hi {name},\n\nYour dealer submission has been received.";
-const DEFAULT_DEALER_PUBLISHED_SUBJECT = "Dealer submission published";
+const DEFAULT_DEALER_PUBLISHED_SUBJECT = "Your submission has been published";
 const DEFAULT_DEALER_PUBLISHED_BODY = "Hi {name},\n\nYour dealer submission has been published.";
 
 function resolveSearchBehaviourSettings(
