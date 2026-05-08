@@ -1376,9 +1376,9 @@ Those converters are used to:
       "dealerNotificationEnabled": true,
       "notificationAccentColor": "#2563eb",
       "dealerNotificationSubject": "Dealer submission received",
-      "dealerNotificationBody": "Hi {name},\n\nYour dealer submission has been received.",
+      "dealerNotificationBody": "Hi {name},\n\nYour dealer submission has been received. We will reach out to you soon on the status of your submission or if we have any questions.",
       "dealerPublishedSubject": "Dealer submission published",
-      "dealerPublishedBody": "Hi {name},\n\nYour dealer submission has been published.",
+      "dealerPublishedBody": "Hi {name},\n\nYour dealer submission has been published. You will see your dealer listing on our map shortly.",
       "fields": [
         {
           "key": "contact",
