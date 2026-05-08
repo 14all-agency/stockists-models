@@ -15,14 +15,14 @@ export const DealerFormAddressValueSchema = z.object({
   postalCode: z.string().optional().nullable(),
   stateProvince: z.string().optional().nullable(),
   country: z.string().optional().nullable(),
-});
+}).strict();
 
 export type DealerFormAddressValue = z.infer<typeof DealerFormAddressValueSchema>;
 
 export const DealerFormContactValueSchema = z.object({
   name: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
-});
+}).strict();
 
 export type DealerFormContactValue = z.infer<typeof DealerFormContactValueSchema>;
 

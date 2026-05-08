@@ -1,22 +1,11 @@
 import { z } from "zod";
 
-import {
-  DealerFormAddressValueSchema,
-  DealerFormContactValueSchema,
-  DealerFormSubmissionStatusSchema,
-} from "./DealerFormSubmission";
+import { DealerFormSubmissionStatusSchema } from "./DealerFormSubmission";
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
 
 const NullableString = z.string().optional().nullable();
 
-export const DealerFormSubmissionInputValueSchema = z.union([
-  z.string(),
-  z.number(),
-  z.boolean(),
-  DealerFormAddressValueSchema,
-  DealerFormContactValueSchema,
-  z.null(),
-]);
+export const DealerFormSubmissionInputValueSchema = z.unknown();
 
 export const DealerFormSubmissionInputFieldSchema = z.object({
   key: z.string().min(1),
