@@ -17,6 +17,7 @@ export const DealerFormSubmissionInputFieldSchema = z.object({
 
 export const SubmitDealerFormBodySchema = z.object({
   fields: z.array(DealerFormSubmissionInputFieldSchema).min(1),
+  recaptchaToken: NullableString,
 });
 
 export type SubmitDealerFormBody = z.infer<typeof SubmitDealerFormBodySchema>;

@@ -28,6 +28,14 @@ export const DealerFormFieldTypeSchema = z
 
 export type DealerFormFieldType = z.infer<typeof DealerFormFieldTypeSchema>;
 
+export const DealerFormRecaptchaVersionSchema = z
+  .enum(["V2", "V3"])
+  .optional()
+  .nullable()
+  .describe("Configured reCAPTCHA version for dealer form submissions.");
+
+export type DealerFormRecaptchaVersion = z.infer<typeof DealerFormRecaptchaVersionSchema>;
+
 export const DealerFormFieldOptionSchema = z.object({
   label: NullableString.describe("Display label shown to dealer for this option."),
   value: NullableString.describe("Stable value stored for this option."),
@@ -162,6 +170,11 @@ export const DealerFormsSettingsSchema = z.object({
   dealerPublishedBody: NullableString.describe(
     "Body template for dealer published emails. Supports {name} placeholder.",
   ),
+  recaptchaSiteKey: NullableString.describe("reCAPTCHA site key for dealer form submissions."),
+  recaptchaSecretKey: NullableString.describe(
+    "reCAPTCHA secret key for dealer form submissions.",
+  ),
+  recaptchaVersion: DealerFormRecaptchaVersionSchema,
 });
 
 export type DealerFormsSettings = z.infer<typeof DealerFormsSettingsSchema>;

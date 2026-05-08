@@ -1310,7 +1310,7 @@ Supported groups:
 * `customFields`
   Covers reusable location custom field definitions, their names, field types (`TEXT`, `TEXT_MULTILINE`, `LINK`), and whether they appear in storefront listings.
 * `dealerForms`
-  Covers public dealer application form field definitions, supported field types (`TEXT`, `TEXT_MULTILINE`, `SELECT`, `CONTACT`, `EMAIL`, `PHONE`, `ADDRESS`, `CHECKBOX`, `FILE_UPLOAD`, `IMAGE_UPLOAD`, `NUMBER`, `LINK`), whether each field is required, whether core fields are `locked` in admin UI, structured object storage for `CONTACT` and `ADDRESS` fields, admin notification email preferences, shared notification accent color, dealer confirmation email enablement, and dealer email subject/body templates for both submission and published notifications with `{name}` placeholder support.
+  Covers public dealer application form field definitions, supported field types (`TEXT`, `TEXT_MULTILINE`, `SELECT`, `CONTACT`, `EMAIL`, `PHONE`, `ADDRESS`, `CHECKBOX`, `FILE_UPLOAD`, `IMAGE_UPLOAD`, `NUMBER`, `LINK`), whether each field is required, whether core fields are `locked` in admin UI, structured object storage for `CONTACT` and `ADDRESS` fields, admin notification email preferences, shared notification accent color, dealer confirmation email enablement, dealer email subject/body templates for both submission and published notifications with `{name}` placeholder support, and optional reCAPTCHA site key, secret key, and version settings for public form submission protection.
 * `language`
   Covers primary language, translated languages, editable user-facing locator text, and per-language label overrides for categories/filters and custom fields.
 * `provider`
@@ -1379,6 +1379,9 @@ Those converters are used to:
       "dealerNotificationBody": "Hi {name},\n\nYour dealer submission has been received. We will reach out to you soon on the status of your submission or if we have any questions.",
       "dealerPublishedSubject": "Dealer submission published",
       "dealerPublishedBody": "Hi {name},\n\nYour dealer submission has been published. You will see your dealer listing on our map shortly.",
+      "recaptchaSiteKey": "site-key",
+      "recaptchaSecretKey": "secret-key",
+      "recaptchaVersion": "V3",
       "fields": [
         {
           "key": "contact",
@@ -1638,6 +1641,7 @@ This endpoint does **not** require HMAC verification.
 
 ```json
 {
+  "recaptchaToken": "captcha-token",
   "fields": [
     {
       "key": "name",
@@ -1667,7 +1671,11 @@ This endpoint does **not** require HMAC verification.
     },
     {
       "key": "logoUrl",
-      "value": "https://cdn.example.com/dealers/downtown-bikes.png"
+      "value": {
+        "fileName": "downtown-bikes.png",
+        "mimeType": "image/png",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAA..."
+      }
     }
   ]
 }
@@ -1681,8 +1689,14 @@ This endpoint does **not** require HMAC verification.
 * `CONTACT` fields must be submitted as structured objects with `name` and `email` inside one field value
 * `ADDRESS` fields must be submitted as structured objects with address parts nested inside one field value
 * `EMAIL` fields must be email-shaped
-* `LINK`, `FILE_UPLOAD`, and `IMAGE_UPLOAD` fields currently store string URLs and must be valid URLs
+* `LINK` fields must be valid URLs
+* `FILE_UPLOAD` and `IMAGE_UPLOAD` fields can be sent as:
+  * Shopify/public URL strings
+  * data URL strings (`data:<mime>;base64,...`)
+  * objects with `base64`, optional `fileName`, and optional `mimeType`
+* base64 file/image uploads are uploaded to the organisation's Shopify Files and stored in MongoDB as the resulting Shopify URL
 * `SELECT` fields must match one configured option value
+* when org `dealerForms.recaptchaSiteKey`, `dealerForms.recaptchaSecretKey`, and `dealerForms.recaptchaVersion` are configured, `recaptchaToken` is required and validated server-side with Google reCAPTCHA before the submission is stored
 * dealer confirmation email can be disabled with org `dealerForms.dealerNotificationEnabled`
 * dealer confirmation email subject/body use org settings templates and replace `{name}` with submitted contact name or empty string
 * dealer confirmation email is suppressed when dealer email is unsubscribed

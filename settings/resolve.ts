@@ -197,6 +197,9 @@ function resolveDealerFormsSettings(
     dealerPublishedSubject:
       settings?.dealerPublishedSubject?.trim() || DEFAULT_DEALER_PUBLISHED_SUBJECT,
     dealerPublishedBody: settings?.dealerPublishedBody?.trim() || DEFAULT_DEALER_PUBLISHED_BODY,
+    recaptchaSiteKey: settings?.recaptchaSiteKey?.trim() || "",
+    recaptchaSecretKey: settings?.recaptchaSecretKey?.trim() || "",
+    recaptchaVersion: settings?.recaptchaVersion ?? null,
   };
 }
 
