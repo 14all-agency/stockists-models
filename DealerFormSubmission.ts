@@ -3,11 +3,6 @@ import { z } from "zod";
 
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
 
-export const DealerFormSubmissionStatusSchema = z
-  .enum(["SUBMITTED", "APPROVED", "REJECTED"])
-  .optional()
-  .nullable();
-
 export const DealerFormAddressValueSchema = z.object({
   addressLine1: z.string().optional().nullable(),
   addressLine2: z.string().optional().nullable(),
@@ -47,7 +42,7 @@ export type DealerFormSubmissionFieldValue = z.infer<typeof DealerFormSubmission
 export const DealerFormSubmissionEntitySchema = z.object({
   _id: z.instanceof(ObjectId),
   org: z.instanceof(ObjectId),
-  status: DealerFormSubmissionStatusSchema,
+  archived: z.boolean().optional().nullable(),
   publishedLocationId: z.instanceof(ObjectId).optional().nullable(),
   contactName: z.string().optional().nullable(),
   contactEmail: z.string().optional().nullable(),
@@ -62,7 +57,7 @@ export type DealerFormSubmissionEntity = z.infer<typeof DealerFormSubmissionEnti
 export const DealerFormSubmissionModelSchema = z.object({
   id: z.string(),
   org: z.string(),
-  status: DealerFormSubmissionStatusSchema,
+  archived: z.boolean().optional().nullable(),
   publishedLocationId: z.string().optional().nullable(),
   contactName: z.string().optional().nullable(),
   contactEmail: z.string().optional().nullable(),
@@ -79,7 +74,7 @@ export const DealerFormSubmissionModel = {
     return DealerFormSubmissionModelSchema.parse({
       id: entity._id.toHexString(),
       org: entity.org.toHexString(),
-      status: entity.status ?? "SUBMITTED",
+      archived: entity.archived ?? false,
       publishedLocationId: entity.publishedLocationId?.toHexString() ?? null,
       contactName: entity.contactName ?? null,
       contactEmail: entity.contactEmail ?? null,

@@ -1,9 +1,12 @@
 import { z } from "zod";
 
-import { DealerFormSubmissionStatusSchema } from "./DealerFormSubmission";
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
 
 const NullableString = z.string().optional().nullable();
+const DealerFormSubmissionFilterStatusSchema = z
+  .enum(["OPEN", "PUBLISHED", "ARCHIVED"])
+  .optional()
+  .nullable();
 
 export const DealerFormSubmissionInputValueSchema = z.unknown();
 
@@ -22,32 +25,27 @@ export const GetDealerFormSubmissionsQuerySchema = z.object({
   limit: z.number().int().positive().max(100).optional().nullable(),
   page: z.number().int().positive().default(1),
   search: z.string().optional().nullable(),
-  status: DealerFormSubmissionStatusSchema,
-  published: z.enum(["true", "false"]).optional().nullable(),
+  status: DealerFormSubmissionFilterStatusSchema,
 });
 
 export type GetDealerFormSubmissionsQuery = z.infer<typeof GetDealerFormSubmissionsQuerySchema>;
 
-export const UpdateDealerFormSubmissionStatusBodySchema = z.object({
-  id: z.string().min(1),
-  status: DealerFormSubmissionStatusSchema.refine((value) => value !== null && value !== undefined, {
-    message: "status is required",
-  }),
-  sendEmail: z.boolean().optional().nullable(),
-  emailSubject: NullableString,
-  emailMessage: NullableString,
-});
-
-export type UpdateDealerFormSubmissionStatusBody = z.infer<
-  typeof UpdateDealerFormSubmissionStatusBodySchema
->;
-
-export const ConvertDealerFormSubmissionBodySchema = z.object({
+export const PublishDealerFormSubmissionBodySchema = z.object({
   id: z.string().min(1),
   status: z.union([z.literal("ACTIVE"), z.literal("UNLISTED")]),
+  sendEmail: z.boolean().optional().nullable(),
 });
 
-export type ConvertDealerFormSubmissionBody = z.infer<typeof ConvertDealerFormSubmissionBodySchema>;
+export type PublishDealerFormSubmissionBody = z.infer<typeof PublishDealerFormSubmissionBodySchema>;
+
+export const SetDealerFormSubmissionArchivedBodySchema = z.object({
+  id: z.string().min(1),
+  archived: z.boolean(),
+});
+
+export type SetDealerFormSubmissionArchivedBody = z.infer<
+  typeof SetDealerFormSubmissionArchivedBodySchema
+>;
 
 export const DealerFormSubmissionFieldResponseSchema = z.object({
   key: z.string().min(1),
@@ -97,12 +95,12 @@ export function parseSubmitDealerFormBody(body: string | null | undefined) {
   return parseBody(body, SubmitDealerFormBodySchema);
 }
 
-export function parseUpdateDealerFormSubmissionStatusBody(body: string | null | undefined) {
-  return parseBody(body, UpdateDealerFormSubmissionStatusBodySchema);
+export function parsePublishDealerFormSubmissionBody(body: string | null | undefined) {
+  return parseBody(body, PublishDealerFormSubmissionBodySchema);
 }
 
-export function parseConvertDealerFormSubmissionBody(body: string | null | undefined) {
-  return parseBody(body, ConvertDealerFormSubmissionBodySchema);
+export function parseSetDealerFormSubmissionArchivedBody(body: string | null | undefined) {
+  return parseBody(body, SetDealerFormSubmissionArchivedBodySchema);
 }
 
 export function parseDeleteDealerFormSubmissionBody(body: string | null | undefined) {
@@ -121,7 +119,6 @@ export function parseGetDealerFormSubmissionsQuery(input: {
     page: pageValue === null ? 1 : Number(pageValue),
     search: normaliseOptionalQueryString(queryStringParameters.search),
     status: normaliseOptionalQueryString(queryStringParameters.status),
-    published: normaliseOptionalQueryString(queryStringParameters.published),
   });
 
   if (!parsed.success) {

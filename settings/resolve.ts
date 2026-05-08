@@ -78,6 +78,12 @@ const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
   customFieldLabels: [],
 };
 
+const DEFAULT_DEALER_NOTIFICATION_ACCENT_COLOR = "#2563eb";
+const DEFAULT_DEALER_NOTIFICATION_SUBJECT = "Dealer submission received";
+const DEFAULT_DEALER_NOTIFICATION_BODY = "Hi {name},\n\nYour dealer submission has been received.";
+const DEFAULT_DEALER_PUBLISHED_SUBJECT = "Dealer submission published";
+const DEFAULT_DEALER_PUBLISHED_BODY = "Hi {name},\n\nYour dealer submission has been published.";
+
 function resolveSearchBehaviourSettings(
   settings?: SearchBehaviourSettings | null,
 ): SearchBehaviourSettings {
@@ -181,6 +187,16 @@ function resolveDealerFormsSettings(
     fields,
     notificationEnabled: settings?.notificationEnabled ?? true,
     notificationEmail: settings?.notificationEmail ?? "",
+    dealerNotificationEnabled: settings?.dealerNotificationEnabled ?? true,
+    notificationAccentColor:
+      settings?.notificationAccentColor?.trim() || DEFAULT_DEALER_NOTIFICATION_ACCENT_COLOR,
+    dealerNotificationSubject:
+      settings?.dealerNotificationSubject?.trim() || DEFAULT_DEALER_NOTIFICATION_SUBJECT,
+    dealerNotificationBody:
+      settings?.dealerNotificationBody?.trim() || DEFAULT_DEALER_NOTIFICATION_BODY,
+    dealerPublishedSubject:
+      settings?.dealerPublishedSubject?.trim() || DEFAULT_DEALER_PUBLISHED_SUBJECT,
+    dealerPublishedBody: settings?.dealerPublishedBody?.trim() || DEFAULT_DEALER_PUBLISHED_BODY,
   };
 }
 

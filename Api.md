@@ -1310,7 +1310,7 @@ Supported groups:
 * `customFields`
   Covers reusable location custom field definitions, their names, field types (`TEXT`, `TEXT_MULTILINE`, `LINK`), and whether they appear in storefront listings.
 * `dealerForms`
-  Covers public dealer application form field definitions, supported field types (`TEXT`, `TEXT_MULTILINE`, `SELECT`, `CONTACT`, `EMAIL`, `PHONE`, `ADDRESS`, `CHECKBOX`, `FILE_UPLOAD`, `IMAGE_UPLOAD`, `NUMBER`, `LINK`), whether each field is required, whether core fields are `locked` in admin UI, structured object storage for `CONTACT` and `ADDRESS` fields, and admin notification email preferences.
+  Covers public dealer application form field definitions, supported field types (`TEXT`, `TEXT_MULTILINE`, `SELECT`, `CONTACT`, `EMAIL`, `PHONE`, `ADDRESS`, `CHECKBOX`, `FILE_UPLOAD`, `IMAGE_UPLOAD`, `NUMBER`, `LINK`), whether each field is required, whether core fields are `locked` in admin UI, structured object storage for `CONTACT` and `ADDRESS` fields, admin notification email preferences, shared notification accent color, dealer confirmation email enablement, and dealer email subject/body templates for both submission and published notifications with `{name}` placeholder support.
 * `language`
   Covers primary language, translated languages, editable user-facing locator text, and per-language label overrides for categories/filters and custom fields.
 * `provider`
@@ -1373,6 +1373,12 @@ Those converters are used to:
     "dealerForms": {
       "notificationEnabled": true,
       "notificationEmail": "dealer-alerts@example.com",
+      "dealerNotificationEnabled": true,
+      "notificationAccentColor": "#2563eb",
+      "dealerNotificationSubject": "Dealer submission received",
+      "dealerNotificationBody": "Hi {name},\n\nYour dealer submission has been received.",
+      "dealerPublishedSubject": "Dealer submission published",
+      "dealerPublishedBody": "Hi {name},\n\nYour dealer submission has been published.",
       "fields": [
         {
           "key": "contact",
@@ -1452,8 +1458,8 @@ Returns paginated dealer form submissions owned by authenticated org, newest fir
 * `limit: number` (optional, max `100`, default `50`)
 * `page: number` (optional, default `1`)
 * `search: string` (optional, searches contact name, contact email, location name, and stored field values)
-* `status: SUBMITTED | APPROVED | REJECTED` (optional)
-* `published: "true" | "false"` (optional, filter by whether `publishedLocationId` is set)
+* `status: OPEN | PUBLISHED | ARCHIVED` (optional)
+* when `status` is omitted, endpoint includes open and published submissions but excludes archived ones
 
 ### Success response
 
@@ -1463,7 +1469,7 @@ Returns paginated dealer form submissions owned by authenticated org, newest fir
     {
       "id": "6820adf54f9a9b0012345678",
       "org": "665f0d3f4f9a9b0099999999",
-      "status": "SUBMITTED",
+      "archived": false,
       "publishedLocationId": null,
       "contactName": "Jane Doe",
       "contactEmail": "jane@example.com",
@@ -1495,12 +1501,12 @@ Returns paginated dealer form submissions owned by authenticated org, newest fir
 
 \---
 
-## Update Dealer Form Submission Status
+## Publish Dealer Form Submission
 
 **Method:** `POST`  
-**Route:** `dealerForms/updateDealerFormSubmissionStatus`
+**Route:** `dealerForms/publishDealerFormSubmission`
 
-Updates one dealer form submission status. Can optionally email dealer with custom subject/message.
+Publishes one dealer form submission into a location. Can optionally email dealer using organisation publish email settings.
 
 ### Query parameters
 
@@ -1511,43 +1517,8 @@ Updates one dealer form submission status. Can optionally email dealer with cust
 ```json
 {
   "id": "6820adf54f9a9b0012345678",
-  "status": "APPROVED",
+  "status": "ACTIVE",
   "sendEmail": true,
-  "emailSubject": "Your dealer application has been approved",
-  "emailMessage": "We will be in touch shortly with next steps."
-}
-```
-
-### Rules
-
-* `id` must be valid ObjectId string for submission owned by authenticated org
-* `status` must be `SUBMITTED`, `APPROVED`, or `REJECTED`
-* dealer email is only sent when `sendEmail` is truthy
-* dealer unsubscribe list suppresses optional status emails
-
-### Success response
-
-Returns updated `DealerFormSubmissionModel`.
-
-\---
-
-## Convert Dealer Form Submission To Location
-
-**Method:** `POST`  
-**Route:** `dealerForms/convertDealerFormSubmissionToLocation`
-
-Creates one location from a dealer form submission and stores resulting `publishedLocationId` back on submission.
-
-### Query parameters
-
-* `shop: string` (required)
-
-### Request body
-
-```json
-{
-  "id": "6820adf54f9a9b0012345678",
-  "status": "ACTIVE"
 }
 ```
 
@@ -1555,7 +1526,8 @@ Creates one location from a dealer form submission and stores resulting `publish
 
 * `id` must be valid ObjectId string for submission owned by authenticated org
 * `status` must be `ACTIVE` or `UNLISTED`
-* each submission can only be converted once
+* archived submissions cannot be published
+* published submissions cannot be published again
 * mapped location fields use reserved dealer field keys:
   `name`, `address`, `phoneNumber`, `website`, `emailAddress`, `logoUrl`
 * `contact` field stores structured contact parts inside one value object:
@@ -1563,7 +1535,9 @@ Creates one location from a dealer form submission and stores resulting `publish
 * `address` field stores structured address parts inside one value object:
   `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, `country`
 * all other populated dealer form fields are stored as location `customFields`
-* conversion also sets submission `status` to `APPROVED`
+* dealer email is only sent when `sendEmail` is truthy
+* dealer publish email subject/body come from org `dealerForms.dealerPublishedSubject` and `dealerForms.dealerPublishedBody`
+* dealer unsubscribe list suppresses optional publish emails
 
 ### Success response
 
@@ -1571,7 +1545,7 @@ Creates one location from a dealer form submission and stores resulting `publish
 {
   "submission": {
     "id": "6820adf54f9a9b0012345678",
-    "status": "APPROVED",
+    "archived": false,
     "publishedLocationId": "6820ae104f9a9b0012345679"
   },
   "location": {
@@ -1581,6 +1555,39 @@ Creates one location from a dealer form submission and stores resulting `publish
   }
 }
 ```
+
+\---
+
+## Set Dealer Form Submission Archived
+
+**Method:** `POST`  
+**Route:** `dealerForms/setDealerFormSubmissionArchived`
+
+Sets `archived` flag on one dealer form submission.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Request body
+
+```json
+{
+  "id": "6820adf54f9a9b0012345678",
+  "archived": true
+}
+```
+
+### Rules
+
+* `id` must be valid ObjectId string for submission owned by authenticated org
+* published submissions cannot be archived
+* archived submissions can be unarchived by sending `"archived": false`
+* archiving never sends email
+
+### Success response
+
+Returns updated `DealerFormSubmissionModel`.
 
 \---
 
@@ -1676,6 +1683,8 @@ This endpoint does **not** require HMAC verification.
 * `EMAIL` fields must be email-shaped
 * `LINK`, `FILE_UPLOAD`, and `IMAGE_UPLOAD` fields currently store string URLs and must be valid URLs
 * `SELECT` fields must match one configured option value
+* dealer confirmation email can be disabled with org `dealerForms.dealerNotificationEnabled`
+* dealer confirmation email subject/body use org settings templates and replace `{name}` with submitted contact name or empty string
 * dealer confirmation email is suppressed when dealer email is unsubscribed
 * org admin notification email is suppressed when org dealer notifications are disabled
 
@@ -1719,7 +1728,7 @@ Dealer form email notifications unsubscribed.
 **Method:** `GET`  
 **Route:** `dealerForms/unsubscribeDealer`
 
-Public unsubscribe link endpoint that stores org-scoped dealer email unsubscribe record. Future dealer confirmation and optional status emails for that org+email are suppressed.
+Public unsubscribe link endpoint that stores org-scoped dealer email unsubscribe record. Future dealer confirmation and optional published emails for that org+email are suppressed.
 
 This endpoint does **not** require HMAC verification.
 

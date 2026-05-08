@@ -144,6 +144,24 @@ export const DealerFormsSettingsSchema = z.object({
   notificationEmail: NullableString.describe(
     "Email address that receives new dealer submission notifications. Defaults to organisation contact email when empty.",
   ),
+  dealerNotificationEnabled: NullableBoolean.describe(
+    "Whether dealer should receive a confirmation email after submitting the dealer form.",
+  ),
+  notificationAccentColor: NullableString.describe(
+    "Accent color used for dealer form notification emails sent to dealer and organisation.",
+  ),
+  dealerNotificationSubject: NullableString.describe(
+    "Subject template for dealer confirmation emails. Supports {name} placeholder.",
+  ),
+  dealerNotificationBody: NullableString.describe(
+    "Body template for dealer confirmation emails. Supports {name} placeholder.",
+  ),
+  dealerPublishedSubject: NullableString.describe(
+    "Subject template for dealer published emails. Supports {name} placeholder.",
+  ),
+  dealerPublishedBody: NullableString.describe(
+    "Body template for dealer published emails. Supports {name} placeholder.",
+  ),
 });
 
 export type DealerFormsSettings = z.infer<typeof DealerFormsSettingsSchema>;
