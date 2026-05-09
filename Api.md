@@ -2195,6 +2195,10 @@ Stores spreadsheet selection and column mapping for org, then queues a sync job 
 ### Rules
 
 * `externalIdColumn` is required and is used as stable row identity for update/delete behavior
+* rows missing an external id are skipped and reported as sync errors
+* duplicated external ids are treated as invalid source data:
+  * all rows with that duplicated id are skipped for the run
+  * existing linked location for that id is not updated or deleted during that run
 * at least one mapping is required
 * `LOCATION_FIELD` mappings target built-in location fields such as `name`, `formattedAddress`, `city`, `status`, `latitude`, or `longitude`
 * `CUSTOM_FIELD` mappings create location `customFields` entries
