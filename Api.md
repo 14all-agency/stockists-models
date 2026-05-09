@@ -1762,6 +1762,370 @@ Dealer email unsubscribed.
 
 \---
 
+## Install Google Sheets Sync
+
+**Method:** `GET`  
+**Route:** `googleSheets/install`
+
+Starts Google OAuth for authenticated shop and returns Google consent URL.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* backend creates one-time OAuth `state` linked to current org
+* response does not redirect directly; frontend should redirect browser to returned `url`
+* Google OAuth redirect target is `${APP_URL}/google-sheets/`
+
+### Success response
+
+```json
+{
+  "url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=...&redirect_uri=...&response_type=code&access_type=offline&prompt=consent&scope=..."
+}
+```
+
+\---
+
+## Google Sheets OAuth Callback
+
+**Method:** `GET`  
+**Route:** `googleSheets/auth`
+
+Completes Google OAuth callback, stores Google token set for org, records Google account email, then redirects back into app.
+
+This endpoint is called by Google, not by frontend fetch.
+
+### Query parameters
+
+* `state: string` (required)
+* `code: string` (required)
+
+### Rules
+
+* callback does **not** use Shopify HMAC verification
+* `state` must match one-time OAuth state created by `googleSheets/install`
+* stored token includes access token, refresh token, expiry, scope, and token type
+* sync record is moved to `CONNECTED` status after successful auth
+* endpoint redirects browser to `${APP_URL}/google-sheets/`
+
+\---
+
+## Get Google Sheets Sync
+
+**Method:** `GET`  
+**Route:** `googleSheets/getSync`
+
+Returns current org Google Sheets sync summary and stored sync configuration when present.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Success response
+
+```json
+{
+  "connected": true,
+  "sync": {
+    "id": "681111114f9a9b0012345678",
+    "org": "665f0d3f4f9a9b0099999999",
+    "status": "ACTIVE",
+    "googleEmail": "owner@example.com",
+    "spreadsheetId": "1abcDEFghiJKLmnop",
+    "spreadsheetName": "Store Locations",
+    "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1abcDEFghiJKLmnop/edit",
+    "sheetId": 0,
+    "sheetName": "Locations",
+    "headerRow": 1,
+    "dataStartRow": 2,
+    "externalIdColumn": "externalId",
+    "externalIdFallbackStatus": "ACTIVE",
+    "mappings": [
+      {
+        "kind": "LOCATION_FIELD",
+        "sourceColumn": "Name",
+        "field": "name"
+      }
+    ],
+    "options": {
+      "deleteMissingRows": true,
+      "matchExistingByAddressOrCoordinates": true,
+      "resolveCoordinatesFromAddress": true,
+      "parseFormattedAddress": true
+    },
+    "watch": {
+      "channelId": "681111114f9a9b0012345679",
+      "resourceId": "5EwB...",
+      "resourceUri": "https://www.googleapis.com/drive/v3/files/...",
+      "token": "681111114f9a9b0012345680",
+      "expirationAt": "2026-05-15T12:00:00.000Z"
+    },
+    "dirtyAt": null,
+    "lastSyncedAt": "2026-05-09T12:00:00.000Z",
+    "lastErrorAt": null,
+    "lastErrorMessage": null,
+    "errorNotificationsEnabled": true,
+    "createdAt": "2026-05-09T11:00:00.000Z",
+    "updatedAt": "2026-05-09T12:00:00.000Z"
+  }
+}
+```
+
+\---
+
+## Get Google Spreadsheets
+
+**Method:** `GET`  
+**Route:** `googleSheets/getSpreadsheets`
+
+Lists spreadsheets visible to connected Google account.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Rules
+
+* org must already have completed Google OAuth
+* returns only spreadsheet files from Google Drive
+
+### Success response
+
+```json
+{
+  "spreadsheets": [
+    {
+      "id": "1abcDEFghiJKLmnop",
+      "name": "Store Locations",
+      "url": "https://docs.google.com/spreadsheets/d/1abcDEFghiJKLmnop/edit"
+    }
+  ]
+}
+```
+
+\---
+
+## Get Google Spreadsheet Sheets
+
+**Method:** `GET`  
+**Route:** `googleSheets/getSheets`
+
+Lists sheets/tabs inside a selected Google spreadsheet.
+
+### Query parameters
+
+* `shop: string` (required)
+* `spreadsheetId: string` (required)
+* standard Shopify HMAC params for verification
+
+### Success response
+
+```json
+{
+  "sheets": [
+    {
+      "id": 0,
+      "name": "Locations"
+    },
+    {
+      "id": 123456789,
+      "name": "Archive"
+    }
+  ]
+}
+```
+
+\---
+
+## Configure Google Sheets Sync
+
+**Method:** `POST`  
+**Route:** `googleSheets/configureSync`
+
+Stores spreadsheet selection and column mapping for org, ensures file watch exists, then runs sync immediately.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Request body
+
+```json
+{
+  "spreadsheetId": "1abcDEFghiJKLmnop",
+  "spreadsheetName": "Store Locations",
+  "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1abcDEFghiJKLmnop/edit",
+  "sheetId": 0,
+  "sheetName": "Locations",
+  "headerRow": 1,
+  "dataStartRow": 2,
+  "externalIdColumn": "externalId",
+  "externalIdFallbackStatus": "ACTIVE",
+  "mappings": [
+    {
+      "kind": "LOCATION_FIELD",
+      "sourceColumn": "Name",
+      "field": "name"
+    },
+    {
+      "kind": "LOCATION_FIELD",
+      "sourceColumn": "Address",
+      "field": "formattedAddress"
+    },
+    {
+      "kind": "LOCATION_FIELD",
+      "sourceColumn": "Latitude",
+      "field": "latitude"
+    },
+    {
+      "kind": "LOCATION_FIELD",
+      "sourceColumn": "Longitude",
+      "field": "longitude"
+    },
+    {
+      "kind": "CUSTOM_FIELD",
+      "sourceColumn": "Opening Hours",
+      "key": "opening-hours",
+      "label": "Opening Hours",
+      "type": "TEXT",
+      "showOnListing": true
+    },
+    {
+      "kind": "FILTER",
+      "sourceColumn": "Category",
+      "key": "category"
+    }
+  ],
+  "options": {
+    "deleteMissingRows": true,
+    "matchExistingByAddressOrCoordinates": true,
+    "resolveCoordinatesFromAddress": true,
+    "parseFormattedAddress": true
+  }
+}
+```
+
+### Rules
+
+* `externalIdColumn` is required and is used as stable row identity for update/delete behavior
+* at least one mapping is required
+* `LOCATION_FIELD` mappings target built-in location fields such as `name`, `formattedAddress`, `city`, `status`, `latitude`, or `longitude`
+* `CUSTOM_FIELD` mappings create location `customFields` entries
+* `FILTER` mappings create location `filters` entries
+* first successful save triggers immediate sync against current sheet contents
+* sync may create, update, and optionally delete locations
+* if `deleteMissingRows=true`, any previously linked row absent from current sheet snapshot deletes corresponding location
+* if `matchExistingByAddressOrCoordinates=true`, unmatched external ids can attach to existing locations using same import matching rules as bulk import
+* response includes sync summary plus immediate sync counts
+
+### Success response
+
+```json
+{
+  "result": {
+    "created": 8,
+    "updated": 3,
+    "deleted": 1,
+    "errors": []
+  },
+  "sync": {
+    "id": "681111114f9a9b0012345678",
+    "status": "ACTIVE",
+    "spreadsheetId": "1abcDEFghiJKLmnop",
+    "sheetName": "Locations",
+    "externalIdColumn": "externalId"
+  }
+}
+```
+
+\---
+
+## Disconnect Google Sheets Sync
+
+**Method:** `POST`  
+**Route:** `googleSheets/disconnect`
+
+Disconnects current org Google Sheets sync, clears stored Google token/watch state, and deletes stored row-link snapshots.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Success response
+
+```json
+{
+  "disconnected": true
+}
+```
+
+\---
+
+## Google Sheets Webhook
+
+**Method:** `POST`  
+**Route:** `googleSheets/webhook`
+
+Receives Google Drive file change notifications for watched spreadsheet files. Marks sync dirty and attempts immediate sync.
+
+This endpoint is called by Google, not by frontend fetch.
+
+### Headers
+
+* `X-Goog-Channel-Id: string` (required)
+* `X-Goog-Channel-Token: string` (required)
+* additional standard Google watch headers may be present
+
+### Rules
+
+* backend validates channel id against stored watch record
+* backend validates channel token against stored watch token
+* Google does not provide changed rows, so backend re-reads configured sheet and diffs against stored row snapshots
+* webhook is best-effort immediate processing; scheduled sync still acts as fallback
+
+### Success response
+
+```json
+{
+  "ok": true
+}
+```
+
+\---
+
+## Unsubscribe Google Sheets Error Emails
+
+**Method:** `GET`  
+**Route:** `googleSheets/unsubscribe`
+
+Public unsubscribe link endpoint that disables Google Sheets sync error notification emails for a sync record.
+
+This endpoint does **not** require HMAC verification.
+
+### Query parameters
+
+* `syncId: string` (required)
+* `token: string` (required)
+
+### Success response
+
+Plain text response:
+
+```text
+Google Sheets sync error emails unsubscribed.
+```
+
+\---
+
 ## Rebuild Storefront Cache
 
 **Method:** `POST`  
