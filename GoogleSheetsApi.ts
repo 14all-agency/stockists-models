@@ -111,6 +111,10 @@ export const GoogleSheetOperationsResponseSchema = z.object({
   }),
 });
 
+export type GoogleSheetOperationsResponse = z.infer<typeof GoogleSheetOperationsResponseSchema>;
+export type GoogleSheetOperation = GoogleSheetOperationsResponse["operations"][number];
+export type GoogleSheetOperationsPagination = GoogleSheetOperationsResponse["pagination"];
+
 function normaliseOptionalQueryString(value: string | null | undefined) {
   const trimmed = value?.trim();
 
