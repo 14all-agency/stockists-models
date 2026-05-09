@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { LocationCustomFieldTypeResult, LocationStatusResult } from "./Location";
 
+const ApiDateSchema = z.coerce.date().optional().nullable();
+
 export const GoogleSheetSyncStatusSchema = z
   .enum(["PENDING_AUTH", "CONNECTED", "ACTIVE", "ERROR", "DISCONNECTED"])
   .optional()
@@ -13,7 +15,7 @@ export type GoogleSheetSyncStatus = z.infer<typeof GoogleSheetSyncStatusSchema>;
 export const GoogleSheetSyncTokenSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string().optional().nullable(),
-  expiresAt: z.date().optional().nullable(),
+  expiresAt: ApiDateSchema,
   scope: z.string().optional().nullable(),
   tokenType: z.string().optional().nullable(),
 });
@@ -25,7 +27,7 @@ export const GoogleSheetWatchSchema = z.object({
   resourceId: z.string().min(1),
   resourceUri: z.string().optional().nullable(),
   token: z.string().optional().nullable(),
-  expirationAt: z.date().optional().nullable(),
+  expirationAt: ApiDateSchema,
 });
 
 export type GoogleSheetWatch = z.infer<typeof GoogleSheetWatchSchema>;
@@ -109,13 +111,13 @@ export const GoogleSheetSyncEntitySchema = z.object({
   options: GoogleSheetSyncOptionsSchema.optional().nullable(),
   token: GoogleSheetSyncTokenSchema.optional().nullable(),
   watch: GoogleSheetWatchSchema.optional().nullable(),
-  dirtyAt: z.date().optional().nullable(),
-  lastSyncedAt: z.date().optional().nullable(),
-  lastErrorAt: z.date().optional().nullable(),
+  dirtyAt: ApiDateSchema,
+  lastSyncedAt: ApiDateSchema,
+  lastErrorAt: ApiDateSchema,
   lastErrorMessage: z.string().optional().nullable(),
   errorNotificationsEnabled: z.boolean().optional().nullable(),
-  createdAt: z.date().optional().nullable(),
-  updatedAt: z.date().optional().nullable(),
+  createdAt: ApiDateSchema,
+  updatedAt: ApiDateSchema,
 });
 
 export type GoogleSheetSyncEntity = z.infer<typeof GoogleSheetSyncEntitySchema>;
