@@ -22,16 +22,6 @@ export const GoogleSheetSyncTokenSchema = z.object({
 
 export type GoogleSheetSyncToken = z.infer<typeof GoogleSheetSyncTokenSchema>;
 
-export const GoogleSheetWatchSchema = z.object({
-  channelId: z.string().min(1),
-  resourceId: z.string().min(1),
-  resourceUri: z.string().optional().nullable(),
-  token: z.string().optional().nullable(),
-  expirationAt: ApiDateSchema,
-});
-
-export type GoogleSheetWatch = z.infer<typeof GoogleSheetWatchSchema>;
-
 export const GoogleSheetSyncOptionsSchema = z.object({
   deleteMissingRows: z.boolean().optional().nullable(),
   matchExistingByAddressOrCoordinates: z.boolean().optional().nullable(),
@@ -110,8 +100,11 @@ export const GoogleSheetSyncEntitySchema = z.object({
   mappings: z.array(GoogleSheetSyncMappingSchema).optional().nullable(),
   options: GoogleSheetSyncOptionsSchema.optional().nullable(),
   token: GoogleSheetSyncTokenSchema.optional().nullable(),
-  watch: GoogleSheetWatchSchema.optional().nullable(),
-  dirtyAt: ApiDateSchema,
+  lastCheckedAt: ApiDateSchema,
+  lastSourceModifiedAt: ApiDateSchema,
+  lastSourceVersion: z.string().optional().nullable(),
+  syncLeaseToken: z.string().optional().nullable(),
+  syncLeaseExpiresAt: ApiDateSchema,
   lastSyncedAt: ApiDateSchema,
   lastErrorAt: ApiDateSchema,
   lastErrorMessage: z.string().optional().nullable(),
@@ -138,8 +131,8 @@ export const GoogleSheetSyncModelSchema = z.object({
   externalIdFallbackStatus: GoogleSheetSyncEntitySchema.shape.externalIdFallbackStatus,
   mappings: GoogleSheetSyncEntitySchema.shape.mappings,
   options: GoogleSheetSyncEntitySchema.shape.options,
-  watch: GoogleSheetSyncEntitySchema.shape.watch,
-  dirtyAt: GoogleSheetSyncEntitySchema.shape.dirtyAt,
+  lastCheckedAt: GoogleSheetSyncEntitySchema.shape.lastCheckedAt,
+  lastSourceModifiedAt: GoogleSheetSyncEntitySchema.shape.lastSourceModifiedAt,
   lastSyncedAt: GoogleSheetSyncEntitySchema.shape.lastSyncedAt,
   lastErrorAt: GoogleSheetSyncEntitySchema.shape.lastErrorAt,
   lastErrorMessage: GoogleSheetSyncEntitySchema.shape.lastErrorMessage,
@@ -168,8 +161,10 @@ export const GoogleSheetSyncModel = {
       externalIdFallbackStatus: entity.externalIdFallbackStatus ?? "ACTIVE",
       mappings: entity.mappings ?? null,
       options: entity.options ?? null,
-      watch: entity.watch ?? null,
-      dirtyAt: entity.dirtyAt ? new Date(entity.dirtyAt) : null,
+      lastCheckedAt: entity.lastCheckedAt ? new Date(entity.lastCheckedAt) : null,
+      lastSourceModifiedAt: entity.lastSourceModifiedAt
+        ? new Date(entity.lastSourceModifiedAt)
+        : null,
       lastSyncedAt: entity.lastSyncedAt ? new Date(entity.lastSyncedAt) : null,
       lastErrorAt: entity.lastErrorAt ? new Date(entity.lastErrorAt) : null,
       lastErrorMessage: entity.lastErrorMessage ?? null,

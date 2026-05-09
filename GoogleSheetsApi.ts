@@ -74,17 +74,8 @@ export const GoogleSheetHeadersResponseSchema = z.object({
 
 export type GoogleSheetHeadersResponse = z.infer<typeof GoogleSheetHeadersResponseSchema>;
 
-export const ConfigureGoogleSheetSyncResultSchema = z.object({
-  created: z.number().int().nonnegative(),
-  updated: z.number().int().nonnegative(),
-  deleted: z.number().int().nonnegative(),
-  errors: z.array(z.string()).optional().nullable(),
-});
-
-export type ConfigureGoogleSheetSyncResult = z.infer<typeof ConfigureGoogleSheetSyncResultSchema>;
-
 export const ConfigureGoogleSheetSyncResponseSchema = z.object({
-  result: ConfigureGoogleSheetSyncResultSchema,
+  queued: z.boolean(),
   sync: GoogleSheetSyncModelSchema,
 });
 
