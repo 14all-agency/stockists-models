@@ -1879,6 +1879,140 @@ Returns current org Google Sheets sync summary and stored sync configuration whe
 
 \---
 
+## Get Google Sheets Operations
+
+**Method:** `GET`  
+**Route:** `googleSheets/getOperations`
+
+Returns Google Sheets sync operation log records for authenticated org. Results are sorted newest to oldest by default.
+
+### Query parameters
+
+* `shop: string` (required)
+* `limit: number` (optional, defaults to `50`, max `100`)
+* `page: number` (optional, defaults to `1`)
+* `syncId: string` (optional)
+* `operation: CREATE | UPDATE | DELETE` (optional)
+* standard Shopify HMAC params for verification
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* all returned records are scoped to authenticated org
+* `syncId` filters to one Google Sheets sync record
+* `operation` filters to one operation type
+* default sort order is newest to oldest using operation timestamp
+
+### Success response
+
+```json
+{
+  "operations": [
+    {
+      "id": "681111114f9a9b0012345690",
+      "org": "665f0d3f4f9a9b0099999999",
+      "sync": "681111114f9a9b0012345678",
+      "syncRow": "681111114f9a9b0012345689",
+      "operation": "UPDATE",
+      "externalId": "AKL-001",
+      "rowNumber": 2,
+      "rawRowData": {
+        "externalId": "AKL-001",
+        "Name": "Auckland Flagship",
+        "Address": "1 Queen Street, Auckland 1010, New Zealand"
+      },
+      "mappedData": {
+        "externalId": "AKL-001",
+        "location": {
+          "status": "ACTIVE",
+          "name": "Auckland Flagship",
+          "addressLine1": null,
+          "addressLine2": null,
+          "city": null,
+          "postalCode": null,
+          "stateProvince": null,
+          "country": null,
+          "phoneNumber": null,
+          "website": null,
+          "emailAddress": null,
+          "logoUrl": null,
+          "notes": null,
+          "customFields": null,
+          "filters": null,
+          "priority": null,
+          "suppressWarnings": null,
+          "coordinates": null,
+          "formattedAddress": "1 Queen Street, Auckland 1010, New Zealand",
+          "id": null
+        }
+      },
+      "locationId": "681111114f9a9b0012345688",
+      "previousLocation": {
+        "id": "681111114f9a9b0012345688",
+        "org": "665f0d3f4f9a9b0099999999",
+        "status": "ACTIVE",
+        "name": "Auckland Store",
+        "addressLine1": null,
+        "addressLine2": null,
+        "city": null,
+        "postalCode": null,
+        "stateProvince": null,
+        "country": null,
+        "phoneNumber": null,
+        "website": null,
+        "emailAddress": null,
+        "logoUrl": null,
+        "notes": null,
+        "customFields": null,
+        "filters": null,
+        "priority": null,
+        "suppressWarnings": null,
+        "coordinates": null,
+        "createdAt": "2026-05-09T08:00:00.000Z",
+        "updatedAt": "2026-05-09T08:10:00.000Z"
+      },
+      "nextLocation": {
+        "id": "681111114f9a9b0012345688",
+        "org": "665f0d3f4f9a9b0099999999",
+        "status": "ACTIVE",
+        "name": "Auckland Flagship",
+        "addressLine1": null,
+        "addressLine2": null,
+        "city": null,
+        "postalCode": null,
+        "stateProvince": null,
+        "country": null,
+        "phoneNumber": null,
+        "website": null,
+        "emailAddress": null,
+        "logoUrl": null,
+        "notes": null,
+        "customFields": null,
+        "filters": null,
+        "priority": null,
+        "suppressWarnings": null,
+        "coordinates": null,
+        "createdAt": "2026-05-09T08:00:00.000Z",
+        "updatedAt": "2026-05-09T08:59:21.000Z"
+      },
+      "happenedAt": "2026-05-09T08:59:21.000Z",
+      "createdAt": "2026-05-09T08:59:21.000Z",
+      "updatedAt": "2026-05-09T08:59:21.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  }
+}
+```
+
+\---
+
 ## Get Google Spreadsheets
 
 **Method:** `GET`  

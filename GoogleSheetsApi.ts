@@ -5,6 +5,10 @@ import {
   GoogleSheetSyncModelSchema,
   GoogleSheetSyncOptionsSchema,
 } from "./GoogleSheetSync";
+import {
+  GoogleSheetSyncOperationModelSchema,
+  GoogleSheetSyncOperationTypeSchema,
+} from "./GoogleSheetSyncOperation";
 import { LocationStatusResult } from "./Location";
 
 export const GoogleSheetReferenceSchema = z.object({
@@ -85,6 +89,55 @@ export const ConfigureGoogleSheetSyncResponseSchema = z.object({
 });
 
 export type ConfigureGoogleSheetSyncResponse = z.infer<typeof ConfigureGoogleSheetSyncResponseSchema>;
+
+const GoogleSheetOperationsQuerySchema = z.object({
+  limit: z.number().int().positive().max(100).optional().nullable(),
+  page: z.number().int().positive().default(1),
+  syncId: z.string().min(1).optional().nullable(),
+  operation: GoogleSheetSyncOperationTypeSchema.optional().nullable(),
+});
+
+export type GoogleSheetOperationsQuery = z.infer<typeof GoogleSheetOperationsQuerySchema>;
+
+export const GoogleSheetOperationsResponseSchema = z.object({
+  operations: z.array(GoogleSheetSyncOperationModelSchema),
+  pagination: z.object({
+    page: z.number().int().positive(),
+    limit: z.number().int().positive(),
+    total: z.number().int().nonnegative(),
+    totalPages: z.number().int().positive(),
+    hasNextPage: z.boolean(),
+    hasPreviousPage: z.boolean(),
+  }),
+});
+
+function normaliseOptionalQueryString(value: string | null | undefined) {
+  const trimmed = value?.trim();
+
+  return trimmed ? trimmed : null;
+}
+
+export function parseGetGoogleSheetOperationsQuery(input: {
+  queryStringParameters?: Record<string, string | null | undefined> | null;
+}) {
+  const queryStringParameters = input.queryStringParameters ?? {};
+  const limitValue = normaliseOptionalQueryString(queryStringParameters.limit);
+  const pageValue = normaliseOptionalQueryString(queryStringParameters.page);
+  const parsed = GoogleSheetOperationsQuerySchema.safeParse({
+    limit: limitValue === null ? null : Number(limitValue),
+    page: pageValue === null ? 1 : Number(pageValue),
+    syncId: normaliseOptionalQueryString(queryStringParameters.syncId),
+    operation: normaliseOptionalQueryString(queryStringParameters.operation),
+  });
+
+  if (!parsed.success) {
+    throw new Error(
+      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
+    );
+  }
+
+  return parsed.data;
+}
 
 export function parseConfigureGoogleSheetSyncBody(body: string | null | undefined) {
   if (!body) {
