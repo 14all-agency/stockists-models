@@ -1859,14 +1859,8 @@ Returns current org Google Sheets sync summary and stored sync configuration whe
       "resolveCoordinatesFromAddress": true,
       "parseFormattedAddress": true
     },
-    "watch": {
-      "channelId": "681111114f9a9b0012345679",
-      "resourceId": "5EwB...",
-      "resourceUri": "https://www.googleapis.com/drive/v3/files/...",
-      "token": "681111114f9a9b0012345680",
-      "expirationAt": "2026-05-15T12:00:00.000Z"
-    },
-    "dirtyAt": null,
+    "lastCheckedAt": "2026-05-09T11:55:00.000Z",
+    "lastSourceModifiedAt": "2026-05-09T11:54:40.000Z",
     "lastSyncedAt": "2026-05-09T12:00:00.000Z",
     "lastErrorAt": null,
     "lastErrorMessage": null,
@@ -2134,7 +2128,7 @@ Returns header values and sample preview rows for selected spreadsheet tab so fr
 **Method:** `POST`  
 **Route:** `googleSheets/configureSync`
 
-Stores spreadsheet selection and column mapping for org, ensures file watch exists, then runs sync immediately.
+Stores spreadsheet selection and column mapping for org, then queues a sync job immediately.
 
 ### Query parameters
 
@@ -2205,22 +2199,17 @@ Stores spreadsheet selection and column mapping for org, ensures file watch exis
 * `LOCATION_FIELD` mappings target built-in location fields such as `name`, `formattedAddress`, `city`, `status`, `latitude`, or `longitude`
 * `CUSTOM_FIELD` mappings create location `customFields` entries
 * `FILTER` mappings create location `filters` entries
-* first successful save triggers immediate sync against current sheet contents
+* first successful save queues a sync job against current sheet contents
 * sync may create, update, and optionally delete locations
 * if `deleteMissingRows=true`, any previously linked row absent from current sheet snapshot deletes corresponding location
 * if `matchExistingByAddressOrCoordinates=true`, unmatched external ids can attach to existing locations using same import matching rules as bulk import
-* response includes sync summary plus immediate sync counts
+* response includes sync summary plus whether queueing succeeded immediately
 
 ### Success response
 
 ```json
 {
-  "result": {
-    "created": 8,
-    "updated": 3,
-    "deleted": 1,
-    "errors": []
-  },
+  "queued": true,
   "sync": {
     "id": "681111114f9a9b0012345678",
     "status": "ACTIVE",
@@ -2238,7 +2227,7 @@ Stores spreadsheet selection and column mapping for org, ensures file watch exis
 **Method:** `POST`  
 **Route:** `googleSheets/disconnect`
 
-Disconnects current org Google Sheets sync, clears stored Google token/watch state, and deletes stored row-link snapshots.
+Disconnects current org Google Sheets sync, clears stored Google token/polling state, and deletes stored row-link snapshots.
 
 ### Query parameters
 
@@ -2250,38 +2239,6 @@ Disconnects current org Google Sheets sync, clears stored Google token/watch sta
 ```json
 {
   "disconnected": true
-}
-```
-
-\---
-
-## Google Sheets Webhook
-
-**Method:** `POST`  
-**Route:** `googleSheets/webhook`
-
-Receives Google Drive file change notifications for watched spreadsheet files. Marks sync dirty and attempts immediate sync.
-
-This endpoint is called by Google, not by frontend fetch.
-
-### Headers
-
-* `X-Goog-Channel-Id: string` (required)
-* `X-Goog-Channel-Token: string` (required)
-* additional standard Google watch headers may be present
-
-### Rules
-
-* backend validates channel id against stored watch record
-* backend validates channel token against stored watch token
-* Google does not provide changed rows, so backend re-reads configured sheet and diffs against stored row snapshots
-* webhook is best-effort immediate processing; scheduled sync still acts as fallback
-
-### Success response
-
-```json
-{
-  "ok": true
 }
 ```
 
@@ -2376,7 +2333,7 @@ Processes Shopify `APP_SUBSCRIPTIONS_UPDATE` webhook. Verifies webhook HMAC, ref
 **Method:** `POST`  
 **Route:** `uninstall`
 
-Processes Shopify `APP_UNINSTALLED` webhook. Verifies webhook HMAC, removes Shopify connection fields from org, sets `uninstalledAt`, and deletes related `pricelists` and `subtotalDiscounts` for that org.
+Processes Shopify `APP_UNINSTALLED` webhook. Verifies webhook HMAC, keeps the organisation record as a historical shell, clears Shopify/billing/storefront rebuild state, sets `uninstalledAt`, deletes stale Shopify install/auth state, and hard-deletes org-owned connected data for that org including `locations`, `clusters`, `searches`, `dealerFormSubmissions`, `dealerFormEmailUnsubscribes`, `locationGeocodeJobs`, `googleSheetSyncs`, `googleSheetSyncRows`, `googleSheetSyncOperations`, and `googleSheetAuthStates`.
 
 ### Headers
 
