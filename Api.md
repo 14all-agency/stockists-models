@@ -1944,6 +1944,57 @@ Lists sheets/tabs inside a selected Google spreadsheet.
 
 \---
 
+## Get Google Sheet Headers
+
+**Method:** `GET`  
+**Route:** `googleSheets/getHeaders`
+
+Returns header values and sample preview rows for selected spreadsheet tab so frontend can build mapping UI from real sheet columns.
+
+### Query parameters
+
+* `shop: string` (required)
+* `spreadsheetId: string` (required)
+* `sheetId: number` (required)
+* `headerRow: number` (optional, defaults to `1`)
+* `dataStartRow: number` (optional, defaults to `headerRow + 1`)
+* standard Shopify HMAC params for verification
+
+### Rules
+
+* org must already have completed Google OAuth
+* backend reads selected tab using authenticated Google token for org
+* `headerRow` determines which row becomes mapping source column names
+* backend should trim blank trailing columns from header list
+* duplicate or blank header cells should be normalized into unique non-empty labels before response
+* `sampleRows` should include small preview window from first data rows after `dataStartRow`
+
+### Success response
+
+```json
+{
+  "spreadsheetId": "1abcDEFghiJKLmnop",
+  "sheetId": 0,
+  "headerRow": 1,
+  "dataStartRow": 2,
+  "headers": ["externalId", "Name", "Address", "Latitude", "Longitude"],
+  "sampleRows": [
+    {
+      "rowNumber": 2,
+      "values": {
+        "externalId": "AKL-001",
+        "Name": "Auckland Flagship",
+        "Address": "1 Queen Street, Auckland 1010, New Zealand",
+        "Latitude": -36.8485,
+        "Longitude": 174.7633
+      }
+    }
+  ]
+}
+```
+
+\---
+
 ## Configure Google Sheets Sync
 
 **Method:** `POST`  

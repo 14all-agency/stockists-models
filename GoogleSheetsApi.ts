@@ -8,7 +8,7 @@ import {
 import { LocationStatusResult } from "./Location";
 
 export const GoogleSheetReferenceSchema = z.object({
-  id: z.string().min(1),
+  id: z.number().int().nonnegative(),
   name: z.string().min(1),
 });
 
@@ -42,6 +42,49 @@ export const GoogleSheetSyncSummaryResponseSchema = z.object({
   sync: GoogleSheetSyncModelSchema.optional().nullable(),
   connected: z.boolean(),
 });
+
+export type GoogleSheetSyncSummaryResponse = z.infer<typeof GoogleSheetSyncSummaryResponseSchema>;
+
+const GoogleSheetPreviewCellValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.null(),
+]);
+
+export const GoogleSheetPreviewRowSchema = z.object({
+  rowNumber: z.number().int().positive(),
+  values: z.record(z.string(), GoogleSheetPreviewCellValueSchema),
+});
+
+export type GoogleSheetPreviewRow = z.infer<typeof GoogleSheetPreviewRowSchema>;
+
+export const GoogleSheetHeadersResponseSchema = z.object({
+  spreadsheetId: z.string().min(1),
+  sheetId: z.number().int().nonnegative(),
+  headerRow: z.number().int().positive(),
+  dataStartRow: z.number().int().positive(),
+  headers: z.array(z.string()),
+  sampleRows: z.array(GoogleSheetPreviewRowSchema).optional().nullable(),
+});
+
+export type GoogleSheetHeadersResponse = z.infer<typeof GoogleSheetHeadersResponseSchema>;
+
+export const ConfigureGoogleSheetSyncResultSchema = z.object({
+  created: z.number().int().nonnegative(),
+  updated: z.number().int().nonnegative(),
+  deleted: z.number().int().nonnegative(),
+  errors: z.array(z.string()).optional().nullable(),
+});
+
+export type ConfigureGoogleSheetSyncResult = z.infer<typeof ConfigureGoogleSheetSyncResultSchema>;
+
+export const ConfigureGoogleSheetSyncResponseSchema = z.object({
+  result: ConfigureGoogleSheetSyncResultSchema,
+  sync: GoogleSheetSyncModelSchema,
+});
+
+export type ConfigureGoogleSheetSyncResponse = z.infer<typeof ConfigureGoogleSheetSyncResponseSchema>;
 
 export function parseConfigureGoogleSheetSyncBody(body: string | null | undefined) {
   if (!body) {
