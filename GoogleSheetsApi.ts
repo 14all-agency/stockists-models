@@ -10,6 +10,7 @@ import {
   GoogleSheetSyncOperationTypeSchema,
 } from "./GoogleSheetSyncOperation";
 import { LocationStatusResult } from "./Location";
+import { normaliseOptionalQueryString, parseJsonBody, throwZodQueryError } from "./apiParsing";
 
 export const GoogleSheetReferenceSchema = z.object({
   id: z.number().int().nonnegative(),
@@ -106,12 +107,6 @@ export type GoogleSheetOperationsResponse = z.infer<typeof GoogleSheetOperations
 export type GoogleSheetOperation = GoogleSheetOperationsResponse["operations"][number];
 export type GoogleSheetOperationsPagination = GoogleSheetOperationsResponse["pagination"];
 
-function normaliseOptionalQueryString(value: string | null | undefined) {
-  const trimmed = value?.trim();
-
-  return trimmed ? trimmed : null;
-}
-
 export function parseGetGoogleSheetOperationsQuery(input: {
   queryStringParameters?: Record<string, string | null | undefined> | null;
 }) {
@@ -126,25 +121,12 @@ export function parseGetGoogleSheetOperationsQuery(input: {
   });
 
   if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
-    );
+    throwZodQueryError(parsed.error);
   }
 
   return parsed.data;
 }
 
 export function parseConfigureGoogleSheetSyncBody(body: string | null | undefined) {
-  if (!body) {
-    throw new Error("Request body is not valid");
-  }
-
-  const parsedJson = JSON.parse(body) as unknown;
-  const parsed = ConfigureGoogleSheetSyncBodySchema.safeParse(parsedJson);
-
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues.map((issue) => issue.message).join(", "));
-  }
-
-  return parsed.data;
+  return parseJsonBody(body, ConfigureGoogleSheetSyncBodySchema);
 }

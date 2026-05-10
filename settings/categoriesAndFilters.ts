@@ -3,14 +3,6 @@ import { z } from "zod";
 import { createSettingsConverter, NullableBoolean, NullableString } from "./shared";
 import { MapPinStyleSchema } from "./provider";
 
-export const CategoriesAndFiltersDisplayModeSchema = z
-	.enum(["STANDALONE", "DROPDOWN"])
-	.optional()
-	.nullable()
-	.describe(
-		"How categories and filters are presented in the search interface: directly below the search bar or inside a collapsible dropdown for denser sets.",
-	);
-
 export const CategoriesAndFiltersMatchModeSchema = z
 	.enum(["MATCH_ALL", "MATCH_ANY"])
 	.optional()
@@ -52,11 +44,10 @@ export const CategoriesAndFiltersSettingsSchema = z
 			.describe(
 				"Administrator-managed category/filter definitions that can be assigned to locations to refine locator results.",
 			),
-		displayMode: CategoriesAndFiltersDisplayModeSchema,
 		multipleSelectionMode: CategoriesAndFiltersMatchModeSchema,
 	})
 	.describe(
-		"Search categories and filters settings group for managing category/filter definitions, controlling how they render, and defining how multiple selections affect results.",
+		"Search categories and filters settings group for managing category/filter definitions and defining how multiple selections affect results.",
 	);
 
 export type CategoriesAndFiltersSettings = z.infer<typeof CategoriesAndFiltersSettingsSchema>;

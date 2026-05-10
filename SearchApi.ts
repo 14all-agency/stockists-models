@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { normaliseOptionalQueryString, throwZodQueryError } from "./apiParsing";
+
 const MAX_TIME_RANGE_DAYS = 90;
 const MAX_TIME_RANGE_MS = MAX_TIME_RANGE_DAYS * 24 * 60 * 60 * 1000;
 
@@ -48,12 +50,6 @@ export const GetLocationSearchCountQuerySchema = GetSearchesBaseQuerySchema;
 
 export type GetLocationSearchCountQuery = z.infer<typeof GetLocationSearchCountQuerySchema>;
 
-function normaliseOptionalQueryString(value: string | null | undefined) {
-  const trimmed = value?.trim();
-
-  return trimmed ? trimmed : null;
-}
-
 function parseQueryDate(value: string | null, fieldName: "from" | "to") {
   if (!value) {
     throw new Error(`\`${fieldName}\` is required`);
@@ -87,9 +83,7 @@ function parseQuery<T>(
   });
 
   if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
-    );
+    throwZodQueryError(parsed.error);
   }
 
   return parsed.data;

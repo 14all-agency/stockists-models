@@ -1306,7 +1306,7 @@ The `settings` payload is grouped by feature area so frontend and backend can sh
 Supported groups:
 
 * `categoriesAndFilters`
-  Covers category/filter definitions, optional category-level pin style overrides, how categories/filters display in the UI, and whether multiple selections use AND or OR matching.
+  Covers category/filter definitions, optional category-level pin style overrides, and whether multiple selections use AND or OR matching.
 * `customFields`
   Covers reusable location custom field definitions, their names, field types (`TEXT`, `TEXT_MULTILINE`, `LINK`), and whether they appear in storefront listings.
 * `dealerForms`
@@ -1357,7 +1357,6 @@ Those converters are used to:
           "pinStyle": null
         }
       ],
-      "displayMode": "STANDALONE",
       "multipleSelectionMode": "MATCH_ANY"
     },
     "customFields": {

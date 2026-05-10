@@ -9,6 +9,7 @@
 import { z } from "zod";
 
 import { SettingsGroupsSchema } from "./OrganisationSettings";
+import { parseJsonBody } from "./apiParsing";
 
 //
 // ======================================================
@@ -36,25 +37,11 @@ export type UpdateOrgBody = z.infer<typeof UpdateOrgBodySchema>;
  * Parses and validates raw request body for updateOrg endpoint.
  */
 export function parseUpdateOrgBody(body: string | null | undefined): UpdateOrgBody {
-  if (!body) {
-    return {};
-  }
-
-  let parsedJson: unknown;
-
-  try {
-    parsedJson = JSON.parse(body);
-  } catch {
-    throw new Error("Request body is not valid");
-  }
-
-  const parsed = UpdateOrgBodySchema.safeParse(parsedJson);
-
-  if (!parsed.success) {
-    throw new Error("Request body is not valid");
-  }
-
-  return parsed.data;
+  return parseJsonBody(body, UpdateOrgBodySchema, {
+    allowEmpty: true,
+    emptyValue: {},
+    includeIssueMessages: false,
+  });
 }
 
 

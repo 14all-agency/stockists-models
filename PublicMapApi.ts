@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+import {
+  normaliseOptionalQueryString,
+  normaliseQueryStringList,
+  throwZodQueryError,
+} from "./apiParsing";
+
 const PublicMapBoundsSchema = z.object({
   west: z.number().min(-180).max(180),
   south: z.number().min(-90).max(90),
@@ -22,21 +28,6 @@ export const GetPublicMapQuerySchema = z.object({
 });
 
 export type GetPublicMapQuery = z.infer<typeof GetPublicMapQuerySchema>;
-
-function normaliseOptionalQueryString(value: string | null | undefined) {
-  const trimmed = value?.trim();
-
-  return trimmed ? trimmed : null;
-}
-
-function normaliseQueryStringList(values: Array<string | null | undefined>) {
-  const normalised = values
-    .flatMap((value) => (value ?? "").split(","))
-    .map((value) => value.trim())
-    .filter(Boolean);
-
-  return normalised.length ? [...new Set(normalised)] : null;
-}
 
 export function parseGetPublicMapQuery(input: {
   queryStringParameters?: Record<string, string | null | undefined> | null;
@@ -71,9 +62,7 @@ export function parseGetPublicMapQuery(input: {
   });
 
   if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
-    );
+    throwZodQueryError(parsed.error);
   }
 
   return parsed.data;

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
+import { normaliseOptionalQueryString, parseJsonBody, throwZodQueryError } from "./apiParsing";
 
 const NullableString = z.string().optional().nullable();
 const DealerFormSubmissionFilterStatusSchema = z
@@ -63,33 +64,7 @@ export const DeleteDealerFormSubmissionBodySchema = z.object({
 export type DeleteDealerFormSubmissionBody = z.infer<typeof DeleteDealerFormSubmissionBodySchema>;
 
 function parseBody<T>(body: string | null | undefined, schema: z.ZodType<T>): T {
-  if (!body) {
-    throw new Error("Request body is not valid");
-  }
-
-  let parsedJson: unknown;
-
-  try {
-    parsedJson = JSON.parse(body);
-  } catch {
-    throw new Error("Request body is not valid");
-  }
-
-  const parsed = schema.safeParse(parsedJson);
-
-  if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Request body is not valid",
-    );
-  }
-
-  return parsed.data;
-}
-
-function normaliseOptionalQueryString(value: string | null | undefined) {
-  const trimmed = value?.trim();
-
-  return trimmed ? trimmed : null;
+  return parseJsonBody(body, schema);
 }
 
 export function parseSubmitDealerFormBody(body: string | null | undefined) {
@@ -123,9 +98,7 @@ export function parseGetDealerFormSubmissionsQuery(input: {
   });
 
   if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
-    );
+    throwZodQueryError(parsed.error);
   }
 
   return parsed.data;

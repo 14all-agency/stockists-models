@@ -148,7 +148,6 @@ function resolveCategoriesAndFiltersSettings(
           }
         : null,
     })),
-    displayMode: settings?.displayMode ?? "STANDALONE",
     multipleSelectionMode: settings?.multipleSelectionMode ?? "MATCH_ANY",
   };
 }

@@ -12,6 +12,12 @@ import {
   LocationLogoUrlInputSchema,
   LocationWebsiteInputSchema,
 } from "./LocationContactFields";
+import {
+  normaliseOptionalQueryString,
+  normaliseQueryStringList,
+  parseJsonBody,
+  throwZodQueryError,
+} from "./apiParsing";
 
 const NullableStringInput = z.string().optional().nullable();
 const NullableNumberInput = z.number().optional().nullable();
@@ -173,46 +179,11 @@ const GetLocationsQuerySchema = z.object({
 
 export type GetLocationsQuery = z.infer<typeof GetLocationsQuerySchema>;
 
-function normaliseOptionalQueryString(value: string | null | undefined) {
-  const trimmed = value?.trim();
-
-  return trimmed ? trimmed : null;
-}
-
-function normaliseQueryStringList(values: Array<string | null | undefined>) {
-  const normalised = values
-    .flatMap((value) => (value ?? "").split(","))
-    .map((value) => value.trim())
-    .filter(Boolean);
-
-  return normalised.length ? [...new Set(normalised)] : null;
-}
-
 function parseBody<T>(
   body: string | null | undefined,
   schema: z.ZodType<T>,
 ): T {
-  if (!body) {
-    throw new Error("Request body is not valid");
-  }
-
-  let parsedJson: unknown;
-
-  try {
-    parsedJson = JSON.parse(body);
-  } catch {
-    throw new Error("Request body is not valid");
-  }
-
-  const parsed = schema.safeParse(parsedJson);
-
-  if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Request body is not valid",
-    );
-  }
-
-  return parsed.data;
+  return parseJsonBody(body, schema);
 }
 
 export function parseCreateLocationBody(body: string | null | undefined): CreateLocationBody {
@@ -288,9 +259,7 @@ export function parseGetLocationsQuery(input: {
   });
 
   if (!parsed.success) {
-    throw new Error(
-      parsed.error.issues.map((issue) => issue.message).join(", ") || "Query parameters are not valid",
-    );
+    throwZodQueryError(parsed.error);
   }
 
   return parsed.data;
