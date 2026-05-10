@@ -7,6 +7,11 @@ import {
   LocationModelSchema,
   LocationStatusResult,
 } from "./Location";
+import {
+  LocationEmailAddressInputSchema,
+  LocationLogoUrlInputSchema,
+  LocationWebsiteInputSchema,
+} from "./LocationContactFields";
 
 const NullableStringInput = z.string().optional().nullable();
 const NullableNumberInput = z.number().optional().nullable();
@@ -21,9 +26,9 @@ export const CreateLocationBodySchema = z.object({
   stateProvince: NullableStringInput,
   country: NullableStringInput,
   phoneNumber: NullableStringInput,
-  website: NullableStringInput,
-  emailAddress: NullableStringInput,
-  logoUrl: NullableStringInput,
+  website: LocationWebsiteInputSchema,
+  emailAddress: LocationEmailAddressInputSchema,
+  logoUrl: LocationLogoUrlInputSchema,
   notes: NullableStringInput,
   customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
   filters: z.array(LocationFilterSchema).optional().nullable(),
@@ -46,9 +51,9 @@ export const UpdateLocationBodySchema = z
     stateProvince: NullableStringInput,
     country: NullableStringInput,
     phoneNumber: NullableStringInput,
-    website: NullableStringInput,
-    emailAddress: NullableStringInput,
-    logoUrl: NullableStringInput,
+    website: LocationWebsiteInputSchema,
+    emailAddress: LocationEmailAddressInputSchema,
+    logoUrl: LocationLogoUrlInputSchema,
     notes: NullableStringInput,
     customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
     filters: z.array(LocationFilterSchema).optional().nullable(),

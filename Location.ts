@@ -1,5 +1,10 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
+import {
+  LocationEmailAddressResult,
+  LocationLogoUrlResult,
+  LocationWebsiteResult,
+} from "./LocationContactFields";
 
 export const LocationStatusResult = z
   .union([
@@ -111,9 +116,9 @@ export const LocationEntityResult = z
     stateProvince: z.string().optional().nullable(),
     country: z.string().optional().nullable(),
     phoneNumber: z.string().optional().nullable(),
-    website: z.string().url().optional().nullable(),
-    emailAddress: z.string().email().optional().nullable(),
-    logoUrl: z.string().url().optional().nullable(),
+    website: LocationWebsiteResult,
+    emailAddress: LocationEmailAddressResult,
+    logoUrl: LocationLogoUrlResult,
     notes: z.string().optional().nullable(),
     customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
     filters: z.array(LocationFilterSchema).optional().nullable(),
