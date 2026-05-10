@@ -53,6 +53,8 @@ export const LanguageContentSchema = z.object({
   closeButtonLabel: NullableString.describe("Generic close button label used in the storefront dialog UI."),
   categoryLabels: z.array(LanguageLabelOverrideSchema).optional().nullable().describe("Per-language label overrides for category/filter definitions, allowing the same underlying category key to be shown with different wording in different languages."),
   customFieldLabels: z.array(LanguageLabelOverrideSchema).optional().nullable().describe("Per-language label overrides for reusable custom field definitions, allowing storefront field labels to be translated without changing the default admin label."),
+  dealerFormFieldLabels: z.array(LanguageLabelOverrideSchema).optional().nullable().describe("Per-language label overrides for dealer form field definitions, keyed by dealer form field key."),
+  dealerFormFieldPlaceholders: z.array(LanguageLabelOverrideSchema).optional().nullable().describe("Per-language placeholder overrides for dealer form field definitions, keyed by dealer form field key."),
 }).describe("Single language bundle containing every user-facing locator string that administrators can customize or translate.");
 
 export type LanguageContent = z.infer<typeof LanguageContentSchema>;

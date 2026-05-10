@@ -46,6 +46,9 @@ export type DealerFormFieldOption = z.infer<typeof DealerFormFieldOptionSchema>;
 export const DealerFormFieldDefinitionSchema = z.object({
   key: NullableString.describe("Stable identifier for this dealer form field."),
   label: NullableString.describe("Field label shown in app settings and storefront form."),
+  placeholder: NullableString.describe(
+    "Optional placeholder shown inside the storefront input for this dealer form field.",
+  ),
   type: DealerFormFieldTypeSchema,
   required: NullableBoolean.describe("Whether dealer must provide value before submission."),
   locked: NullableBoolean.describe(
@@ -64,16 +67,34 @@ export const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
   {
     key: "contact",
     label: "Contact Details",
+    placeholder: "Enter contact name",
     type: "CONTACT",
     required: true,
     locked: true,
     options: [],
   },
-  { key: "name", label: "Store name", type: "TEXT", required: true, locked: true, options: [] },
-  { key: "address", label: "Address", type: "ADDRESS", required: true, locked: true, options: [] },
+  {
+    key: "name",
+    label: "Store name",
+    placeholder: "Enter store name",
+    type: "TEXT",
+    required: true,
+    locked: true,
+    options: [],
+  },
+  {
+    key: "address",
+    label: "Address",
+    placeholder: "Search address",
+    type: "ADDRESS",
+    required: true,
+    locked: true,
+    options: [],
+  },
   {
     key: "phoneNumber",
     label: "Store phone",
+    placeholder: "Enter store phone",
     type: "PHONE",
     required: false,
     locked: false,
@@ -82,6 +103,7 @@ export const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
   {
     key: "website",
     label: "Website",
+    placeholder: "Enter website",
     type: "LINK",
     required: false,
     locked: false,
@@ -90,6 +112,7 @@ export const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
   {
     key: "emailAddress",
     label: "Store email",
+    placeholder: "Enter store email",
     type: "EMAIL",
     required: false,
     locked: false,
@@ -98,6 +121,7 @@ export const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
   {
     key: "logoUrl",
     label: "Logo URL",
+    placeholder: "Enter logo URL",
     type: "IMAGE_UPLOAD",
     required: false,
     locked: false,
@@ -106,6 +130,7 @@ export const DEFAULT_DEALER_FORM_FIELDS: DealerFormFieldDefinition[] = [
   {
     key: "message",
     label: "Message",
+    placeholder: "Enter message",
     type: "TEXT_MULTILINE",
     required: false,
     locked: false,

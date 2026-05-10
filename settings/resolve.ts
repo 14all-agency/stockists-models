@@ -76,6 +76,8 @@ const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
   closeButtonLabel: "Close",
   categoryLabels: [],
   customFieldLabels: [],
+  dealerFormFieldLabels: [],
+  dealerFormFieldPlaceholders: [],
 };
 
 const DEFAULT_DEALER_NOTIFICATION_ACCENT_COLOR = "#2563eb";
@@ -172,6 +174,7 @@ function resolveDealerFormsSettings(
     ? (settings?.fields || []).map((field): DealerFormFieldDefinition => ({
         key: field.key ?? "",
         label: field.label ?? "",
+        placeholder: field.placeholder ?? "",
         type: field.type ?? "TEXT",
         required: field.required ?? false,
         locked: field.locked ?? false,
@@ -274,6 +277,8 @@ function createLanguageContent(language?: LanguageContent | null): LanguageConte
     closeButtonLabel: language?.closeButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.closeButtonLabel,
     categoryLabels: language?.categoryLabels ?? [],
     customFieldLabels: language?.customFieldLabels ?? [],
+    dealerFormFieldLabels: language?.dealerFormFieldLabels ?? [],
+    dealerFormFieldPlaceholders: language?.dealerFormFieldPlaceholders ?? [],
   };
 }
 
