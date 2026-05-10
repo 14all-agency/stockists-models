@@ -79,7 +79,7 @@ export const BulkCreateLocationsBodySchema = z.object({
 
 export type BulkCreateLocationsBody = z.infer<typeof BulkCreateLocationsBodySchema>;
 
-export const ImportLocationBodySchema = CreateLocationBodySchema.extend({
+export const ImportLocationBodySchema = CreateLocationBodySchema.safeExtend({
   id: z.string().min(1).optional().nullable(),
   formattedAddress: z.string().optional().nullable(),
 });
