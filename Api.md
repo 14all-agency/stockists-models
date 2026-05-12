@@ -453,6 +453,8 @@ This endpoint does **not** require HMAC verification.
 * every response now includes `centerCoordinates`
 * `centerCoordinates` returns resolved center point used for distance-aware mode; this includes IP-derived geolocation coordinates when applicable
 * when no center point is active, `centerCoordinates` is `null`
+* every response now includes `centerAddress`
+* `centerAddress` is populated only when backend resolved center from IP geolocation API fields; otherwise it is `null`
 
 ### Success response using cached or dynamic clusters
 
@@ -461,6 +463,7 @@ This endpoint does **not** require HMAC verification.
   "mode": "cached_clusters",
   "zoom": 6,
   "centerCoordinates": null,
+  "centerAddress": null,
   "items": [
     {
       "type": "cluster",
@@ -509,6 +512,7 @@ This endpoint does **not** require HMAC verification.
   "mode": "points",
   "zoom": 12,
   "centerCoordinates": null,
+  "centerAddress": null,
   "items": [
     {
       "type": "point",
@@ -547,6 +551,15 @@ This endpoint does **not** require HMAC verification.
   "centerCoordinates": {
     "lng": 174.7633,
     "lat": -36.8485
+  },
+  "centerAddress": {
+    "formattedAddress": "Santa Clara, California, 95051, United States",
+    "addressLine1": null,
+    "addressLine2": null,
+    "city": "Santa Clara",
+    "postalCode": "95051",
+    "stateProvince": "California",
+    "country": "United States"
   },
   "items": [
     {

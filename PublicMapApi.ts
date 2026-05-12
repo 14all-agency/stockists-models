@@ -18,6 +18,18 @@ const PublicMapCoordinatesSchema = z.object({
   lat: z.number().min(-90).max(90),
 });
 
+export const PublicMapCenterAddressSchema = z.object({
+  formattedAddress: z.string().nullable(),
+  addressLine1: z.string().nullable(),
+  addressLine2: z.string().nullable(),
+  city: z.string().nullable(),
+  postalCode: z.string().nullable(),
+  stateProvince: z.string().nullable(),
+  country: z.string().nullable(),
+});
+
+export type PublicMapCenterAddress = z.infer<typeof PublicMapCenterAddressSchema>;
+
 export const GetPublicMapQuerySchema = z.object({
   zoom: z.number().nonnegative(),
   search: z.string().optional().nullable(),
