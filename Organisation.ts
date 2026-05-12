@@ -38,6 +38,24 @@ export const ShopifyStatusResult = z.union([
   z.literal("ERROR"),
 ]).optional().nullable();
 
+export const OnboardingCompletionInstallResult = z.object({
+  pageHandle: z.string().optional().nullable(),
+  template: z.string().optional().nullable(),
+  themeId: z.string().optional().nullable(),
+});
+
+export const OnboardingCompletionResult = z.object({
+  completedAt: z.date(),
+  install: OnboardingCompletionInstallResult.optional().nullable(),
+});
+
+export const OnboardingCompletionModelSchema = z.object({
+  completedAt: z.string(),
+  install: OnboardingCompletionInstallResult.optional().nullable(),
+});
+
+export type OnboardingCompletionModel = z.infer<typeof OnboardingCompletionModelSchema>;
+
 export const OrganisationResult = z.object({
   _id: z.instanceof(ObjectId),
   country: z.string().optional().nullable().describe("country of origin"),
@@ -79,6 +97,11 @@ export const OrganisationResult = z.object({
   billingSubscriptionId: z.string().optional().nullable(),
   billingPlanHandle: z.string().optional().nullable(),
   billingUpdatedAt: z.date().nullable().optional(),
+  onboardingCompletions: z
+    .record(z.string(), OnboardingCompletionResult)
+    .optional()
+    .nullable()
+    .describe("Per-completion onboarding/install records keyed by completion key."),
 });
 
 export type OrganisationResultEntity = z.infer<typeof OrganisationResult>;
@@ -122,6 +145,10 @@ export const OrganisationModelSchema = z.object({
   billingSubscriptionId: OrganisationResult.shape.billingSubscriptionId,
   billingPlanHandle: OrganisationResult.shape.billingPlanHandle,
   billingUpdatedAt: OrganisationResult.shape.billingUpdatedAt,
+  onboardingCompletions: z
+    .record(z.string(), OnboardingCompletionModelSchema)
+    .optional()
+    .nullable(),
 });
 
 export type OrganisationModel = z.infer<typeof OrganisationModelSchema>;
@@ -185,6 +212,17 @@ export const OrganisationModel = {
       billingSubscriptionId: entity.billingSubscriptionId ?? null,
       billingPlanHandle: entity.billingPlanHandle ?? null,
       billingUpdatedAt: entity.billingUpdatedAt ? new Date(entity.billingUpdatedAt) : null,
+      onboardingCompletions: entity.onboardingCompletions
+        ? Object.fromEntries(
+            Object.entries(entity.onboardingCompletions).map(([key, value]) => [
+              key,
+              {
+                completedAt: value.completedAt.toISOString(),
+                install: value.install ?? null,
+              },
+            ]),
+          )
+        : null,
     };
 
     return OrganisationModelSchema.parse(obj);

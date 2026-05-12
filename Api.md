@@ -1343,6 +1343,31 @@ Those converters are used to:
 
 `shopify/updateOrg` performs a partial top-level merge on `settings`, so sending one group does not overwrite unrelated groups already stored on the organisation.
 
+### Onboarding completions
+
+`shopify/updateOrg` also accepts an optional `onboardingCompletions` object keyed by completion key.
+
+Each completion record stores:
+
+* `completedAt`
+  ISO timestamp for when completion was last recorded.
+* `install`
+  Optional install metadata for storefront install steps.
+* `install.themeId`
+  Shopify theme ID used for install.
+* `install.template`
+  Template used for install, for example `index` or `page.stockists`.
+* `install.pageHandle`
+  Shopify page handle when completion applies to a page install.
+
+Frontend completion resolution now follows this order:
+
+1. read completion from current org state
+2. fall back to localStorage if org value is missing or invalid
+3. if localStorage has newer valid structured data than org, sync local copy back to org
+
+Legacy localStorage values like `"1"` still count as completed for fallback checks, but they do not contain install details and are not synced back to org until overwritten by a newer structured completion record.
+
 ### Query parameters
 
 * `shop: string` (required)
@@ -1352,6 +1377,16 @@ Those converters are used to:
 ```json
 {
   "contactEmail": "alerts@example.com",
+  "onboardingCompletions": {
+    "stockists_map_install_custom": {
+      "completedAt": "2026-05-13T01:23:45.000Z",
+      "install": {
+        "themeId": "gid://shopify/Theme/123456789",
+        "template": "page.stockists",
+        "pageHandle": "stockists"
+      }
+    }
+  },
   "settings": {
     "provider": {
       "provider": "LEAFLET",

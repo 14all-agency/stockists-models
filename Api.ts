@@ -8,6 +8,7 @@
 
 import { z } from "zod";
 
+import { OnboardingCompletionModelSchema } from "./Organisation";
 import { SettingsGroupsSchema } from "./OrganisationSettings";
 import { parseJsonBody } from "./apiParsing";
 
@@ -28,6 +29,7 @@ export const UpdateOrgBodySchema = z.object({
       message: "Request body is not valid",
     })
     .optional(),
+  onboardingCompletions: z.record(z.string(), OnboardingCompletionModelSchema).optional(),
   settings: SettingsGroupsSchema.partial().optional(),
 });
 
