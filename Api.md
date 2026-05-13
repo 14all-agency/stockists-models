@@ -434,6 +434,8 @@ This endpoint does **not** require HMAC verification.
 
 * frontend makes one request even when viewport crosses dateline
 * backend handles dateline splitting internally
+* endpoint applies public abuse rate limits
+* when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
 * if `search` or `categories` are provided, precomputed cluster cache is skipped
 * at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
 * if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
@@ -1748,6 +1750,8 @@ This endpoint does **not** require HMAC verification.
 * dealer confirmation email subject/body use org settings templates and replace `{name}` with submitted contact name or empty string
 * dealer confirmation email is suppressed when dealer email is unsubscribed
 * org admin notification email is suppressed when org dealer notifications are disabled
+* endpoint applies public abuse rate limits
+* when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
 
 ### Success response
 
