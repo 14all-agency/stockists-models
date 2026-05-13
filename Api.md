@@ -245,7 +245,7 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 When the create would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
 
 ```json
-"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 100. New: 1."
+"We could not create your new location because the limit on your Lifetime Free plan is 100, and your current amount of locations used is 100."
 ```
 
 ### Success response
@@ -945,7 +945,7 @@ Creates many locations for authenticated org in one request.
 When the create would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
 
 ```json
-"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 95. New: 10."
+"We could not create your 10 new locations because the limit on your Lifetime Free plan is 100, and your current amount of locations used is 95."
 ```
 
 ### Success response
@@ -1048,7 +1048,7 @@ Imports many locations for authenticated org in one request. Backend may create 
 When the import would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
 
 ```json
-"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 95. New: 10."
+"We could not create your 10 new locations because the limit on your Lifetime Free plan is 100, and your current amount of locations used is 95."
 ```
 
 ### Success response
@@ -1658,7 +1658,7 @@ Publishes one dealer form submission into a location. Can optionally email deale
 When publishing would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
 
 ```json
-"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 100. New: 1."
+"We could not create your new location because the limit on your Lifetime Free plan is 100, and your current amount of locations used is 100."
 ```
 
 ### Success response
