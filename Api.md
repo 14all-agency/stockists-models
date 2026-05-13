@@ -240,6 +240,14 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 * location ownership is always set from authenticated org, not request body
 * create is rejected when adding one location would exceed authenticated org's billing plan location limit
 
+### Location limit response
+
+When the create would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
+
+```json
+"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 100. New: 1."
+```
+
 ### Success response
 
 ```json
@@ -932,6 +940,14 @@ Creates many locations for authenticated org in one request.
 * request is all-or-nothing; no partial inserts on validation failure
 * request is rejected when adding all requested locations would exceed authenticated org's billing plan location limit
 
+### Location limit response
+
+When the create would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
+
+```json
+"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 95. New: 10."
+```
+
 ### Success response
 
 ```json
@@ -1026,6 +1042,14 @@ Imports many locations for authenticated org in one request. Backend may create 
 * request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
 * only net-new created locations count against billing plan limit; updates do not
 * request is rejected before writing when created rows would exceed authenticated org's billing plan location limit
+
+### Location limit response
+
+When the import would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
+
+```json
+"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 95. New: 10."
+```
 
 ### Success response
 
@@ -1628,6 +1652,14 @@ Publishes one dealer form submission into a location. Can optionally email deale
 * dealer publish email subject/body come from org `dealerForms.dealerPublishedSubject` and `dealerForms.dealerPublishedBody`
 * dealer unsubscribe list suppresses optional publish emails
 * publish is rejected when creating the location would exceed authenticated org's billing plan location limit
+
+### Location limit response
+
+When publishing would exceed the org's billing plan location limit, the endpoint returns HTTP `409`:
+
+```json
+"Location limit exceeded for Lifetime Free plan. Limit: 100. Current: 100. New: 1."
+```
 
 ### Success response
 
@@ -2297,7 +2329,7 @@ Stores spreadsheet selection and column mapping for org, then queues a sync job 
 * if `deleteMissingRows=true`, any previously linked row absent from current sheet snapshot deletes corresponding location
 * if `matchExistingByAddressOrCoordinates=true`, unmatched external ids can attach to existing locations using same import matching rules as bulk import
 * net-new synced locations are checked against authenticated org's billing plan location limit after planned deletions are subtracted
-* when sync would exceed location limit, no location writes are persisted and sync records an error
+* when sync would exceed location limit, no location writes are persisted, sync records an error, and the configured Google Sheets sync error email is sent unless notifications are disabled
 * response includes sync summary plus whether queueing succeeded immediately
 
 ### Success response
