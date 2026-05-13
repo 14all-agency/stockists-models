@@ -4,6 +4,10 @@ import type { CustomFieldType } from "./customFields";
 import {
   createSettingsConverter,
   NullableBoolean,
+  NullableKeyString,
+  NullableLabelString,
+  NullableLongTextString,
+  NullablePlaceholderString,
   NullableString,
 } from "./shared";
 
@@ -37,16 +41,16 @@ export const DealerFormRecaptchaVersionSchema = z
 export type DealerFormRecaptchaVersion = z.infer<typeof DealerFormRecaptchaVersionSchema>;
 
 export const DealerFormFieldOptionSchema = z.object({
-  label: NullableString.describe("Display label shown to dealer for this option."),
+  label: NullableLabelString.describe("Display label shown to dealer for this option."),
   value: NullableString.describe("Stable value stored for this option."),
 });
 
 export type DealerFormFieldOption = z.infer<typeof DealerFormFieldOptionSchema>;
 
 export const DealerFormFieldDefinitionSchema = z.object({
-  key: NullableString.describe("Stable identifier for this dealer form field."),
-  label: NullableString.describe("Field label shown in app settings and storefront form."),
-  placeholder: NullableString.describe(
+  key: NullableKeyString.describe("Stable identifier for this dealer form field."),
+  label: NullableLabelString.describe("Field label shown in app settings and storefront form."),
+  placeholder: NullablePlaceholderString.describe(
     "Optional placeholder shown inside the storefront input for this dealer form field.",
   ),
   type: DealerFormFieldTypeSchema,
@@ -56,6 +60,7 @@ export const DealerFormFieldDefinitionSchema = z.object({
   ),
   options: z
     .array(DealerFormFieldOptionSchema)
+    .max(50)
     .optional()
     .nullable()
     .describe("Selectable options for select fields."),
@@ -168,6 +173,7 @@ export function mapDealerFieldTypeToCustomFieldType(
 export const DealerFormsSettingsSchema = z.object({
   fields: z
     .array(DealerFormFieldDefinitionSchema)
+    .max(30)
     .optional()
     .nullable()
     .describe("Administrator-managed dealer form field definitions."),
@@ -186,13 +192,13 @@ export const DealerFormsSettingsSchema = z.object({
   dealerNotificationSubject: NullableString.describe(
     "Subject template for dealer confirmation emails. Supports {name} placeholder.",
   ),
-  dealerNotificationBody: NullableString.describe(
+  dealerNotificationBody: NullableLongTextString.describe(
     "Body template for dealer confirmation emails. Supports {name} placeholder.",
   ),
   dealerPublishedSubject: NullableString.describe(
     "Subject template for dealer published emails. Supports {name} placeholder.",
   ),
-  dealerPublishedBody: NullableString.describe(
+  dealerPublishedBody: NullableLongTextString.describe(
     "Body template for dealer published emails. Supports {name} placeholder.",
   ),
   recaptchaSiteKey: NullableString.describe("reCAPTCHA site key for dealer form submissions."),

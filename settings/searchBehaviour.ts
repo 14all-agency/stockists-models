@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-import { createSettingsConverter, NullableBoolean, NullableNumber, NullableString } from "./shared";
+import {
+  createSettingsConverter,
+  NullableBoolean,
+  NullableLabelString,
+  NullableNumber,
+  NullableString,
+} from "./shared";
 
 export const SearchStartingPositionModeSchema = z
   .enum(["FIT_ALL_LOCATIONS", "SPECIFIC_AREA"])
@@ -39,7 +45,7 @@ export const SearchCountryLockModeSchema = z
   .describe("Whether search should be unrestricted across countries or locked to a specific administrator-defined country list.");
 
 export const SearchStartingAreaSchema = z.object({
-  label: NullableString.describe("Administrative label for the predefined area used when the map starts focused on a specific region."),
+  label: NullableLabelString.describe("Administrative label for the predefined area used when the map starts focused on a specific region."),
   lat: NullableNumber.describe("Latitude for the predefined starting area center point."),
   lng: NullableNumber.describe("Longitude for the predefined starting area center point."),
   zoom: NullableNumber.describe("Zoom level to apply when focusing on a specific starting area rather than fitting all locations."),
@@ -61,7 +67,7 @@ export const SearchBehaviourSettingsSchema = z.object({
   distanceUnit: SearchDistanceUnitSchema,
   searchSuggestionMode: SearchSuggestionModeSchema,
   countryLockMode: SearchCountryLockModeSchema,
-  countryCodes: z.array(z.string()).optional().nullable().describe("Allowed country codes when search is restricted to specific countries for accuracy and relevance."),
+  countryCodes: z.array(z.string().max(3)).max(250).optional().nullable().describe("Allowed country codes when search is restricted to specific countries for accuracy and relevance."),
 }).describe("Search behavior settings group for initial map positioning, clustering, geolocation, distance rules, result limits, and search suggestion constraints.");
 
 export type SearchBehaviourSettings = z.infer<typeof SearchBehaviourSettingsSchema>;

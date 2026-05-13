@@ -31,10 +31,10 @@ export const PublicMapCenterAddressSchema = z.object({
 export type PublicMapCenterAddress = z.infer<typeof PublicMapCenterAddressSchema>;
 
 export const GetPublicMapQuerySchema = z.object({
-  zoom: z.number().nonnegative(),
-  search: z.string().optional().nullable(),
+  zoom: z.number().nonnegative().max(24),
+  search: z.string().max(250).optional().nullable(),
   source: z.enum(["SEARCH", "GEOLOCATION"]).optional().nullable(),
-  categories: z.array(z.string().min(1)).optional().nullable(),
+  categories: z.array(z.string().min(1).max(64)).max(10).optional().nullable(),
   bounds: PublicMapBoundsSchema,
   coordinates: PublicMapCoordinatesSchema.optional().nullable(),
 });

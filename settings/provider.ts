@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-import { createSettingsConverter, NullableBoolean, NullableString } from "./shared";
+import {
+  createSettingsConverter,
+  NullableBoolean,
+  NullableLabelString,
+  NullableLongTextString,
+  NullableString,
+} from "./shared";
 
 export const MapProviderSchema = z
 	.enum(["LEAFLET", "MAPBOX", "GOOGLE_MAPS"])
@@ -36,7 +42,7 @@ export const CustomImageDisplayModeSchema = z
 
 export const MapPinStyleSchema = z
 	.object({
-		name: NullableString.describe(
+		name: NullableLabelString.describe(
 			"Human-readable map pin style name shown to administrators when editing the pin style.",
 		),
 		pinType: MapPinTypeSchema,
@@ -65,7 +71,7 @@ export const ProviderSettingsSchema = z
 		mapThemeId: NullableString.describe(
 			"Selected provider-specific map theme identifier. Available theme choices depend on the currently selected map provider.",
 		),
-		mapThemeStyleCode: NullableString.describe(
+		mapThemeStyleCode: NullableLongTextString.describe(
 			"Advanced provider-specific map style code or JSON applied when the selected provider and theme mode support custom styling.",
 		),
 		defaultPinStyle: MapPinStyleSchema

@@ -2,9 +2,18 @@ import { z } from "zod";
 
 import {
   CoordinatesSchema,
+  LocationAddressLineSchema,
+  LocationCitySchema,
   LocationCustomFieldSchema,
   LocationFilterSchema,
   LocationModelSchema,
+  LocationNameSchema,
+  LocationNotesSchema,
+  LocationPhoneNumberSchema,
+  LocationPostalCodeSchema,
+  MAX_LOCATION_CUSTOM_FIELDS,
+  MAX_LOCATION_FILTERS,
+  MAX_LOCATION_NAME_LENGTH,
   LocationStatusResult,
 } from "./Location";
 import {
@@ -19,25 +28,25 @@ import {
   throwZodQueryError,
 } from "./apiParsing";
 
-const NullableStringInput = z.string().optional().nullable();
+const BULK_LOCATION_BODY_MAX_BYTES = 5 * 1024 * 1024;
 const NullableNumberInput = z.number().optional().nullable();
 
 export const CreateLocationBodySchema = z.object({
   status: LocationStatusResult,
-  name: z.string().min(1),
-  addressLine1: NullableStringInput,
-  addressLine2: NullableStringInput,
-  city: NullableStringInput,
-  postalCode: NullableStringInput,
-  stateProvince: NullableStringInput,
-  country: NullableStringInput,
-  phoneNumber: NullableStringInput,
+  name: z.string().min(1).max(MAX_LOCATION_NAME_LENGTH),
+  addressLine1: LocationAddressLineSchema,
+  addressLine2: LocationAddressLineSchema,
+  city: LocationCitySchema,
+  postalCode: LocationPostalCodeSchema,
+  stateProvince: LocationCitySchema,
+  country: LocationCitySchema,
+  phoneNumber: LocationPhoneNumberSchema,
   website: LocationWebsiteInputSchema,
   emailAddress: LocationEmailAddressInputSchema,
   logoUrl: LocationLogoUrlInputSchema,
-  notes: NullableStringInput,
-  customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
-  filters: z.array(LocationFilterSchema).optional().nullable(),
+  notes: LocationNotesSchema,
+  customFields: z.array(LocationCustomFieldSchema).max(MAX_LOCATION_CUSTOM_FIELDS).optional().nullable(),
+  filters: z.array(LocationFilterSchema).max(MAX_LOCATION_FILTERS).optional().nullable(),
   priority: NullableNumberInput,
   suppressWarnings: z.boolean().optional().nullable(),
   coordinates: CoordinatesSchema.shape.coordinates,
@@ -49,20 +58,20 @@ export const UpdateLocationBodySchema = z
   .object({
     id: z.string().min(1),
     status: LocationStatusResult,
-    name: NullableStringInput,
-    addressLine1: NullableStringInput,
-    addressLine2: NullableStringInput,
-    city: NullableStringInput,
-    postalCode: NullableStringInput,
-    stateProvince: NullableStringInput,
-    country: NullableStringInput,
-    phoneNumber: NullableStringInput,
+    name: LocationNameSchema,
+    addressLine1: LocationAddressLineSchema,
+    addressLine2: LocationAddressLineSchema,
+    city: LocationCitySchema,
+    postalCode: LocationPostalCodeSchema,
+    stateProvince: LocationCitySchema,
+    country: LocationCitySchema,
+    phoneNumber: LocationPhoneNumberSchema,
     website: LocationWebsiteInputSchema,
     emailAddress: LocationEmailAddressInputSchema,
     logoUrl: LocationLogoUrlInputSchema,
-    notes: NullableStringInput,
-    customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
-    filters: z.array(LocationFilterSchema).optional().nullable(),
+    notes: LocationNotesSchema,
+    customFields: z.array(LocationCustomFieldSchema).max(MAX_LOCATION_CUSTOM_FIELDS).optional().nullable(),
+    filters: z.array(LocationFilterSchema).max(MAX_LOCATION_FILTERS).optional().nullable(),
     priority: NullableNumberInput,
     suppressWarnings: z.boolean().optional().nullable(),
     coordinates: CoordinatesSchema.shape.coordinates,
@@ -87,7 +96,7 @@ export type BulkCreateLocationsBody = z.infer<typeof BulkCreateLocationsBodySche
 
 export const ImportLocationBodySchema = CreateLocationBodySchema.safeExtend({
   id: z.string().min(1).optional().nullable(),
-  formattedAddress: z.string().optional().nullable(),
+  formattedAddress: z.string().max(500).optional().nullable(),
 });
 
 export type ImportLocationBody = z.infer<typeof ImportLocationBodySchema>;
@@ -129,19 +138,19 @@ export const BulkUpdateLocationsBodySchema = z.object({
 export type BulkUpdateLocationsBody = z.infer<typeof BulkUpdateLocationsBodySchema>;
 
 export const BulkDeleteLocationsBodySchema = z.object({
-  ids: z.array(z.string().min(1)).min(1),
+  ids: z.array(z.string().min(1)).min(1).max(200),
 });
 
 export type BulkDeleteLocationsBody = z.infer<typeof BulkDeleteLocationsBodySchema>;
 
 export const QueueLocationGeocodeBodySchema = z.object({
-  locationIds: z.array(z.string().min(1)).min(1),
+  locationIds: z.array(z.string().min(1)).min(1).max(1000),
 });
 
 export type QueueLocationGeocodeBody = z.infer<typeof QueueLocationGeocodeBodySchema>;
 
 export const SuppressLocationWarningsBodySchema = z.object({
-  locationIds: z.array(z.string().min(1)).min(1),
+  locationIds: z.array(z.string().min(1)).min(1).max(1000),
 });
 
 export type SuppressLocationWarningsBody = z.infer<typeof SuppressLocationWarningsBodySchema>;
@@ -172,9 +181,9 @@ const GetLocationsQuerySchema = z.object({
   limit: z.number().int().positive().max(1000).optional().nullable(),
   page: z.number().int().positive().default(1),
   ids: z.array(z.string().min(1)).optional().nullable(),
-  search: z.string().optional().nullable(),
+  search: z.string().max(250).optional().nullable(),
   status: LocationStatusResult,
-  categories: z.array(z.string().min(1)).optional().nullable(),
+  categories: z.array(z.string().min(1).max(64)).max(50).optional().nullable(),
 });
 
 export type GetLocationsQuery = z.infer<typeof GetLocationsQuerySchema>;
@@ -182,8 +191,11 @@ export type GetLocationsQuery = z.infer<typeof GetLocationsQuerySchema>;
 function parseBody<T>(
   body: string | null | undefined,
   schema: z.ZodType<T>,
+  maxBytes?: number,
 ): T {
-  return parseJsonBody(body, schema);
+  return parseJsonBody(body, schema, {
+    maxBytes,
+  });
 }
 
 export function parseCreateLocationBody(body: string | null | undefined): CreateLocationBody {
@@ -197,19 +209,19 @@ export function parseUpdateLocationBody(body: string | null | undefined): Update
 export function parseBulkCreateLocationsBody(
   body: string | null | undefined,
 ): BulkCreateLocationsBody {
-  return parseBody(body, BulkCreateLocationsBodySchema);
+  return parseBody(body, BulkCreateLocationsBodySchema, BULK_LOCATION_BODY_MAX_BYTES);
 }
 
 export function parseImportLocationsBulkBody(
   body: string | null | undefined,
 ): ImportLocationsBulkBody {
-  return parseBody(body, ImportLocationsBulkBodySchema);
+  return parseBody(body, ImportLocationsBulkBodySchema, BULK_LOCATION_BODY_MAX_BYTES);
 }
 
 export function parseBulkUpdateLocationsBody(
   body: string | null | undefined,
 ): BulkUpdateLocationsBody {
-  return parseBody(body, BulkUpdateLocationsBodySchema);
+  return parseBody(body, BulkUpdateLocationsBodySchema, BULK_LOCATION_BODY_MAX_BYTES);
 }
 
 export function parseBulkDeleteLocationsBody(

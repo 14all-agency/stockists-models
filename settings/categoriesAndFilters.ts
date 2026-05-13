@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { createSettingsConverter, NullableBoolean, NullableString } from "./shared";
+import {
+  createSettingsConverter,
+  NullableBoolean,
+  NullableKeyString,
+  NullableLabelString,
+} from "./shared";
 import { MapPinStyleSchema } from "./provider";
 
 export const CategoriesAndFiltersMatchModeSchema = z
@@ -13,10 +18,10 @@ export const CategoriesAndFiltersMatchModeSchema = z
 
 export const CategoryFilterDefinitionSchema = z
 	.object({
-		key: NullableString.describe(
+		key: NullableKeyString.describe(
 			"Stable identifier for the category/filter so locations and frontend UI state can reference it consistently.",
 		),
-		label: NullableString.describe(
+		label: NullableLabelString.describe(
 			"User-facing category/filter label shown in management lists and the locator interface, such as a store type, brand, or product category.",
 		),
 		showInSearch: NullableBoolean.describe(
@@ -30,7 +35,7 @@ export const CategoryFilterDefinitionSchema = z
 		),
 	})
 	.describe(
-		"Category/filter definition used to categorize locations and let visitors narrow search results. Categories and filters are the same concept in the administration UI.",
+			"Category/filter definition used to categorize locations and let visitors narrow search results. Categories and filters are the same concept in the administration UI.",
 	);
 
 export type CategoryFilterDefinition = z.infer<typeof CategoryFilterDefinitionSchema>;
@@ -39,6 +44,7 @@ export const CategoriesAndFiltersSettingsSchema = z
 	.object({
 		categories: z
 			.array(CategoryFilterDefinitionSchema)
+			.max(50)
 			.optional()
 			.nullable()
 			.describe(

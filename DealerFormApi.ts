@@ -3,6 +3,7 @@ import { z } from "zod";
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
 import { normaliseOptionalQueryString, parseJsonBody, throwZodQueryError } from "./apiParsing";
 
+const DEALER_FORM_BODY_MAX_BYTES = 3 * 1024 * 1024;
 const NullableString = z.string().optional().nullable();
 const DealerFormSubmissionFilterStatusSchema = z
   .enum(["OPEN", "PUBLISHED", "ARCHIVED"])
@@ -12,12 +13,12 @@ const DealerFormSubmissionFilterStatusSchema = z
 export const DealerFormSubmissionInputValueSchema = z.unknown();
 
 export const DealerFormSubmissionInputFieldSchema = z.object({
-  key: z.string().min(1),
+  key: z.string().min(1).max(64),
   value: DealerFormSubmissionInputValueSchema,
 });
 
 export const SubmitDealerFormBodySchema = z.object({
-  fields: z.array(DealerFormSubmissionInputFieldSchema).min(1),
+  fields: z.array(DealerFormSubmissionInputFieldSchema).min(1).max(40),
   recaptchaToken: NullableString,
 });
 
@@ -26,7 +27,7 @@ export type SubmitDealerFormBody = z.infer<typeof SubmitDealerFormBodySchema>;
 export const GetDealerFormSubmissionsQuerySchema = z.object({
   limit: z.number().int().positive().max(100).optional().nullable(),
   page: z.number().int().positive().default(1),
-  search: z.string().optional().nullable(),
+  search: z.string().max(120).optional().nullable(),
   status: DealerFormSubmissionFilterStatusSchema,
 });
 
@@ -63,12 +64,14 @@ export const DeleteDealerFormSubmissionBodySchema = z.object({
 
 export type DeleteDealerFormSubmissionBody = z.infer<typeof DeleteDealerFormSubmissionBodySchema>;
 
-function parseBody<T>(body: string | null | undefined, schema: z.ZodType<T>): T {
-  return parseJsonBody(body, schema);
+function parseBody<T>(body: string | null | undefined, schema: z.ZodType<T>, maxBytes?: number): T {
+  return parseJsonBody(body, schema, {
+    maxBytes,
+  });
 }
 
 export function parseSubmitDealerFormBody(body: string | null | undefined) {
-  return parseBody(body, SubmitDealerFormBodySchema);
+  return parseBody(body, SubmitDealerFormBodySchema, DEALER_FORM_BODY_MAX_BYTES);
 }
 
 export function parsePublishDealerFormSubmissionBody(body: string | null | undefined) {

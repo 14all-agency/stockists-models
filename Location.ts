@@ -6,6 +6,39 @@ import {
   LocationWebsiteResult,
 } from "./LocationContactFields";
 
+export const MAX_LOCATION_NAME_LENGTH = 120;
+export const MAX_LOCATION_ADDRESS_LINE_LENGTH = 250;
+export const MAX_LOCATION_CITY_LENGTH = 120;
+export const MAX_LOCATION_POSTAL_CODE_LENGTH = 40;
+export const MAX_LOCATION_PHONE_NUMBER_LENGTH = 40;
+export const MAX_LOCATION_NOTES_LENGTH = 2000;
+export const MAX_LOCATION_CUSTOM_FIELD_KEY_LENGTH = 64;
+export const MAX_LOCATION_CUSTOM_FIELD_LABEL_LENGTH = 120;
+export const MAX_LOCATION_CUSTOM_FIELD_VALUE_LENGTH = 1000;
+export const MAX_LOCATION_FILTER_KEY_LENGTH = 64;
+export const MAX_LOCATION_FILTER_VALUE_LENGTH = 64;
+export const MAX_LOCATION_CUSTOM_FIELDS = 25;
+export const MAX_LOCATION_FILTERS = 25;
+
+export const LocationNameSchema = z.string().max(MAX_LOCATION_NAME_LENGTH).optional().nullable();
+export const LocationAddressLineSchema = z
+  .string()
+  .max(MAX_LOCATION_ADDRESS_LINE_LENGTH)
+  .optional()
+  .nullable();
+export const LocationCitySchema = z.string().max(MAX_LOCATION_CITY_LENGTH).optional().nullable();
+export const LocationPostalCodeSchema = z
+  .string()
+  .max(MAX_LOCATION_POSTAL_CODE_LENGTH)
+  .optional()
+  .nullable();
+export const LocationPhoneNumberSchema = z
+  .string()
+  .max(MAX_LOCATION_PHONE_NUMBER_LENGTH)
+  .optional()
+  .nullable();
+export const LocationNotesSchema = z.string().max(MAX_LOCATION_NOTES_LENGTH).optional().nullable();
+
 export const LocationStatusResult = z
   .union([
     z.literal("ACTIVE"),
@@ -28,43 +61,45 @@ export const LocationCustomFieldTypeResult = z
 
 export type LocationCustomFieldType = z.infer<typeof LocationCustomFieldTypeResult>;
 
-export const LocationCustomFieldSchema = z.object({
-  key: z.string().optional().nullable(),
-  label: z.string().optional().nullable(),
-  type: LocationCustomFieldTypeResult.describe("Display/input type for this custom field"),
-  value: z.string().optional().nullable(),
-  showOnListing: z.boolean().optional().nullable().describe("Whether this field is visible in storefront location listings"),
-}).superRefine((value, ctx) => {
-  if (value.value === null || value.value === undefined || !value.type) {
-    return;
-  }
+export const LocationCustomFieldSchema = z
+  .object({
+    key: z.string().max(MAX_LOCATION_CUSTOM_FIELD_KEY_LENGTH).optional().nullable(),
+    label: z.string().max(MAX_LOCATION_CUSTOM_FIELD_LABEL_LENGTH).optional().nullable(),
+    type: LocationCustomFieldTypeResult.describe("Display/input type for this custom field"),
+    value: z.string().max(MAX_LOCATION_CUSTOM_FIELD_VALUE_LENGTH).optional().nullable(),
+    showOnListing: z.boolean().optional().nullable().describe("Whether this field is visible in storefront location listings"),
+  })
+  .superRefine((value, ctx) => {
+    if (value.value === null || value.value === undefined || !value.type) {
+      return;
+    }
 
-  if (typeof value.value !== "string") {
-    ctx.addIssue({
-      code: "custom",
-      message: "Custom field value must be a string",
-      path: ["value"],
-    });
-  }
-
-  if (value.type === "LINK" && typeof value.value === "string") {
-    const parsed = z.string().url().safeParse(value.value);
-
-    if (!parsed.success) {
+    if (typeof value.value !== "string") {
       ctx.addIssue({
         code: "custom",
-        message: "Custom field value must be a valid URL",
+        message: "Custom field value must be a string",
         path: ["value"],
       });
     }
-  }
-});
+
+    if (value.type === "LINK" && typeof value.value === "string") {
+      const parsed = z.string().url().safeParse(value.value);
+
+      if (!parsed.success) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Custom field value must be a valid URL",
+          path: ["value"],
+        });
+      }
+    }
+  });
 
 export type LocationCustomField = z.infer<typeof LocationCustomFieldSchema>;
 
 export const LocationFilterSchema = z.object({
-  key: z.string().optional().nullable(),
-  value: z.string().optional().nullable(),
+  key: z.string().max(MAX_LOCATION_FILTER_KEY_LENGTH).optional().nullable(),
+  value: z.string().max(MAX_LOCATION_FILTER_VALUE_LENGTH).optional().nullable(),
 });
 
 export type LocationFilter = z.infer<typeof LocationFilterSchema>;
@@ -108,20 +143,20 @@ export const LocationEntityResult = z
     _id: z.instanceof(ObjectId),
     org: z.instanceof(ObjectId).describe("Organisation that owns this location"),
     status: LocationStatusResult.describe("Location visibility and publication state"),
-    name: z.string().optional().nullable(),
-    addressLine1: z.string().optional().nullable(),
-    addressLine2: z.string().optional().nullable(),
-    city: z.string().optional().nullable(),
-    postalCode: z.string().optional().nullable(),
-    stateProvince: z.string().optional().nullable(),
-    country: z.string().optional().nullable(),
-    phoneNumber: z.string().optional().nullable(),
+    name: LocationNameSchema,
+    addressLine1: LocationAddressLineSchema,
+    addressLine2: LocationAddressLineSchema,
+    city: LocationCitySchema,
+    postalCode: LocationPostalCodeSchema,
+    stateProvince: LocationCitySchema,
+    country: LocationCitySchema,
+    phoneNumber: LocationPhoneNumberSchema,
     website: LocationWebsiteResult,
     emailAddress: LocationEmailAddressResult,
     logoUrl: LocationLogoUrlResult,
-    notes: z.string().optional().nullable(),
-    customFields: z.array(LocationCustomFieldSchema).optional().nullable(),
-    filters: z.array(LocationFilterSchema).optional().nullable(),
+    notes: LocationNotesSchema,
+    customFields: z.array(LocationCustomFieldSchema).max(MAX_LOCATION_CUSTOM_FIELDS).optional().nullable(),
+    filters: z.array(LocationFilterSchema).max(MAX_LOCATION_FILTERS).optional().nullable(),
     priority: z.number().optional().nullable(),
     suppressWarnings: z.boolean().optional().nullable(),
     coordinates: CoordinatesSchema.shape.coordinates,

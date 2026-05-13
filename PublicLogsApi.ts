@@ -7,7 +7,7 @@ import { parseEventJsonBody } from "./apiParsing";
 const NullableStringField = z.string().max(500).optional().nullable();
 
 export const SaveLogsBodySchema = z.object({
-  logs: z.array(z.unknown()),
+  logs: z.array(z.unknown()).max(50),
   message: NullableStringField,
   user_agent: NullableStringField,
   page: z.string().max(2000).optional().nullable(),

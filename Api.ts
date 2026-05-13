@@ -12,6 +12,21 @@ import { OnboardingCompletionModelSchema } from "./Organisation";
 import { SettingsGroupsSchema } from "./OrganisationSettings";
 import { parseJsonBody } from "./apiParsing";
 
+const MAX_ONBOARDING_COMPLETION_KEYS = 50;
+const MAX_ONBOARDING_COMPLETION_KEY_LENGTH = 64;
+
+const OnboardingCompletionsSchema = z
+  .record(z.string().max(MAX_ONBOARDING_COMPLETION_KEY_LENGTH), OnboardingCompletionModelSchema)
+  .superRefine((value, ctx) => {
+    if (Object.keys(value).length > MAX_ONBOARDING_COMPLETION_KEYS) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Request body is not valid",
+        path: ["onboardingCompletions"],
+      });
+    }
+  });
+
 //
 // ======================================================
 // UPDATE ORG (POST /shopify/updateOrg)
@@ -29,7 +44,7 @@ export const UpdateOrgBodySchema = z.object({
       message: "Request body is not valid",
     })
     .optional(),
-  onboardingCompletions: z.record(z.string(), OnboardingCompletionModelSchema).optional(),
+  onboardingCompletions: OnboardingCompletionsSchema.optional(),
   settings: SettingsGroupsSchema.partial().optional(),
 });
 

@@ -2,27 +2,37 @@ import { ObjectId } from "bson";
 import { z } from "zod";
 
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
+import {
+  MAX_LOCATION_ADDRESS_LINE_LENGTH,
+  MAX_LOCATION_CITY_LENGTH,
+  MAX_LOCATION_NAME_LENGTH,
+  MAX_LOCATION_POSTAL_CODE_LENGTH,
+} from "./Location";
+
+const MAX_DEALER_FORM_STORED_TEXT_LENGTH = 2000;
+const MAX_DEALER_FORM_CONTACT_NAME_LENGTH = 120;
+const MAX_DEALER_FORM_CONTACT_EMAIL_LENGTH = 254;
 
 export const DealerFormAddressValueSchema = z.object({
-  addressLine1: z.string().optional().nullable(),
-  addressLine2: z.string().optional().nullable(),
-  city: z.string().optional().nullable(),
-  postalCode: z.string().optional().nullable(),
-  stateProvince: z.string().optional().nullable(),
-  country: z.string().optional().nullable(),
+  addressLine1: z.string().max(MAX_LOCATION_ADDRESS_LINE_LENGTH).optional().nullable(),
+  addressLine2: z.string().max(MAX_LOCATION_ADDRESS_LINE_LENGTH).optional().nullable(),
+  city: z.string().max(MAX_LOCATION_CITY_LENGTH).optional().nullable(),
+  postalCode: z.string().max(MAX_LOCATION_POSTAL_CODE_LENGTH).optional().nullable(),
+  stateProvince: z.string().max(MAX_LOCATION_CITY_LENGTH).optional().nullable(),
+  country: z.string().max(MAX_LOCATION_CITY_LENGTH).optional().nullable(),
 }).strict();
 
 export type DealerFormAddressValue = z.infer<typeof DealerFormAddressValueSchema>;
 
 export const DealerFormContactValueSchema = z.object({
-  name: z.string().optional().nullable(),
-  email: z.string().optional().nullable(),
+  name: z.string().max(MAX_DEALER_FORM_CONTACT_NAME_LENGTH).optional().nullable(),
+  email: z.string().max(MAX_DEALER_FORM_CONTACT_EMAIL_LENGTH).optional().nullable(),
 }).strict();
 
 export type DealerFormContactValue = z.infer<typeof DealerFormContactValueSchema>;
 
 export const DealerFormSubmissionStoredValueSchema = z.union([
-  z.string(),
+  z.string().max(MAX_DEALER_FORM_STORED_TEXT_LENGTH),
   z.number(),
   z.boolean(),
   DealerFormAddressValueSchema,
@@ -30,8 +40,8 @@ export const DealerFormSubmissionStoredValueSchema = z.union([
 ]);
 
 export const DealerFormSubmissionFieldValueSchema = z.object({
-  key: z.string().min(1),
-  label: z.string().min(1),
+  key: z.string().min(1).max(64),
+  label: z.string().min(1).max(120),
   type: DealerFormFieldTypeSchema,
   required: z.boolean().optional().nullable(),
   value: DealerFormSubmissionStoredValueSchema.optional().nullable(),
@@ -44,9 +54,9 @@ export const DealerFormSubmissionEntitySchema = z.object({
   org: z.instanceof(ObjectId),
   archived: z.boolean().optional().nullable(),
   publishedLocationId: z.instanceof(ObjectId).optional().nullable(),
-  contactName: z.string().optional().nullable(),
-  contactEmail: z.string().optional().nullable(),
-  locationName: z.string().optional().nullable(),
+  contactName: z.string().max(MAX_DEALER_FORM_CONTACT_NAME_LENGTH).optional().nullable(),
+  contactEmail: z.string().max(MAX_DEALER_FORM_CONTACT_EMAIL_LENGTH).optional().nullable(),
+  locationName: z.string().max(MAX_LOCATION_NAME_LENGTH).optional().nullable(),
   fields: z.array(DealerFormSubmissionFieldValueSchema),
   createdAt: z.date().optional().nullable(),
   updatedAt: z.date().optional().nullable(),
