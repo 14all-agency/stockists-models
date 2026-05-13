@@ -177,6 +177,18 @@ export const LocationGeocodeJobsSummaryResponseSchema = z.object({
 
 export type LocationGeocodeJobsSummaryResponse = z.infer<typeof LocationGeocodeJobsSummaryResponseSchema>;
 
+export const LocationUsageResponseSchema = z.object({
+  plan: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  limit: z.number().int().nonnegative(),
+  usage: z.number().int().nonnegative(),
+  remaining: z.number().int().nonnegative(),
+});
+
+export type LocationUsageResponse = z.infer<typeof LocationUsageResponseSchema>;
+
 const GetLocationsQuerySchema = z.object({
   limit: z.number().int().positive().max(1000).optional().nullable(),
   page: z.number().int().positive().default(1),

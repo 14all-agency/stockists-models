@@ -238,6 +238,7 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 * `coordinates[1]` must be between `-90` and `90`
 * custom field values must match their declared `type`
 * location ownership is always set from authenticated org, not request body
+* create is rejected when adding one location would exceed authenticated org's billing plan location limit
 
 ### Success response
 
@@ -399,6 +400,39 @@ Returns locations owned by authenticated org, sorted by `priority`, then `update
   }
 }
 ```
+
+\---
+
+## Get Usage
+
+**Method:** `GET`  
+**Route:** `locations/getUsage`
+
+Returns authenticated org's current location usage and billing plan location limit.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Success response
+
+```json
+{
+  "plan": {
+    "id": "FREE",
+    "name": "Lifetime Free"
+  },
+  "limit": 100,
+  "usage": 42,
+  "remaining": 58
+}
+```
+
+### Notes
+
+* `usage` counts all current locations owned by authenticated org
+* `limit` comes from org `billingPlanHandle`; unknown or missing handles fall back to `FREE`
+* `remaining` never returns a negative number
 
 \---
 
@@ -896,6 +930,7 @@ Creates many locations for authenticated org in one request.
 * `locations` array must contain at least one item
 * every item must pass same validation as `createLocation`
 * request is all-or-nothing; no partial inserts on validation failure
+* request is rejected when adding all requested locations would exceed authenticated org's billing plan location limit
 
 ### Success response
 
@@ -989,6 +1024,8 @@ Imports many locations for authenticated org in one request. Backend may create 
 * geocoding/parsing work runs asynchronously through backend geocode jobs; endpoint returns after create/update queueing, not after all geocoding is finished
 * queued geocode work is processed in batches of up to `50` location ids per job
 * request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
+* only net-new created locations count against billing plan limit; updates do not
+* request is rejected before writing when created rows would exceed authenticated org's billing plan location limit
 
 ### Success response
 
@@ -1590,6 +1627,7 @@ Publishes one dealer form submission into a location. Can optionally email deale
 * dealer email is only sent when `sendEmail` is truthy
 * dealer publish email subject/body come from org `dealerForms.dealerPublishedSubject` and `dealerForms.dealerPublishedBody`
 * dealer unsubscribe list suppresses optional publish emails
+* publish is rejected when creating the location would exceed authenticated org's billing plan location limit
 
 ### Success response
 
@@ -2258,6 +2296,8 @@ Stores spreadsheet selection and column mapping for org, then queues a sync job 
 * sync may create, update, and optionally delete locations
 * if `deleteMissingRows=true`, any previously linked row absent from current sheet snapshot deletes corresponding location
 * if `matchExistingByAddressOrCoordinates=true`, unmatched external ids can attach to existing locations using same import matching rules as bulk import
+* net-new synced locations are checked against authenticated org's billing plan location limit after planned deletions are subtracted
+* when sync would exceed location limit, no location writes are persisted and sync records an error
 * response includes sync summary plus whether queueing succeeded immediately
 
 ### Success response
