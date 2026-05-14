@@ -98,7 +98,7 @@ function resolveSearchBehaviourSettings(
     clusterLocationsWhenZoomedOut: settings?.clusterLocationsWhenZoomedOut ?? true,
     clusteringZoomLevel: settings?.clusteringZoomLevel ?? 8,
     automaticGeolocation: settings?.automaticGeolocation ?? false,
-    geolocationMethod: settings?.geolocationMethod ?? "HIGH_ACCURACY",
+    geolocationMethod: settings?.geolocationMethod ?? "IP_ADDRESS",
     typedSearchDistanceMode: settings?.typedSearchDistanceMode ?? "BOTH",
     searchRadius: settings?.searchRadius ?? 25,
     geolocationRadius: settings?.geolocationRadius ?? 25,
