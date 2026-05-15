@@ -97,6 +97,15 @@ export const OrganisationResult = z.object({
   billingSubscriptionId: z.string().optional().nullable(),
   billingPlanHandle: z.string().optional().nullable(),
   billingUpdatedAt: z.date().nullable().optional(),
+  billingEnforcementReason: z
+    .union([z.literal("DOWNGRADE"), z.literal("INACTIVE")])
+    .optional()
+    .nullable(),
+  billingEnforcementStartedAt: z.date().nullable().optional(),
+  overLimitWarningSentAt: z.date().nullable().optional(),
+  overLimitReminderSentAt: z.date().nullable().optional(),
+  overLimitResolvedAt: z.date().nullable().optional(),
+  overLimitAutoTrimmedAt: z.date().nullable().optional(),
   onboardingCompletions: z
     .record(z.string(), OnboardingCompletionResult)
     .optional()
@@ -145,6 +154,12 @@ export const OrganisationModelSchema = z.object({
   billingSubscriptionId: OrganisationResult.shape.billingSubscriptionId,
   billingPlanHandle: OrganisationResult.shape.billingPlanHandle,
   billingUpdatedAt: OrganisationResult.shape.billingUpdatedAt,
+  billingEnforcementReason: OrganisationResult.shape.billingEnforcementReason,
+  billingEnforcementStartedAt: OrganisationResult.shape.billingEnforcementStartedAt,
+  overLimitWarningSentAt: OrganisationResult.shape.overLimitWarningSentAt,
+  overLimitReminderSentAt: OrganisationResult.shape.overLimitReminderSentAt,
+  overLimitResolvedAt: OrganisationResult.shape.overLimitResolvedAt,
+  overLimitAutoTrimmedAt: OrganisationResult.shape.overLimitAutoTrimmedAt,
   onboardingCompletions: z
     .record(z.string(), OnboardingCompletionModelSchema)
     .optional()
@@ -212,6 +227,20 @@ export const OrganisationModel = {
       billingSubscriptionId: entity.billingSubscriptionId ?? null,
       billingPlanHandle: entity.billingPlanHandle ?? null,
       billingUpdatedAt: entity.billingUpdatedAt ? new Date(entity.billingUpdatedAt) : null,
+      billingEnforcementReason: entity.billingEnforcementReason ?? null,
+      billingEnforcementStartedAt: entity.billingEnforcementStartedAt
+        ? new Date(entity.billingEnforcementStartedAt)
+        : null,
+      overLimitWarningSentAt: entity.overLimitWarningSentAt
+        ? new Date(entity.overLimitWarningSentAt)
+        : null,
+      overLimitReminderSentAt: entity.overLimitReminderSentAt
+        ? new Date(entity.overLimitReminderSentAt)
+        : null,
+      overLimitResolvedAt: entity.overLimitResolvedAt ? new Date(entity.overLimitResolvedAt) : null,
+      overLimitAutoTrimmedAt: entity.overLimitAutoTrimmedAt
+        ? new Date(entity.overLimitAutoTrimmedAt)
+        : null,
       onboardingCompletions: entity.onboardingCompletions
         ? Object.fromEntries(
             Object.entries(entity.onboardingCompletions).map(([key, value]) => [

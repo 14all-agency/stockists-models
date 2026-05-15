@@ -72,7 +72,13 @@ Checks current active Shopify app subscription, maps it to internal plan, update
   "org": {
     "id": "665f0d3f4f9a9b0099999999",
     "billingPlanStatus": "ACTIVE",
-    "billingPlanHandle": "PRO"
+    "billingPlanHandle": "PRO",
+    "billingEnforcementReason": null,
+    "billingEnforcementStartedAt": null,
+    "overLimitWarningSentAt": null,
+    "overLimitReminderSentAt": null,
+    "overLimitResolvedAt": null,
+    "overLimitAutoTrimmedAt": null
   }
 }
 ```
@@ -82,6 +88,12 @@ Checks current active Shopify app subscription, maps it to internal plan, update
 ```json
 {}
 ```
+
+### Billing field notes
+
+* `billingPlanStatus` is core subscription state and is only `ACTIVE` or `INACTIVE`
+* `billingEnforcementReason` is separate enforcement metadata and may be `DOWNGRADE` or `INACTIVE`
+* over-limit timestamps are populated only when org exceeds its current plan limit after downgrade/freeze
 
 \---
 
@@ -1555,6 +1567,7 @@ Legacy localStorage values like `"1"` still count as completed for fallback chec
 * every provided settings group must match its shared Zod schema
 * omitted top-level settings groups keep their existing stored values
 * the response returns the full `OrganisationModel` with normalized `settings`
+* `billingPlanStatus` remains `ACTIVE` or `INACTIVE`; over-limit downgrade tracking lives in separate enforcement fields on the response model
 
 \---
 
@@ -2506,6 +2519,12 @@ Example:
   "contactEmail": "alerts@example.com",
   "shopifyConnectionStatus": "ACTIVE",
   "billingPlanStatus": "ACTIVE",
-  "billingPlanHandle": "PRO"
+  "billingPlanHandle": "PRO",
+  "billingEnforcementReason": null,
+  "billingEnforcementStartedAt": null,
+  "overLimitWarningSentAt": null,
+  "overLimitReminderSentAt": null,
+  "overLimitResolvedAt": null,
+  "overLimitAutoTrimmedAt": null
 }
 ```
