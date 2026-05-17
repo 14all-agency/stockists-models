@@ -34,4 +34,9 @@ export const PLANS: BillingPlan[] = [
     name: "Pro",
     limit: 2_500,
   },
+  {
+    id: "VIP",
+    name: "VIP",
+    limit: 2_500,
+  },
 ];
