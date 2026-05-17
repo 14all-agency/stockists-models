@@ -6,7 +6,6 @@ import {
   LocationCitySchema,
   LocationCustomFieldSchema,
   LocationFilterSchema,
-  LocationModelSchema,
   LocationNameSchema,
   LocationNotesSchema,
   LocationPhoneNumberSchema,
@@ -124,9 +123,21 @@ export const ImportLocationsBulkSkippedSchema = z.object({
 export type ImportLocationsBulkSkipped = z.infer<typeof ImportLocationsBulkSkippedSchema>;
 
 export const ImportLocationsBulkResponseSchema = z.object({
-  created: z.array(LocationModelSchema).optional().nullable(),
-  updated: z.array(LocationModelSchema).optional().nullable(),
-  skipped: z.array(ImportLocationsBulkSkippedSchema).optional().nullable(),
+  job: z.object({
+    id: z.string().min(1),
+    org: z.string().min(1),
+    status: z.union([
+      z.literal("PENDING"),
+      z.literal("PROCESSING"),
+      z.literal("COMPLETED"),
+      z.literal("FAILED"),
+    ]),
+    totalRows: z.number().int().positive(),
+    queuedCount: z.number().int().nonnegative(),
+    createdCount: z.number().int().nonnegative(),
+    updatedCount: z.number().int().nonnegative(),
+    skipped: z.array(ImportLocationsBulkSkippedSchema),
+  }),
 });
 
 export type ImportLocationsBulkResponse = z.infer<typeof ImportLocationsBulkResponseSchema>;
@@ -188,6 +199,21 @@ export const LocationUsageResponseSchema = z.object({
 });
 
 export type LocationUsageResponse = z.infer<typeof LocationUsageResponseSchema>;
+
+const LocationImportJobStatusQuerySchema = z.union([
+  z.literal("PENDING"),
+  z.literal("PROCESSING"),
+  z.literal("COMPLETED"),
+  z.literal("FAILED"),
+]);
+
+const GetLocationImportJobsQuerySchema = z.object({
+  limit: z.number().int().positive().max(100).optional().nullable(),
+  page: z.number().int().positive().default(1),
+  status: LocationImportJobStatusQuerySchema.optional().nullable(),
+});
+
+export type GetLocationImportJobsQuery = z.infer<typeof GetLocationImportJobsQuerySchema>;
 
 const GetLocationsQuerySchema = z.object({
   limit: z.number().int().positive().max(1000).optional().nullable(),
@@ -280,6 +306,25 @@ export function parseGetLocationsQuery(input: {
       ...(multiValueQueryStringParameters.categories ?? []),
       queryStringParameters.categories,
     ]),
+  });
+
+  if (!parsed.success) {
+    throwZodQueryError(parsed.error);
+  }
+
+  return parsed.data;
+}
+
+export function parseGetLocationImportJobsQuery(input: {
+  queryStringParameters?: Record<string, string | null | undefined> | null;
+}) {
+  const queryStringParameters = input.queryStringParameters ?? {};
+  const limitValue = normaliseOptionalQueryString(queryStringParameters.limit);
+  const pageValue = normaliseOptionalQueryString(queryStringParameters.page);
+  const parsed = GetLocationImportJobsQuerySchema.safeParse({
+    limit: limitValue === null ? null : Number(limitValue),
+    page: pageValue === null ? 1 : Number(pageValue),
+    status: normaliseOptionalQueryString(queryStringParameters.status),
   });
 
   if (!parsed.success) {

@@ -1049,8 +1049,11 @@ Imports many locations for authenticated org in one request. Backend may create 
 * `options.resolveCoordinatesFromAddress=true` allows backend to geocode rows that have address data but no coordinates
 * `options.parseFormattedAddress=true` allows backend to split `formattedAddress` into `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, and `country`
 * when parsing `formattedAddress`, explicitly provided structured address fields should win and parsed values should only fill blanks
-* geocoding/parsing work runs asynchronously through backend geocode jobs; endpoint returns after create/update queueing, not after all geocoding is finished
-* queued geocode work is processed in batches of up to `50` location ids per job
+* request pre-validates rows before queueing, including `id` validation, existing-record matching, document-shape validation, and billing-plan limit checks
+* rows that fail pre-validation are stored on the job as `skipped` and are not queued for execution
+* import writes run asynchronously through a dedicated backend SNS worker; endpoint returns after job creation, not after location writes or geocoding finish
+* once the import worker writes locations, any required geocoding/parsing follow-up is queued through backend geocode jobs
+* queued geocode work is processed in batches of up to `10` location ids per job
 * request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
 * only net-new created locations count against billing plan limit; updates do not
 * request is rejected before writing when created rows would exceed authenticated org's billing plan location limit
@@ -1067,28 +1070,118 @@ When the import would exceed the org's billing plan location limit, the endpoint
 
 ```json
 {
-  "created": [
+  "job": {
+    "id": "6827f0d34f9a9b0012345678",
+    "org": "665f0d3f4f9a9b0099999999",
+    "status": "PENDING",
+    "totalRows": 2,
+    "queuedCount": 2,
+    "createdCount": 1,
+    "updatedCount": 1,
+    "skipped": []
+  }
+}
+```
+
+\---
+
+## Get Import Jobs
+
+**Method:** `GET`  
+**Route:** `locations/getImportJobs`
+
+Returns paginated location import jobs for authenticated org, newest first.
+
+### Query parameters
+
+* `shop: string` (required)
+* `limit: number` (optional, defaults to `50`, max `100`)
+* `page: number` (optional, defaults to `1`)
+* `status: PENDING | PROCESSING | COMPLETED | FAILED` (optional)
+
+### Success response
+
+```json
+{
+  "jobs": [
     {
-      "id": "665f0d3f4f9a9b0012345679",
+      "id": "6827f0d34f9a9b0012345678",
       "org": "665f0d3f4f9a9b0099999999",
-      "status": "UNLISTED",
-      "name": "Wellington Showroom"
+      "status": "COMPLETED",
+      "totalRows": 2,
+      "queuedCount": 2,
+      "createdCount": 1,
+      "updatedCount": 1,
+      "skipped": [],
+      "result": {
+        "createdLocationIds": ["665f0d3f4f9a9b0012345679"],
+        "updatedLocationIds": ["665f0d3f4f9a9b0012345678"],
+        "geocodeQueuedCount": 1
+      },
+      "requestedAt": "2026-05-17T01:00:00.000Z",
+      "startedAt": "2026-05-17T01:00:02.000Z",
+      "completedAt": "2026-05-17T01:00:04.000Z",
+      "failedAt": null,
+      "error": null
     }
   ],
-  "updated": [
-    {
-      "id": "665f0d3f4f9a9b0012345678",
-      "org": "665f0d3f4f9a9b0099999999",
-      "status": "ACTIVE",
-      "name": "Auckland Flagship"
-    }
-  ],
-  "skipped": [
-    {
-      "row": 7,
-      "reason": "ambiguous_match"
-    }
-  ]
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  }
+}
+```
+
+\---
+
+## Get Import Job
+
+**Method:** `GET`  
+**Route:** `locations/getImportJob/{id}`
+
+Returns one location import job owned by authenticated org.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Path parameters
+
+* `id: string` (required, must be valid ObjectId string)
+
+### Success response
+
+```json
+{
+  "job": {
+    "id": "6827f0d34f9a9b0012345678",
+    "org": "665f0d3f4f9a9b0099999999",
+    "status": "FAILED",
+    "totalRows": 8,
+    "queuedCount": 6,
+    "createdCount": 4,
+    "updatedCount": 2,
+    "skipped": [
+      {
+        "row": 7,
+        "reason": "ambiguous_match"
+      },
+      {
+        "row": 8,
+        "reason": "id_not_found"
+      }
+    ],
+    "result": null,
+    "requestedAt": "2026-05-17T01:00:00.000Z",
+    "startedAt": "2026-05-17T01:00:02.000Z",
+    "completedAt": null,
+    "failedAt": "2026-05-17T01:00:05.000Z",
+    "error": "Location not found for queued update row 3"
+  }
 }
 ```
 
