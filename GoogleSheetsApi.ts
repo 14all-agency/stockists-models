@@ -19,6 +19,14 @@ export const GoogleSheetReferenceSchema = z.object({
 
 export type GoogleSheetReference = z.infer<typeof GoogleSheetReferenceSchema>;
 
+export const GoogleSpreadsheetReferenceSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  url: z.string().url(),
+});
+
+export type GoogleSpreadsheetReference = z.infer<typeof GoogleSpreadsheetReferenceSchema>;
+
 export const ConfigureGoogleSheetSyncBodySchema = z.object({
   spreadsheetId: z.string().min(1),
   spreadsheetName: z.string().min(1),
