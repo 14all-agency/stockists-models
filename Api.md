@@ -2068,7 +2068,6 @@ Primary Google Sheets connect endpoint for browser popup auth code flow. Fronten
 ### Rules
 
 * request uses standard authenticated admin flow and Shopify HMAC verification
-* request must include `X-Requested-With: XmlHttpRequest`
 * popup code exchange uses browser page origin as Google OAuth `redirect_uri`
 * backend exchanges code for Google access/refresh tokens and stores them on existing sync record
 * if Google does not return new refresh token, backend preserves previously stored refresh token when present
