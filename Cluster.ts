@@ -1,6 +1,6 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import {
   CoordinatesSchema,
   LocationCustomFieldSchema,
@@ -40,8 +40,8 @@ export const PublicLocationMapPayloadSchema = z.object({
 export type PublicLocationMapPayload = z.infer<typeof PublicLocationMapPayloadSchema>;
 
 export const ClusterEntityResult = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId).describe("Organisation that owns this cluster"),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema.describe("Organisation that owns this cluster"),
   version: z.string().min(1).describe("Active cluster dataset version for this rebuild batch"),
   zoom: z.number().int().min(0),
   x: z.number().int().min(0),
@@ -49,7 +49,7 @@ export const ClusterEntityResult = z.object({
   cell: z.string().min(1),
   coordinates: CoordinatesSchema.shape.coordinates,
   count: z.number().int().nonnegative(),
-  pointIds: z.array(z.instanceof(ObjectId)).max(10),
+  pointIds: z.array(ObjectIdSchema).max(10),
   sumLng: z.number(),
   sumLat: z.number(),
   bounds: ClusterBoundsSchema,

@@ -1,6 +1,6 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import { LocationCustomFieldTypeResult, LocationStatusResult } from "./Location";
 
 const ApiDateSchema = z.coerce.date().optional().nullable();
@@ -84,8 +84,8 @@ export const GoogleSheetSyncMappingSchema = z.discriminatedUnion("kind", [
 export type GoogleSheetSyncMapping = z.infer<typeof GoogleSheetSyncMappingSchema>;
 
 export const GoogleSheetSyncEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
   status: GoogleSheetSyncStatusSchema,
   googleEmail: z.string().email().optional().nullable(),
   spreadsheetId: z.string().optional().nullable(),

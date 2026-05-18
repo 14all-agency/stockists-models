@@ -1,5 +1,6 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
+import { ObjectIdSchema } from "./ObjectId";
 import {
   LocationEmailAddressResult,
   LocationLogoUrlResult,
@@ -140,8 +141,8 @@ export const CoordinatesSchema = z
 
 export const LocationEntityResult = z
   .object({
-    _id: z.instanceof(ObjectId),
-    org: z.instanceof(ObjectId).describe("Organisation that owns this location"),
+    _id: ObjectIdSchema,
+    org: ObjectIdSchema.describe("Organisation that owns this location"),
     status: LocationStatusResult.describe("Location visibility and publication state"),
     name: LocationNameSchema,
     addressLine1: LocationAddressLineSchema,

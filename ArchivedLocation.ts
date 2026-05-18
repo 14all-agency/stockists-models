@@ -1,6 +1,6 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import { LocationEntityResult } from "./Location";
 
 export const ArchivedLocationReasonSchema = z.union([z.literal("BILLING_AUTO_TRIM")]);
@@ -8,9 +8,9 @@ export const ArchivedLocationReasonSchema = z.union([z.literal("BILLING_AUTO_TRI
 export type ArchivedLocationReason = z.infer<typeof ArchivedLocationReasonSchema>;
 
 export const ArchivedLocationEntityResult = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
-  locationId: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
+  locationId: ObjectIdSchema,
   location: LocationEntityResult,
   archiveReason: ArchivedLocationReasonSchema,
   archivedAt: z.date(),

@@ -1,6 +1,6 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import {
   ImportLocationBodySchema,
   ImportLocationsBulkOptionsSchema,
@@ -55,8 +55,8 @@ export const LocationImportJobPayloadSchema = z.object({
 export type LocationImportJobPayload = z.infer<typeof LocationImportJobPayloadSchema>;
 
 export const LocationImportJobEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
   status: LocationImportJobStatusSchema,
   options: ImportLocationsBulkOptionsSchema.optional().nullable(),
   totalRows: z.number().int().positive(),

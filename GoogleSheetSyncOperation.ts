@@ -1,6 +1,6 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import { LocationModelSchema } from "./Location";
 import { ImportLocationBodySchema } from "./LocationApi";
 
@@ -18,16 +18,16 @@ export const GoogleSheetSyncMappedRowSchema = z.object({
 export type GoogleSheetSyncMappedRow = z.infer<typeof GoogleSheetSyncMappedRowSchema>;
 
 export const GoogleSheetSyncOperationEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
-  sync: z.instanceof(ObjectId),
-  syncRow: z.instanceof(ObjectId).optional().nullable(),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
+  sync: ObjectIdSchema,
+  syncRow: ObjectIdSchema.optional().nullable(),
   operation: GoogleSheetSyncOperationTypeSchema,
   externalId: z.string().optional().nullable(),
   rowNumber: z.number().int().positive().optional().nullable(),
   rawRowData: z.record(z.string(), z.string()).optional().nullable(),
   mappedData: GoogleSheetSyncMappedRowSchema.optional().nullable(),
-  locationId: z.instanceof(ObjectId).optional().nullable(),
+  locationId: ObjectIdSchema.optional().nullable(),
   previousLocation: LocationModelSchema.optional().nullable(),
   nextLocation: LocationModelSchema.optional().nullable(),
   happenedAt: z.date(),

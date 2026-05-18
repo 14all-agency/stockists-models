@@ -1,6 +1,6 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import type { ImportLocationsBulkOptions } from "./LocationApi";
 
 export const LocationGeocodeJobCollection = "locationGeocodeJobs";
@@ -38,8 +38,8 @@ export const LocationImportGeocodeJobPayloadSchema = z.object({
 export type LocationImportGeocodeJobPayload = z.infer<typeof LocationImportGeocodeJobPayloadSchema>;
 
 export const LocationGeocodeJobEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
   type: z.literal("LOCATION_IMPORT_GEOCODE"),
   status: LocationGeocodeJobStatusSchema,
   locationIds: z.array(z.string().min(1)),

@@ -1,6 +1,7 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import { DealerFormFieldTypeSchema } from "./settings/dealerForms";
 import {
   MAX_LOCATION_ADDRESS_LINE_LENGTH,
@@ -50,10 +51,10 @@ export const DealerFormSubmissionFieldValueSchema = z.object({
 export type DealerFormSubmissionFieldValue = z.infer<typeof DealerFormSubmissionFieldValueSchema>;
 
 export const DealerFormSubmissionEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
   archived: z.boolean().optional().nullable(),
-  publishedLocationId: z.instanceof(ObjectId).optional().nullable(),
+  publishedLocationId: ObjectIdSchema.optional().nullable(),
   contactName: z.string().max(MAX_DEALER_FORM_CONTACT_NAME_LENGTH).optional().nullable(),
   contactEmail: z.string().max(MAX_DEALER_FORM_CONTACT_EMAIL_LENGTH).optional().nullable(),
   locationName: z.string().max(MAX_LOCATION_NAME_LENGTH).optional().nullable(),

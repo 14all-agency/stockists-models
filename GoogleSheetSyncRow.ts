@@ -1,12 +1,13 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
+
 export const GoogleSheetSyncRowEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  sync: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  sync: ObjectIdSchema,
+  org: ObjectIdSchema,
   externalId: z.string().min(1),
-  locationId: z.instanceof(ObjectId),
+  locationId: ObjectIdSchema,
   rowHash: z.string().min(1),
   rowNumber: z.number().int().positive(),
   createdAt: z.date().optional().nullable(),

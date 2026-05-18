@@ -1,11 +1,11 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import { CoordinatesSchema, LocationEntityResult } from "./Location";
 
 export const SearchEntityResult = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId).describe("Organisation that owns this search record"),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema.describe("Organisation that owns this search record"),
   coordinates: CoordinatesSchema.shape.coordinates,
   formattedAddress: z.string().optional().nullable(),
   addressLine1: LocationEntityResult.shape.addressLine1,
@@ -15,7 +15,7 @@ export const SearchEntityResult = z.object({
   stateProvince: LocationEntityResult.shape.stateProvince,
   country: LocationEntityResult.shape.country,
   nearestLocations: z
-    .array(z.instanceof(ObjectId))
+    .array(ObjectIdSchema)
     .max(10)
     .optional()
     .nullable()

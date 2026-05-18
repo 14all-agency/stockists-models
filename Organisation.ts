@@ -1,6 +1,7 @@
 import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
 import { SettingsConverter, SettingsResult } from "./OrganisationSettings";
 
 export const ShopifyConnectionResult = z.object({
@@ -57,7 +58,7 @@ export const OnboardingCompletionModelSchema = z.object({
 export type OnboardingCompletionModel = z.infer<typeof OnboardingCompletionModelSchema>;
 
 export const OrganisationResult = z.object({
-  _id: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
   country: z.string().optional().nullable().describe("country of origin"),
   contactEmail: z.string().optional().nullable().describe("The email to contact for this org"),
   locale: z.string().optional().nullable().describe("shop locale / language"),

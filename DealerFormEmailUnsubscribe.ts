@@ -1,9 +1,10 @@
-import { ObjectId } from "bson";
 import { z } from "zod";
 
+import { ObjectIdSchema } from "./ObjectId";
+
 export const DealerFormEmailUnsubscribeEntitySchema = z.object({
-  _id: z.instanceof(ObjectId),
-  org: z.instanceof(ObjectId),
+  _id: ObjectIdSchema,
+  org: ObjectIdSchema,
   email: z.string().email(),
   createdAt: z.date().optional().nullable(),
   updatedAt: z.date().optional().nullable(),
