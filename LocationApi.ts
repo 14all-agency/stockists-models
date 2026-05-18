@@ -87,12 +87,6 @@ export const UpdateLocationBodySchema = z
 
 export type UpdateLocationBody = z.infer<typeof UpdateLocationBodySchema>;
 
-export const BulkCreateLocationsBodySchema = z.object({
-  locations: z.array(CreateLocationBodySchema).min(1),
-});
-
-export type BulkCreateLocationsBody = z.infer<typeof BulkCreateLocationsBodySchema>;
-
 export const ImportLocationBodySchema = CreateLocationBodySchema.safeExtend({
   id: z.string().min(1).optional().nullable(),
   formattedAddress: z.string().max(500).optional().nullable(),
@@ -242,12 +236,6 @@ export function parseCreateLocationBody(body: string | null | undefined): Create
 
 export function parseUpdateLocationBody(body: string | null | undefined): UpdateLocationBody {
   return parseBody(body, UpdateLocationBodySchema);
-}
-
-export function parseBulkCreateLocationsBody(
-  body: string | null | undefined,
-): BulkCreateLocationsBody {
-  return parseBody(body, BulkCreateLocationsBodySchema, BULK_LOCATION_BODY_MAX_BYTES);
 }
 
 export function parseImportLocationsBulkBody(
