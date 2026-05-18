@@ -1994,7 +1994,7 @@ Dealer email unsubscribed.
 **Method:** `GET`  
 **Route:** `googleSheets/install`
 
-Starts Google OAuth for authenticated shop and returns Google consent URL.
+Starts legacy redirect-based Google OAuth fallback for authenticated shop and returns Google consent URL.
 
 ### Query parameters
 
@@ -2006,6 +2006,7 @@ Starts Google OAuth for authenticated shop and returns Google consent URL.
 * request uses standard authenticated admin flow and Shopify HMAC verification
 * backend creates one-time OAuth `state` linked to current org
 * response does not redirect directly; frontend should redirect browser to returned `url`
+* primary production flow should use `POST googleSheets/connectWithCode`; this route exists as migration fallback
 * OAuth requests Google Drive `drive.file` access plus basic identity scopes so user can later choose one spreadsheet to share with the app
 * Google OAuth redirect target is `${APP_URL}/google-sheets/`
 
@@ -2024,7 +2025,7 @@ Starts Google OAuth for authenticated shop and returns Google consent URL.
 **Method:** `GET`  
 **Route:** `googleSheets/auth`
 
-Completes Google OAuth callback, stores Google token set for org, records Google account email, then redirects back into app.
+Completes legacy redirect-based Google OAuth callback, stores Google token set for org, records Google account email, then redirects back into app.
 
 This endpoint is called by Google, not by frontend fetch.
 
@@ -2044,6 +2045,79 @@ This endpoint is called by Google, not by frontend fetch.
 
 \---
 
+## Connect Google Sheets With Code
+
+**Method:** `POST`  
+**Route:** `googleSheets/connectWithCode`
+
+Primary Google Sheets connect endpoint for browser popup auth code flow. Frontend obtains one-time auth code with Google Identity Services popup UX, posts it to backend, backend exchanges it for tokens, stores refresh token for offline sync, then returns same sync summary shape as `getSync`.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Request body
+
+```json
+{
+  "code": "4/0AeaY..."
+}
+```
+
+### Rules
+
+* request uses standard authenticated admin flow and Shopify HMAC verification
+* request must include `X-Requested-With: XmlHttpRequest`
+* popup code exchange uses browser page origin as Google OAuth `redirect_uri`
+* backend exchanges code for Google access/refresh tokens and stores them on existing sync record
+* if Google does not return new refresh token, backend preserves previously stored refresh token when present
+* backend records Google account email from Google userinfo endpoint
+* sync record is moved to `CONNECTED` status after successful exchange
+* response payload intentionally matches `getSync` so frontend can open Picker immediately without another auth prompt
+
+### Success response
+
+```json
+{
+  "connected": true,
+  "picker": {
+    "appId": "123456789012",
+    "clientId": "example.apps.googleusercontent.com",
+    "developerKey": "AIzaExample",
+    "oauthToken": "ya29.a0AfH6SMExample",
+    "oauthTokenExpiresAt": "2026-05-18T01:00:00.000Z"
+  },
+  "sync": {
+    "id": "681111114f9a9b0012345678",
+    "org": "665f0d3f4f9a9b0099999999",
+    "status": "CONNECTED",
+    "googleEmail": "owner@example.com",
+    "spreadsheetId": null,
+    "spreadsheetName": null,
+    "spreadsheetUrl": null,
+    "sheetId": null,
+    "sheetName": null,
+    "headerRow": null,
+    "dataStartRow": null,
+    "externalIdColumn": null,
+    "externalIdFallbackStatus": "ACTIVE",
+    "mappings": null,
+    "options": null,
+    "lastCheckedAt": null,
+    "lastSourceModifiedAt": null,
+    "lastSyncedAt": null,
+    "lastErrorAt": null,
+    "lastErrorMessage": null,
+    "errorNotificationsEnabled": true,
+    "createdAt": "2026-05-18T01:00:00.000Z",
+    "updatedAt": "2026-05-18T01:00:00.000Z"
+  }
+}
+```
+
+\---
+
 ## Get Google Sheets Sync
 
 **Method:** `GET`  
@@ -2051,7 +2125,7 @@ This endpoint is called by Google, not by frontend fetch.
 
 Returns current org Google Sheets sync summary and stored sync configuration when present.
 
-Response also includes Google Picker configuration for the frontend. When `connected=true`, `picker.oauthToken` contains a short-lived access token that the frontend can pass to Google Picker.
+Response also includes Google Picker configuration for the frontend. When `connected=true`, `picker.oauthToken` contains a short-lived access token that the frontend can pass to Google Picker. Response shape matches `POST googleSheets/connectWithCode`.
 
 ### Query parameters
 

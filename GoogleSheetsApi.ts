@@ -61,6 +61,12 @@ export const GoogleSheetSyncSummaryResponseSchema = z.object({
 
 export type GoogleSheetSyncSummaryResponse = z.infer<typeof GoogleSheetSyncSummaryResponseSchema>;
 
+export const ConnectGoogleSheetWithCodeBodySchema = z.object({
+  code: z.string().min(1),
+});
+
+export type ConnectGoogleSheetWithCodeBody = z.infer<typeof ConnectGoogleSheetWithCodeBodySchema>;
+
 const GoogleSheetPreviewCellValueSchema = z.union([
   z.string(),
   z.number(),
@@ -140,4 +146,8 @@ export function parseGetGoogleSheetOperationsQuery(input: {
 
 export function parseConfigureGoogleSheetSyncBody(body: string | null | undefined) {
   return parseJsonBody(body, ConfigureGoogleSheetSyncBodySchema);
+}
+
+export function parseConnectGoogleSheetWithCodeBody(body: string | null | undefined) {
+  return parseJsonBody(body, ConnectGoogleSheetWithCodeBodySchema);
 }
