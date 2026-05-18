@@ -19,14 +19,6 @@ export const GoogleSheetReferenceSchema = z.object({
 
 export type GoogleSheetReference = z.infer<typeof GoogleSheetReferenceSchema>;
 
-export const GoogleSpreadsheetReferenceSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1),
-  url: z.string().url(),
-});
-
-export type GoogleSpreadsheetReference = z.infer<typeof GoogleSpreadsheetReferenceSchema>;
-
 export const ConfigureGoogleSheetSyncBodySchema = z.object({
   spreadsheetId: z.string().min(1),
   spreadsheetName: z.string().min(1),
@@ -43,9 +35,20 @@ export const ConfigureGoogleSheetSyncBodySchema = z.object({
 
 export type ConfigureGoogleSheetSyncBody = z.infer<typeof ConfigureGoogleSheetSyncBodySchema>;
 
+export const GoogleSheetPickerConfigSchema = z.object({
+  appId: z.string().min(1),
+  clientId: z.string().min(1),
+  developerKey: z.string().min(1),
+  oauthToken: z.string().min(1).optional().nullable(),
+  oauthTokenExpiresAt: z.coerce.date().optional().nullable(),
+});
+
+export type GoogleSheetPickerConfig = z.infer<typeof GoogleSheetPickerConfigSchema>;
+
 export const GoogleSheetSyncSummaryResponseSchema = z.object({
   sync: GoogleSheetSyncModelSchema.optional().nullable(),
   connected: z.boolean(),
+  picker: GoogleSheetPickerConfigSchema,
 });
 
 export type GoogleSheetSyncSummaryResponse = z.infer<typeof GoogleSheetSyncSummaryResponseSchema>;

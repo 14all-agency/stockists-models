@@ -2006,6 +2006,7 @@ Starts Google OAuth for authenticated shop and returns Google consent URL.
 * request uses standard authenticated admin flow and Shopify HMAC verification
 * backend creates one-time OAuth `state` linked to current org
 * response does not redirect directly; frontend should redirect browser to returned `url`
+* OAuth requests Google Drive `drive.file` access plus basic identity scopes so user can later choose one spreadsheet to share with the app
 * Google OAuth redirect target is `${APP_URL}/google-sheets/`
 
 ### Success response
@@ -2036,8 +2037,9 @@ This endpoint is called by Google, not by frontend fetch.
 
 * callback does **not** use Shopify HMAC verification
 * `state` must match one-time OAuth state created by `googleSheets/install`
-* stored token includes access token, refresh token, expiry, scope, and token type
+* stored token includes access token, refresh token, and expiry
 * sync record is moved to `CONNECTED` status after successful auth
+* spreadsheet selection happens later in frontend via Google Picker using the authenticated Google session
 * endpoint redirects browser to `${APP_URL}/google-sheets/`
 
 \---
@@ -2049,6 +2051,8 @@ This endpoint is called by Google, not by frontend fetch.
 
 Returns current org Google Sheets sync summary and stored sync configuration when present.
 
+Response also includes Google Picker configuration for the frontend. When `connected=true`, `picker.oauthToken` contains a short-lived access token that the frontend can pass to Google Picker.
+
 ### Query parameters
 
 * `shop: string` (required)
@@ -2059,6 +2063,13 @@ Returns current org Google Sheets sync summary and stored sync configuration whe
 ```json
 {
   "connected": true,
+  "picker": {
+    "appId": "123456789012",
+    "clientId": "example.apps.googleusercontent.com",
+    "developerKey": "AIzaExample",
+    "oauthToken": "ya29.a0AfH6SMExample",
+    "oauthTokenExpiresAt": "2026-05-18T01:00:00.000Z"
+  },
   "sync": {
     "id": "681111114f9a9b0012345678",
     "org": "665f0d3f4f9a9b0099999999",
@@ -2234,39 +2245,6 @@ Returns Google Sheets sync operation log records for authenticated org. Results 
 
 \---
 
-## Get Google Spreadsheets
-
-**Method:** `GET`  
-**Route:** `googleSheets/getSpreadsheets`
-
-Lists spreadsheets visible to connected Google account.
-
-### Query parameters
-
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
-
-### Rules
-
-* org must already have completed Google OAuth
-* returns only spreadsheet files from Google Drive
-
-### Success response
-
-```json
-{
-  "spreadsheets": [
-    {
-      "id": "1abcDEFghiJKLmnop",
-      "name": "Store Locations",
-      "url": "https://docs.google.com/spreadsheets/d/1abcDEFghiJKLmnop/edit"
-    }
-  ]
-}
-```
-
-\---
-
 ## Get Google Spreadsheet Sheets
 
 **Method:** `GET`  
@@ -2279,6 +2257,12 @@ Lists sheets/tabs inside a selected Google spreadsheet.
 * `shop: string` (required)
 * `spreadsheetId: string` (required)
 * standard Shopify HMAC params for verification
+
+### Rules
+
+* org must already have completed Google OAuth
+* spreadsheet must already have been explicitly selected by the user in Google Picker on the frontend
+* backend reads spreadsheet tabs using authenticated Google token for org
 
 ### Success response
 
@@ -2318,6 +2302,7 @@ Returns header values and sample preview rows for selected spreadsheet tab so fr
 ### Rules
 
 * org must already have completed Google OAuth
+* spreadsheet must already have been explicitly selected by the user in Google Picker on the frontend
 * backend reads selected tab using authenticated Google token for org
 * `headerRow` determines which row becomes mapping source column names
 * backend should trim blank trailing columns from header list
@@ -2421,6 +2406,7 @@ Stores spreadsheet selection and column mapping for org, then queues a sync job 
 
 ### Rules
 
+* spreadsheet metadata in request body should come from the spreadsheet the user explicitly selected in Google Picker
 * `externalIdColumn` is required and is used as stable row identity for update/delete behavior
 * rows missing an external id are skipped and reported as sync errors
 * duplicated external ids are treated as invalid source data:

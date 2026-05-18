@@ -16,8 +16,6 @@ export const GoogleSheetSyncTokenSchema = z.object({
   accessToken: z.string(),
   refreshToken: z.string().optional().nullable(),
   expiresAt: ApiDateSchema,
-  scope: z.string().optional().nullable(),
-  tokenType: z.string().optional().nullable(),
 });
 
 export type GoogleSheetSyncToken = z.infer<typeof GoogleSheetSyncTokenSchema>;
