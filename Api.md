@@ -1105,6 +1105,43 @@ Returns one location import job owned by authenticated org.
 
 \---
 
+## Reverse Import Job
+
+**Method:** `POST`  
+**Route:** `locations/reverseImportJob/{id}`
+
+Reverses one completed location import job owned by authenticated org by deleting only locations created by that import. Updated existing locations are not changed.
+
+### Query parameters
+
+* `shop: string` (required)
+
+### Path parameters
+
+* `id: string` (required, must be valid ObjectId string)
+
+### Rules
+
+* import job must belong to authenticated org
+* import job must have `status=COMPLETED`
+* only queued rows with `operation=CREATE` are reversed
+* locations already deleted elsewhere are skipped
+* locations updated by import are not rolled back
+
+### Success response
+
+```json
+{
+  "deleted": true,
+  "ids": [
+    "665f0d3f4f9a9b0012345679"
+  ],
+  "deletedCount": 1
+}
+```
+
+\---
+
 ## Queue Location Geocode
 
 **Method:** `POST`  
