@@ -5,8 +5,22 @@ import {
   NullableBoolean,
   NullableLabelString,
   NullableNumber,
-  NullableString,
 } from "./shared";
+
+const MIN_CLUSTER_DENSITY_MODIFIER = -4;
+const MAX_CLUSTER_DENSITY_MODIFIER = 4;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+export function normalizeClusteringDensityModifier(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return 0;
+  }
+
+  return clamp(Math.round(value), MIN_CLUSTER_DENSITY_MODIFIER, MAX_CLUSTER_DENSITY_MODIFIER);
+}
 
 export const SearchStartingPositionModeSchema = z
   .enum(["FIT_ALL_LOCATIONS", "SPECIFIC_AREA"])
@@ -58,6 +72,7 @@ export const SearchBehaviourSettingsSchema = z.object({
   startingArea: SearchStartingAreaSchema.optional().nullable().describe("Preselected starting area details used only when the locator should focus on a specific area on first load."),
   clusterLocationsWhenZoomedOut: NullableBoolean.describe("Whether nearby location markers should be grouped into cluster circles when visitors zoom out on the map."),
   clusteringZoomLevel: NullableNumber.describe("Zoom threshold at which grouped cluster markers begin replacing individual location pins."),
+  clusteringDensityModifier: NullableNumber.describe("Integer modifier that shifts the internal cluster cell calculation up or down from the requested zoom to make clusters denser or looser without changing the visible clustering zoom threshold."),
   automaticGeolocation: NullableBoolean.describe("Whether the locator should automatically attempt to detect the visitor's location and show nearby stores on load."),
   geolocationMethod: SearchGeolocationMethodSchema,
   typedSearchDistanceMode: SearchDistanceModeSchema,

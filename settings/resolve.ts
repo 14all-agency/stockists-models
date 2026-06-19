@@ -11,7 +11,11 @@ import {
 } from "./dealerForms";
 import { type LanguageContent, type LanguageSettings } from "./language";
 import { type MapPinStyle, type ProviderSettings } from "./provider";
-import { type SearchBehaviourSettings, type SearchStartingArea } from "./searchBehaviour";
+import {
+  normalizeClusteringDensityModifier,
+  type SearchBehaviourSettings,
+  type SearchStartingArea,
+} from "./searchBehaviour";
 
 type ResolvableSettingsInput = {
   searchBehaviour?: SearchBehaviourSettings | null;
@@ -97,6 +101,9 @@ function resolveSearchBehaviourSettings(
     },
     clusterLocationsWhenZoomedOut: settings?.clusterLocationsWhenZoomedOut ?? true,
     clusteringZoomLevel: settings?.clusteringZoomLevel ?? 8,
+    clusteringDensityModifier: normalizeClusteringDensityModifier(
+      settings?.clusteringDensityModifier,
+    ),
     automaticGeolocation: settings?.automaticGeolocation ?? false,
     geolocationMethod: settings?.geolocationMethod ?? "IP_ADDRESS",
     typedSearchDistanceMode: settings?.typedSearchDistanceMode ?? "BOTH",
