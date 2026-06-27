@@ -53,17 +53,74 @@ const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
   geolocationButtonLabel: "Use my location",
   geolocationLoadingLabel: "Finding your location...",
   filterDropdownButtonLabel: "Filter results",
+  resetFiltersButtonLabel: "Reset filters",
   initialMessageHtml: "Enter your city or postcode to find nearby locations.",
+  emptyResultsNearbyMessage: "Sorry, we didn't find any stockists nearby",
   noResultsMessageHtml: "Sorry, we couldn’t find any matching locations.",
   addressNotFoundMessageHtml: "We couldn’t recognize that address. Try another search.",
   geolocationErrorMessageHtml:
     "We couldn’t access your location. Check your browser settings and try again.",
+  rateLimitedMessageHtml: "Too many map searches. Please wait a moment, then try again.",
   genericErrorMessageHtml: "Something went wrong. Please try again.",
   directionsLinkLabel: "Directions",
   websiteLinkLabel: "Website",
   popupCloseLabel: "Close popup",
   fullscreenToggleLabel: "Toggle fullscreen map",
   locationLogoAltLabel: "Location logo",
+  dealerFormUnavailableMessage: "Dealer form not available right now.",
+  dealerFormNoFieldsMessage: "No dealer form fields configured yet.",
+  dealerFormPleaseWaitMessage: "Please wait a moment, then submit again.",
+  dealerFormFieldErrorFallbackMessage: "Please check this field.",
+  dealerFormHighlightedFieldsMessage: "Please fix highlighted fields and try again.",
+  dealerFormTooManyUploadsMessage:
+    "Some fields exceed allowed limits. Use up to 3 upload fields per submission.",
+  dealerFormUploadTotalTooLargeMessage:
+    "Request too large. Uploaded files must stay under 15 MB combined.",
+  dealerFormRecaptchaFailedMessage: "reCAPTCHA verification failed. Please try again.",
+  dealerFormRequestTooLargeMessage:
+    "Request too large. Shorten answers or remove files, then try again.",
+  dealerFormSubmitErrorMessage: "Could not submit your application. Please try again.",
+  dealerFormTooManyRequestsMessage: "Too many requests, please try again shortly.",
+  dealerFormContactRequiredMessage: "Enter contact name and email.",
+  dealerFormContactNameTooLongMessage: "Contact name must be 120 characters or fewer.",
+  dealerFormContactEmailTooLongMessage: "Contact email must be 254 characters or fewer.",
+  dealerFormInvalidEmailMessage: "Enter a valid email address.",
+  dealerFormAddressSuggestionRequiredMessage:
+    "Select a suggested address or complete the address manually.",
+  dealerFormAddressRequiredMessage: "Complete all required address fields.",
+  dealerFormFieldLimitExceededMessage: "Some fields exceed allowed limits.",
+  dealerFormFieldNotFoundMessage: "Field could not be found.",
+  dealerFormCheckboxRequiredMessage: "Please check this box to continue.",
+  dealerFormFileRequiredMessage: "Please upload a file.",
+  dealerFormFileTooLargeMessage: "Please upload a file smaller than 10 MB.",
+  dealerFormImageFileRequiredMessage: "Please upload an image file.",
+  dealerFormRequiredFieldMessage: "This field is required.",
+  dealerFormInvalidUrlMessage: "Enter a valid URL.",
+  dealerFormInvalidSelectOptionMessage: "Choose a valid option.",
+  dealerFormInvalidNumberMessage: "Enter a valid number.",
+  dealerFormTextTooLongMessage: "This field must be 2000 characters or fewer.",
+  dealerFormAddressNoResultsMessage: "No results found.",
+  dealerFormGenericInputPlaceholder: "Enter value",
+  dealerFormContactNameLabel: "Contact name",
+  dealerFormContactNamePlaceholder: "Enter contact name",
+  dealerFormContactEmailLabel: "Contact email",
+  dealerFormContactEmailPlaceholder: "Enter contact email",
+  dealerFormAddressLookupLabel: "Address",
+  dealerFormAddressLookupPlaceholder: "Search address",
+  dealerFormEnterAddressManuallyLabel: "Enter manually",
+  dealerFormHideAddressFieldsLabel: "Hide address fields",
+  dealerFormAddressLine1Label: "Address line 1",
+  dealerFormAddressLine1Placeholder: "Enter address line 1",
+  dealerFormAddressLine2Label: "Address line 2",
+  dealerFormAddressLine2Placeholder: "Enter address line 2",
+  dealerFormCityLabel: "City",
+  dealerFormCityPlaceholder: "Enter city",
+  dealerFormPostalCodeLabel: "Postal code",
+  dealerFormPostalCodePlaceholder: "Enter postal code",
+  dealerFormStateProvinceLabel: "State / Province",
+  dealerFormStateProvincePlaceholder: "Enter state or province",
+  dealerFormCountryLabel: "Country",
+  dealerFormCountryPlaceholder: "Enter country",
   debugReportBugLinkLabel: "report a bug",
   debugReportBugCloseDialogLabel: "Close report bug popup",
   debugReportBugDialogTitle: "Report bug",
@@ -238,13 +295,19 @@ function createLanguageContent(language?: LanguageContent | null): LanguageConte
       language?.geolocationLoadingLabel ?? DEFAULT_LANGUAGE_CONTENT.geolocationLoadingLabel,
     filterDropdownButtonLabel:
       language?.filterDropdownButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.filterDropdownButtonLabel,
+    resetFiltersButtonLabel:
+      language?.resetFiltersButtonLabel ?? DEFAULT_LANGUAGE_CONTENT.resetFiltersButtonLabel,
     initialMessageHtml: language?.initialMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.initialMessageHtml,
     noResultsMessageHtml:
       language?.noResultsMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.noResultsMessageHtml,
+    emptyResultsNearbyMessage:
+      language?.emptyResultsNearbyMessage ?? DEFAULT_LANGUAGE_CONTENT.emptyResultsNearbyMessage,
     addressNotFoundMessageHtml:
       language?.addressNotFoundMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.addressNotFoundMessageHtml,
     geolocationErrorMessageHtml:
       language?.geolocationErrorMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.geolocationErrorMessageHtml,
+    rateLimitedMessageHtml:
+      language?.rateLimitedMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.rateLimitedMessageHtml,
     genericErrorMessageHtml:
       language?.genericErrorMessageHtml ?? DEFAULT_LANGUAGE_CONTENT.genericErrorMessageHtml,
     directionsLinkLabel: language?.directionsLinkLabel ?? DEFAULT_LANGUAGE_CONTENT.directionsLinkLabel,
@@ -254,6 +317,137 @@ function createLanguageContent(language?: LanguageContent | null): LanguageConte
       language?.fullscreenToggleLabel ?? DEFAULT_LANGUAGE_CONTENT.fullscreenToggleLabel,
     locationLogoAltLabel:
       language?.locationLogoAltLabel ?? DEFAULT_LANGUAGE_CONTENT.locationLogoAltLabel,
+    dealerFormUnavailableMessage:
+      language?.dealerFormUnavailableMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormUnavailableMessage,
+    dealerFormNoFieldsMessage:
+      language?.dealerFormNoFieldsMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormNoFieldsMessage,
+    dealerFormPleaseWaitMessage:
+      language?.dealerFormPleaseWaitMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormPleaseWaitMessage,
+    dealerFormFieldErrorFallbackMessage:
+      language?.dealerFormFieldErrorFallbackMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormFieldErrorFallbackMessage,
+    dealerFormHighlightedFieldsMessage:
+      language?.dealerFormHighlightedFieldsMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormHighlightedFieldsMessage,
+    dealerFormTooManyUploadsMessage:
+      language?.dealerFormTooManyUploadsMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormTooManyUploadsMessage,
+    dealerFormUploadTotalTooLargeMessage:
+      language?.dealerFormUploadTotalTooLargeMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormUploadTotalTooLargeMessage,
+    dealerFormRecaptchaFailedMessage:
+      language?.dealerFormRecaptchaFailedMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormRecaptchaFailedMessage,
+    dealerFormRequestTooLargeMessage:
+      language?.dealerFormRequestTooLargeMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormRequestTooLargeMessage,
+    dealerFormSubmitErrorMessage:
+      language?.dealerFormSubmitErrorMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormSubmitErrorMessage,
+    dealerFormTooManyRequestsMessage:
+      language?.dealerFormTooManyRequestsMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormTooManyRequestsMessage,
+    dealerFormContactRequiredMessage:
+      language?.dealerFormContactRequiredMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormContactRequiredMessage,
+    dealerFormContactNameTooLongMessage:
+      language?.dealerFormContactNameTooLongMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormContactNameTooLongMessage,
+    dealerFormContactEmailTooLongMessage:
+      language?.dealerFormContactEmailTooLongMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormContactEmailTooLongMessage,
+    dealerFormInvalidEmailMessage:
+      language?.dealerFormInvalidEmailMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormInvalidEmailMessage,
+    dealerFormAddressSuggestionRequiredMessage:
+      language?.dealerFormAddressSuggestionRequiredMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormAddressSuggestionRequiredMessage,
+    dealerFormAddressRequiredMessage:
+      language?.dealerFormAddressRequiredMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormAddressRequiredMessage,
+    dealerFormFieldLimitExceededMessage:
+      language?.dealerFormFieldLimitExceededMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormFieldLimitExceededMessage,
+    dealerFormFieldNotFoundMessage:
+      language?.dealerFormFieldNotFoundMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormFieldNotFoundMessage,
+    dealerFormCheckboxRequiredMessage:
+      language?.dealerFormCheckboxRequiredMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormCheckboxRequiredMessage,
+    dealerFormFileRequiredMessage:
+      language?.dealerFormFileRequiredMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormFileRequiredMessage,
+    dealerFormFileTooLargeMessage:
+      language?.dealerFormFileTooLargeMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormFileTooLargeMessage,
+    dealerFormImageFileRequiredMessage:
+      language?.dealerFormImageFileRequiredMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormImageFileRequiredMessage,
+    dealerFormRequiredFieldMessage:
+      language?.dealerFormRequiredFieldMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormRequiredFieldMessage,
+    dealerFormInvalidUrlMessage:
+      language?.dealerFormInvalidUrlMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormInvalidUrlMessage,
+    dealerFormInvalidSelectOptionMessage:
+      language?.dealerFormInvalidSelectOptionMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormInvalidSelectOptionMessage,
+    dealerFormInvalidNumberMessage:
+      language?.dealerFormInvalidNumberMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormInvalidNumberMessage,
+    dealerFormTextTooLongMessage:
+      language?.dealerFormTextTooLongMessage ?? DEFAULT_LANGUAGE_CONTENT.dealerFormTextTooLongMessage,
+    dealerFormAddressNoResultsMessage:
+      language?.dealerFormAddressNoResultsMessage ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormAddressNoResultsMessage,
+    dealerFormGenericInputPlaceholder:
+      language?.dealerFormGenericInputPlaceholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormGenericInputPlaceholder,
+    dealerFormContactNameLabel:
+      language?.dealerFormContactNameLabel ?? DEFAULT_LANGUAGE_CONTENT.dealerFormContactNameLabel,
+    dealerFormContactNamePlaceholder:
+      language?.dealerFormContactNamePlaceholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormContactNamePlaceholder,
+    dealerFormContactEmailLabel:
+      language?.dealerFormContactEmailLabel ?? DEFAULT_LANGUAGE_CONTENT.dealerFormContactEmailLabel,
+    dealerFormContactEmailPlaceholder:
+      language?.dealerFormContactEmailPlaceholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormContactEmailPlaceholder,
+    dealerFormAddressLookupLabel:
+      language?.dealerFormAddressLookupLabel ?? DEFAULT_LANGUAGE_CONTENT.dealerFormAddressLookupLabel,
+    dealerFormAddressLookupPlaceholder:
+      language?.dealerFormAddressLookupPlaceholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormAddressLookupPlaceholder,
+    dealerFormEnterAddressManuallyLabel:
+      language?.dealerFormEnterAddressManuallyLabel ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormEnterAddressManuallyLabel,
+    dealerFormHideAddressFieldsLabel:
+      language?.dealerFormHideAddressFieldsLabel ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormHideAddressFieldsLabel,
+    dealerFormAddressLine1Label:
+      language?.dealerFormAddressLine1Label ?? DEFAULT_LANGUAGE_CONTENT.dealerFormAddressLine1Label,
+    dealerFormAddressLine1Placeholder:
+      language?.dealerFormAddressLine1Placeholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormAddressLine1Placeholder,
+    dealerFormAddressLine2Label:
+      language?.dealerFormAddressLine2Label ?? DEFAULT_LANGUAGE_CONTENT.dealerFormAddressLine2Label,
+    dealerFormAddressLine2Placeholder:
+      language?.dealerFormAddressLine2Placeholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormAddressLine2Placeholder,
+    dealerFormCityLabel:
+      language?.dealerFormCityLabel ?? DEFAULT_LANGUAGE_CONTENT.dealerFormCityLabel,
+    dealerFormCityPlaceholder:
+      language?.dealerFormCityPlaceholder ?? DEFAULT_LANGUAGE_CONTENT.dealerFormCityPlaceholder,
+    dealerFormPostalCodeLabel:
+      language?.dealerFormPostalCodeLabel ?? DEFAULT_LANGUAGE_CONTENT.dealerFormPostalCodeLabel,
+    dealerFormPostalCodePlaceholder:
+      language?.dealerFormPostalCodePlaceholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormPostalCodePlaceholder,
+    dealerFormStateProvinceLabel:
+      language?.dealerFormStateProvinceLabel ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormStateProvinceLabel,
+    dealerFormStateProvincePlaceholder:
+      language?.dealerFormStateProvincePlaceholder ??
+      DEFAULT_LANGUAGE_CONTENT.dealerFormStateProvincePlaceholder,
+    dealerFormCountryLabel:
+      language?.dealerFormCountryLabel ?? DEFAULT_LANGUAGE_CONTENT.dealerFormCountryLabel,
+    dealerFormCountryPlaceholder:
+      language?.dealerFormCountryPlaceholder ?? DEFAULT_LANGUAGE_CONTENT.dealerFormCountryPlaceholder,
     debugReportBugLinkLabel:
       language?.debugReportBugLinkLabel ?? DEFAULT_LANGUAGE_CONTENT.debugReportBugLinkLabel,
     debugReportBugCloseDialogLabel:
