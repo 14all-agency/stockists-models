@@ -126,6 +126,42 @@ Stores lightweight review feedback signals on org record.
 
 \---
 
+## Submit Feedback
+
+**Method:** `POST`  
+**Route:** `shopify/submitFeedback`
+
+Sends store feedback to internal admin email using org contact email as `replyTo`.
+
+### Query parameters
+
+* `shop: string` (required)
+* standard Shopify HMAC params for verification
+
+### Request body
+
+```json
+{
+  "message": "Love new search layout, but category editing felt confusing."
+}
+```
+
+### Notes
+
+* subject line format is `[Stockist Maps]: Feedback from [store name]`
+* email body is raw `message`
+* `replyTo` uses authenticated org `contactEmail`
+* request fails if email config or org contact email is missing
+* request uses standard authenticated admin flow and Shopify HMAC verification
+
+### Success response
+
+```json
+{}
+```
+
+\---
+
 ## Ping Web Vitals
 
 **Method:** `POST`  
@@ -1500,6 +1536,7 @@ Legacy localStorage values like `"1"` still count as completed for fallback chec
 ```json
 {
   "contactEmail": "alerts@example.com",
+  "subscribed": false,
   "onboardingCompletions": {
     "stockists_map_install_custom": {
       "completedAt": "2026-05-13T01:23:45.000Z",
@@ -1611,6 +1648,7 @@ Legacy localStorage values like `"1"` still count as completed for fallback chec
 ### Rules
 
 * `contactEmail` must be email-shaped when provided
+* `subscribed` controls marketing email eligibility only and does not affect transactional emails
 * `settings` is optional
 * every provided settings group must match its shared Zod schema
 * omitted top-level settings groups keep their existing stored values
@@ -2568,6 +2606,7 @@ Example:
   "id": "665f0d3f4f9a9b0099999999",
   "name": "Example Store",
   "contactEmail": "alerts@example.com",
+  "subscribed": false,
   "shopifyConnectionStatus": "ACTIVE",
   "billingPlanStatus": "ACTIVE",
   "billingPlanHandle": "PRO",

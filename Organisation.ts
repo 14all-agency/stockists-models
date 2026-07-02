@@ -61,6 +61,11 @@ export const OrganisationResult = z.object({
   _id: ObjectIdSchema,
   country: z.string().optional().nullable().describe("country of origin"),
   contactEmail: z.string().optional().nullable().describe("The email to contact for this org"),
+  subscribed: z
+    .boolean()
+    .optional()
+    .nullable()
+    .describe("Whether organisation is subscribed to marketing emails"),
   locale: z.string().optional().nullable().describe("shop locale / language"),
   passwordProtected: z.boolean().optional().nullable().describe("whether or not store is password protected"),
   reviewed: z.boolean().optional().nullable().describe("whether or not store has engaged with review element"),
@@ -120,6 +125,7 @@ export const OrganisationModelSchema = z.object({
   id: z.string(),
   country: OrganisationResult.shape.country,
   contactEmail: OrganisationResult.shape.contactEmail,
+  subscribed: z.boolean(),
   passwordProtected: OrganisationResult.shape.passwordProtected,
   locale: OrganisationResult.shape.locale,
   reviewed: OrganisationResult.shape.reviewed,
@@ -180,6 +186,7 @@ export const OrganisationModel = {
       country: entity.country ?? null,
       passwordProtected: entity.passwordProtected ?? null,
       contactEmail: entity.contactEmail ?? null,
+      subscribed: entity.subscribed ?? false,
       locale: entity.locale ?? null,
       reviewed: entity.reviewed ?? null,
       reviewSurface: entity.reviewSurface ?? null,

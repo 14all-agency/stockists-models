@@ -14,6 +14,7 @@ import { parseJsonBody } from "./apiParsing";
 
 const MAX_ONBOARDING_COMPLETION_KEYS = 50;
 const MAX_ONBOARDING_COMPLETION_KEY_LENGTH = 64;
+const MAX_FEEDBACK_MESSAGE_LENGTH = 5000;
 
 const OnboardingCompletionsSchema = z
   .record(z.string().max(MAX_ONBOARDING_COMPLETION_KEY_LENGTH), OnboardingCompletionModelSchema)
@@ -44,6 +45,7 @@ export const UpdateOrgBodySchema = z.object({
       message: "Request body is not valid",
     })
     .optional(),
+  subscribed: z.boolean().optional(),
   onboardingCompletions: OnboardingCompletionsSchema.optional(),
   settings: SettingsGroupsSchema.partial().optional(),
 });
@@ -57,6 +59,24 @@ export function parseUpdateOrgBody(body: string | null | undefined): UpdateOrgBo
   return parseJsonBody(body, UpdateOrgBodySchema, {
     allowEmpty: true,
     emptyValue: {},
+    includeIssueMessages: false,
+  });
+}
+
+//
+// ======================================================
+// SUBMIT FEEDBACK (POST /shopify/submitFeedback)
+// ======================================================
+//
+
+export const SubmitFeedbackBodySchema = z.object({
+  message: z.string().trim().min(1).max(MAX_FEEDBACK_MESSAGE_LENGTH),
+});
+
+export type SubmitFeedbackBody = z.infer<typeof SubmitFeedbackBodySchema>;
+
+export function parseSubmitFeedbackBody(body: string | null | undefined): SubmitFeedbackBody {
+  return parseJsonBody(body, SubmitFeedbackBodySchema, {
     includeIssueMessages: false,
   });
 }
