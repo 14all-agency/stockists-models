@@ -106,6 +106,7 @@ export const GoogleSheetSyncEntitySchema = z.object({
   lastSyncedAt: ApiDateSchema,
   lastErrorAt: ApiDateSchema,
   lastErrorMessage: z.string().optional().nullable(),
+  lastErrorEmailSentAt: ApiDateSchema,
   errorNotificationsEnabled: z.boolean().optional().nullable(),
   createdAt: ApiDateSchema,
   updatedAt: ApiDateSchema,
@@ -134,6 +135,7 @@ export const GoogleSheetSyncModelSchema = z.object({
   lastSyncedAt: GoogleSheetSyncEntitySchema.shape.lastSyncedAt,
   lastErrorAt: GoogleSheetSyncEntitySchema.shape.lastErrorAt,
   lastErrorMessage: GoogleSheetSyncEntitySchema.shape.lastErrorMessage,
+  lastErrorEmailSentAt: GoogleSheetSyncEntitySchema.shape.lastErrorEmailSentAt,
   errorNotificationsEnabled: GoogleSheetSyncEntitySchema.shape.errorNotificationsEnabled,
   createdAt: GoogleSheetSyncEntitySchema.shape.createdAt,
   updatedAt: GoogleSheetSyncEntitySchema.shape.updatedAt,
@@ -166,6 +168,9 @@ export const GoogleSheetSyncModel = {
       lastSyncedAt: entity.lastSyncedAt ? new Date(entity.lastSyncedAt) : null,
       lastErrorAt: entity.lastErrorAt ? new Date(entity.lastErrorAt) : null,
       lastErrorMessage: entity.lastErrorMessage ?? null,
+      lastErrorEmailSentAt: entity.lastErrorEmailSentAt
+        ? new Date(entity.lastErrorEmailSentAt)
+        : null,
       errorNotificationsEnabled: entity.errorNotificationsEnabled ?? true,
       createdAt: entity.createdAt ? new Date(entity.createdAt) : null,
       updatedAt: entity.updatedAt ? new Date(entity.updatedAt) : null,
