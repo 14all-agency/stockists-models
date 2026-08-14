@@ -44,7 +44,11 @@ export const CreateLocationBodySchema = z.object({
   emailAddress: LocationEmailAddressInputSchema,
   logoUrl: LocationLogoUrlInputSchema,
   notes: LocationNotesSchema,
-  customFields: z.array(LocationCustomFieldSchema).max(MAX_LOCATION_CUSTOM_FIELDS).optional().nullable(),
+  customFields: z
+    .array(LocationCustomFieldSchema)
+    .max(MAX_LOCATION_CUSTOM_FIELDS)
+    .optional()
+    .nullable(),
   filters: z.array(LocationFilterSchema).max(MAX_LOCATION_FILTERS).optional().nullable(),
   priority: NullableNumberInput,
   suppressWarnings: z.boolean().optional().nullable(),
@@ -69,7 +73,11 @@ export const UpdateLocationBodySchema = z
     emailAddress: LocationEmailAddressInputSchema,
     logoUrl: LocationLogoUrlInputSchema,
     notes: LocationNotesSchema,
-    customFields: z.array(LocationCustomFieldSchema).max(MAX_LOCATION_CUSTOM_FIELDS).optional().nullable(),
+    customFields: z
+      .array(LocationCustomFieldSchema)
+      .max(MAX_LOCATION_CUSTOM_FIELDS)
+      .optional()
+      .nullable(),
     filters: z.array(LocationFilterSchema).max(MAX_LOCATION_FILTERS).optional().nullable(),
     priority: NullableNumberInput,
     suppressWarnings: z.boolean().optional().nullable(),
@@ -160,27 +168,44 @@ export const SuppressLocationWarningsBodySchema = z.object({
 
 export type SuppressLocationWarningsBody = z.infer<typeof SuppressLocationWarningsBodySchema>;
 
-export const DuplicateLocationAuditSchema = z.object({
-  recommendedKeep: z.string().min(1),
-  recommendedDelete: z.string().min(1),
-  oldestLocation: z.string().min(1),
-  newestLocation: z.string().min(1),
+export const DuplicateLocationGroupSchema = z.object({
+  locationIds: z.array(z.string().min(1)).min(2),
+  recommendedDelete: z.array(z.string().min(1)).min(1),
+  oldestDelete: z.array(z.string().min(1)).min(1),
+  newestDelete: z.array(z.string().min(1)).min(1),
 });
 
 export const LocationMaintenanceAuditResponseSchema = z.object({
   missingAddressParts: z.array(z.string().min(1)),
   missingCoordinates: z.array(z.string().min(1)),
-  duplicateLocations: z.array(DuplicateLocationAuditSchema),
+  duplicateLocationGroupCount: z.number().int().nonnegative(),
 });
 
-export type LocationMaintenanceAuditResponse = z.infer<typeof LocationMaintenanceAuditResponseSchema>;
+export type LocationMaintenanceAuditResponse = z.infer<
+  typeof LocationMaintenanceAuditResponseSchema
+>;
+
+export const LocationDuplicateAuditResponseSchema = z.object({
+  groups: z.array(DuplicateLocationGroupSchema),
+  pagination: z.object({
+    page: z.number().int().positive(),
+    limit: z.number().int().positive(),
+    total: z.number().int().nonnegative(),
+    totalPages: z.number().int().nonnegative(),
+    hasNextPage: z.boolean(),
+  }),
+});
+
+export type LocationDuplicateAuditResponse = z.infer<typeof LocationDuplicateAuditResponseSchema>;
 
 export const LocationGeocodeJobsSummaryResponseSchema = z.object({
   processing: z.number().int().nonnegative(),
   failed: z.number().int().nonnegative(),
 });
 
-export type LocationGeocodeJobsSummaryResponse = z.infer<typeof LocationGeocodeJobsSummaryResponseSchema>;
+export type LocationGeocodeJobsSummaryResponse = z.infer<
+  typeof LocationGeocodeJobsSummaryResponseSchema
+>;
 
 export const LocationUsageResponseSchema = z.object({
   plan: z.object({
@@ -216,15 +241,20 @@ const GetLocationsQuerySchema = z.object({
   search: z.string().max(250).optional().nullable(),
   status: LocationStatusResult,
   categories: z.array(z.string().min(1).max(64)).max(50).optional().nullable(),
+  maintenanceIssue: z
+    .union([z.literal("duplicates"), z.literal("geocoding")])
+    .optional()
+    .nullable(),
+});
+
+const GetLocationDuplicateAuditQuerySchema = z.object({
+  limit: z.number().int().positive().max(100).default(100),
+  page: z.number().int().positive().default(1),
 });
 
 export type GetLocationsQuery = z.infer<typeof GetLocationsQuerySchema>;
 
-function parseBody<T>(
-  body: string | null | undefined,
-  schema: z.ZodType<T>,
-  maxBytes?: number,
-): T {
+function parseBody<T>(body: string | null | undefined, schema: z.ZodType<T>, maxBytes?: number): T {
   return parseJsonBody(body, schema, {
     maxBytes,
   });
@@ -268,12 +298,12 @@ export function parseSuppressLocationWarningsBody(
   return parseBody(body, SuppressLocationWarningsBodySchema);
 }
 
-
 export function parseGetLocationsQuery(input: {
   queryStringParameters?: Record<string, string | null | undefined> | null;
-  multiValueQueryStringParameters?:
-    | Record<string, Array<string | null | undefined> | null | undefined>
-    | null;
+  multiValueQueryStringParameters?: Record<
+    string,
+    Array<string | null | undefined> | null | undefined
+  > | null;
 }): GetLocationsQuery {
   const queryStringParameters = input.queryStringParameters ?? {};
   const multiValueQueryStringParameters = input.multiValueQueryStringParameters ?? {};
@@ -294,6 +324,25 @@ export function parseGetLocationsQuery(input: {
       ...(multiValueQueryStringParameters.categories ?? []),
       queryStringParameters.categories,
     ]),
+    maintenanceIssue: normaliseOptionalQueryString(queryStringParameters.maintenanceIssue),
+  });
+
+  if (!parsed.success) {
+    throwZodQueryError(parsed.error);
+  }
+
+  return parsed.data;
+}
+
+export function parseGetLocationDuplicateAuditQuery(input: {
+  queryStringParameters?: Record<string, string | null | undefined> | null;
+}) {
+  const queryStringParameters = input.queryStringParameters ?? {};
+  const limitValue = normaliseOptionalQueryString(queryStringParameters.limit);
+  const pageValue = normaliseOptionalQueryString(queryStringParameters.page);
+  const parsed = GetLocationDuplicateAuditQuerySchema.safeParse({
+    limit: limitValue === null ? undefined : Number(limitValue),
+    page: pageValue === null ? undefined : Number(pageValue),
   });
 
   if (!parsed.success) {

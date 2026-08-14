@@ -7,8 +7,8 @@ Checks whether shop already has active Shopify connection with required scopes. 
 
 ### Query parameters
 
-* `shop: string` (required, must end with `myshopify.com`)
-* standard Shopify HMAC params for verification
+- `shop: string` (required, must end with `myshopify.com`)
+- standard Shopify HMAC params for verification
 
 ### Success response when already connected
 
@@ -41,10 +41,10 @@ Completes Shopify OAuth install flow. Verifies `shop` + `state`, exchanges `code
 
 ### Query parameters
 
-* `shop: string` (required)
-* `code: string` (required)
-* `state: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- `code: string` (required)
+- `state: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Success response
 
@@ -61,9 +61,9 @@ Checks current active Shopify app subscription, maps it to internal plan, update
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
-* `charge_id: string` (optional, used in current lookup flow)
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
+- `charge_id: string` (optional, used in current lookup flow)
 
 ### Success response when active subscription found
 
@@ -91,9 +91,9 @@ Checks current active Shopify app subscription, maps it to internal plan, update
 
 ### Billing field notes
 
-* `billingPlanStatus` is core subscription state and is only `ACTIVE` or `INACTIVE`
-* `billingEnforcementReason` is separate enforcement metadata and may be `DOWNGRADE` or `INACTIVE`
-* over-limit timestamps are populated only when org exceeds its current plan limit after downgrade/freeze
+- `billingPlanStatus` is core subscription state and is only `ACTIVE` or `INACTIVE`
+- `billingEnforcementReason` is separate enforcement metadata and may be `DOWNGRADE` or `INACTIVE`
+- over-limit timestamps are populated only when org exceeds its current plan limit after downgrade/freeze
 
 \---
 
@@ -106,8 +106,8 @@ Stores lightweight review feedback signals on org record.
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Request body
 
@@ -135,8 +135,8 @@ Sends store feedback to internal admin email using org contact email as `replyTo
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Request body
 
@@ -148,11 +148,11 @@ Sends store feedback to internal admin email using org contact email as `replyTo
 
 ### Notes
 
-* subject line format is `[Stockist Maps]: Feedback from [store name]`
-* email body is raw `message`
-* `replyTo` uses authenticated org `contactEmail`
-* request fails if email config or org contact email is missing
-* request uses standard authenticated admin flow and Shopify HMAC verification
+- subject line format is `[Stockist Maps]: Feedback from [store name]`
+- email body is raw `message`
+- `replyTo` uses authenticated org `contactEmail`
+- request fails if email config or org contact email is missing
+- request uses standard authenticated admin flow and Shopify HMAC verification
 
 ### Success response
 
@@ -171,8 +171,8 @@ Stores reported frontend vitals payload for shop.
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Request body
 
@@ -203,8 +203,8 @@ Stores alert payload and, outside `dev`, emails admin unless `silent` is truthy.
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Request body
 
@@ -235,7 +235,7 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -276,17 +276,17 @@ Creates one location owned by authenticated org and returns full `LocationModel`
 
 ### Rules
 
-* `name` is required
-* `status` can be `ACTIVE`, `UNLISTED`, or `INACTIVE`
-* omitted `status` defaults to `ACTIVE`
-* `website` and `logoUrl` must be valid URLs when provided
-* `emailAddress` must be valid email when provided
-* `coordinates` must be `[longitude, latitude]`
-* `coordinates[0]` must be between `-180` and `180`
-* `coordinates[1]` must be between `-90` and `90`
-* custom field values must match their declared `type`
-* location ownership is always set from authenticated org, not request body
-* create is rejected when adding one location would exceed authenticated org's billing plan location limit
+- `name` is required
+- `status` can be `ACTIVE`, `UNLISTED`, or `INACTIVE`
+- omitted `status` defaults to `ACTIVE`
+- `website` and `logoUrl` must be valid URLs when provided
+- `emailAddress` must be valid email when provided
+- `coordinates` must be `[longitude, latitude]`
+- `coordinates[0]` must be between `-180` and `180`
+- `coordinates[1]` must be between `-90` and `90`
+- custom field values must match their declared `type`
+- location ownership is always set from authenticated org, not request body
+- create is rejected when adding one location would exceed authenticated org's billing plan location limit
 
 ### Location limit response
 
@@ -348,7 +348,7 @@ Updates one existing location owned by authenticated org and returns full `Locat
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -367,11 +367,11 @@ Updates one existing location owned by authenticated org and returns full `Locat
 
 ### Rules
 
-* `id` must be valid ObjectId string
-* location must belong to authenticated org
-* at least one field besides `id` must be provided
-* omitted fields keep existing stored values
-* merged result must still satisfy full location validation rules
+- `id` must be valid ObjectId string
+- location must belong to authenticated org
+- at least one field besides `id` must be provided
+- omitted fields keep existing stored values
+- merged result must still satisfy full location validation rules
 
 ### Success response
 
@@ -388,11 +388,11 @@ Returns one location owned by authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Path parameters
 
-* `id: string` (required, must be valid ObjectId string)
+- `id: string` (required, must be valid ObjectId string)
 
 ### Success response
 
@@ -409,13 +409,14 @@ Returns locations owned by authenticated org, sorted by `priority`, then `update
 
 ### Query parameters
 
-* `shop: string` (required)
-* `limit: number` (optional, max `100`; enables pagination)
-* `page: number` (optional, defaults to `1`; when provided without `limit`, uses a default page size of `50`)
-* `ids: string | string[]` (optional, comma-separated or repeated query param; when provided, returns all matching org-owned location ids and ignores pagination, search, status, and categories filters)
-* `search: string` (optional, case-insensitive partial match against location `name` and address fields)
-* `status: ACTIVE | UNLISTED | INACTIVE` (optional)
-* `categories: string | string[]` (optional, comma-separated or repeated query param; matches assigned location filter `value`s)
+- `shop: string` (required)
+- `limit: number` (optional, max `100`; enables pagination)
+- `page: number` (optional, defaults to `1`; when provided without `limit`, uses a default page size of `50`)
+- `ids: string | string[]` (optional, comma-separated or repeated query param; when provided, returns all matching org-owned location ids and ignores pagination, search, status, and categories filters)
+- `search: string` (optional, case-insensitive partial match against location `name` and address fields)
+- `status: ACTIVE | UNLISTED | INACTIVE` (optional)
+- `categories: string | string[]` (optional, comma-separated or repeated query param; matches assigned location filter `value`s)
+- `maintenanceIssue: "duplicates" | "geocoding"` (optional; returns paginated locations matching the selected maintenance issue and ignores search, status, and categories filters)
 
 ### Success response
 
@@ -468,7 +469,7 @@ Returns authenticated org's current location usage and billing plan location lim
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Success response
 
@@ -486,9 +487,9 @@ Returns authenticated org's current location usage and billing plan location lim
 
 ### Notes
 
-* `usage` counts all current locations owned by authenticated org
-* `limit` comes from org `billingPlanHandle`; unknown or missing handles fall back to `FREE`
-* `remaining` never returns a negative number
+- `usage` counts all current locations owned by authenticated org
+- `limit` comes from org `billingPlanHandle`; unknown or missing handles fall back to `FREE`
+- `remaining` never returns a negative number
 
 \---
 
@@ -499,54 +500,54 @@ Returns authenticated org's current location usage and billing plan location lim
 
 Public-facing map query endpoint. Resolves org from `shop` and returns either:
 
-* cached precomputed clusters
-* dynamic on-the-fly clusters when search/category filters are used
-* raw points when clustering is disabled or zoom is above org clustering threshold
-* distance-sorted raw points when coordinates are supplied outside clustering zoom
+- cached precomputed clusters
+- dynamic on-the-fly clusters when search/category filters are used
+- raw points when clustering is disabled or zoom is above org clustering threshold
+- distance-sorted raw points when coordinates are supplied outside clustering zoom
 
 This endpoint does **not** require HMAC verification.
 
 ### Query parameters
 
-* `shop: string` (required, must end with `myshopify.com`)
-* `zoom: number` (required)
-* `west: number` (required, longitude bound)
-* `south: number` (required, latitude bound)
-* `east: number` (required, longitude bound)
-* `north: number` (required, latitude bound)
-* `search: string` (optional; bypasses cluster cache and clusters matching locations dynamically)
-* `categories: string | string[]` (optional, comma-separated or repeated query param; bypasses cluster cache and clusters matching locations dynamically)
-* `source: SEARCH | GEOLOCATION` (optional; only used when `lng` and `lat` are also supplied)
-* `lng: number` (optional; longitude for distance-aware point sorting/filtering)
-* `lat: number` (optional; latitude for distance-aware point sorting/filtering)
+- `shop: string` (required, must end with `myshopify.com`)
+- `zoom: number` (required)
+- `west: number` (required, longitude bound)
+- `south: number` (required, latitude bound)
+- `east: number` (required, longitude bound)
+- `north: number` (required, latitude bound)
+- `search: string` (optional; bypasses cluster cache and clusters matching locations dynamically)
+- `categories: string | string[]` (optional, comma-separated or repeated query param; bypasses cluster cache and clusters matching locations dynamically)
+- `source: SEARCH | GEOLOCATION` (optional; only used when `lng` and `lat` are also supplied)
+- `lng: number` (optional; longitude for distance-aware point sorting/filtering)
+- `lat: number` (optional; latitude for distance-aware point sorting/filtering)
 
 ### Notes
 
-* frontend makes one request even when viewport crosses dateline
-* backend handles dateline splitting internally
-* endpoint applies public abuse rate limits
-* when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
-* if `search` or `categories` are provided, precomputed cluster cache is skipped
-* at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
-* if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
-* if request zoom is clustering, `source`/`lng`/`lat` are ignored and cluster behavior remains unchanged, except for IP-based geolocation fallback described below
-* distance-aware point mode ignores text-field regex matching from `search`; coordinates are the source of truth for ordering/filtering
-* if `source=GEOLOCATION` and org `geolocationMethod=IP_ADDRESS`, backend resolves coordinates from request IP and ignores supplied `lng`/`lat`
-* if `source=GEOLOCATION` and `lng`/`lat` are omitted, backend resolves coordinates from request IP before applying distance mode
-* IP-based geolocation uses MongoDB cache keyed by request IP before calling IPGeolocation.io
-* if IP-based geolocation is required for `source=GEOLOCATION` and resolution fails, endpoint returns an error
-* if `source=GEOLOCATION` and backend is using IP-derived coordinates, clustering is bypassed so response uses distance-aware raw points even when zoom would normally cluster
-* in distance-aware point mode:
-  * `source=GEOLOCATION` uses org `geolocationRadius`
-  * `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `searchRadius`
-  * `source=SEARCH` + `typedSearchDistanceMode=ENTIRE_SEARCHED_AREA` uses current viewport bounds, then sorts results by distance from supplied coordinates
-  * `source=SEARCH` + `typedSearchDistanceMode=BOTH` combines viewport-bounded and radius-bounded results, then sorts merged results by distance from supplied coordinates
-* distance is returned per point in the org's configured distance unit (`MILES` or `KILOMETERS`)
-* every response now includes `centerCoordinates`
-* `centerCoordinates` returns resolved center point used for distance-aware mode; this includes IP-derived geolocation coordinates when applicable
-* when no center point is active, `centerCoordinates` is `null`
-* every response now includes `centerAddress`
-* `centerAddress` is populated only when backend resolved center from IP geolocation API fields; otherwise it is `null`
+- frontend makes one request even when viewport crosses dateline
+- backend handles dateline splitting internally
+- endpoint applies public abuse rate limits
+- when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
+- if `search` or `categories` are provided, precomputed cluster cache is skipped
+- at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
+- if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
+- if request zoom is clustering, `source`/`lng`/`lat` are ignored and cluster behavior remains unchanged, except for IP-based geolocation fallback described below
+- distance-aware point mode ignores text-field regex matching from `search`; coordinates are the source of truth for ordering/filtering
+- if `source=GEOLOCATION` and org `geolocationMethod=IP_ADDRESS`, backend resolves coordinates from request IP and ignores supplied `lng`/`lat`
+- if `source=GEOLOCATION` and `lng`/`lat` are omitted, backend resolves coordinates from request IP before applying distance mode
+- IP-based geolocation uses MongoDB cache keyed by request IP before calling IPGeolocation.io
+- if IP-based geolocation is required for `source=GEOLOCATION` and resolution fails, endpoint returns an error
+- if `source=GEOLOCATION` and backend is using IP-derived coordinates, clustering is bypassed so response uses distance-aware raw points even when zoom would normally cluster
+- in distance-aware point mode:
+  - `source=GEOLOCATION` uses org `geolocationRadius`
+  - `source=SEARCH` + `typedSearchDistanceMode=SPECIFIC_RADIUS` uses org `searchRadius`
+  - `source=SEARCH` + `typedSearchDistanceMode=ENTIRE_SEARCHED_AREA` uses current viewport bounds, then sorts results by distance from supplied coordinates
+  - `source=SEARCH` + `typedSearchDistanceMode=BOTH` combines viewport-bounded and radius-bounded results, then sorts merged results by distance from supplied coordinates
+- distance is returned per point in the org's configured distance unit (`MILES` or `KILOMETERS`)
+- every response now includes `centerCoordinates`
+- `centerCoordinates` returns resolved center point used for distance-aware mode; this includes IP-derived geolocation coordinates when applicable
+- when no center point is active, `centerCoordinates` is `null`
+- every response now includes `centerAddress`
+- `centerAddress` is populated only when backend resolved center from IP geolocation API fields; otherwise it is `null`
 
 ### Success response using cached or dynamic clusters
 
@@ -694,7 +695,7 @@ Public-facing analytics endpoint that stores a search record against an org. Int
 
 ### Query parameters
 
-* `shop: string` (required, must end with `myshopify.com`)
+- `shop: string` (required, must end with `myshopify.com`)
 
 ### Request body
 
@@ -708,23 +709,20 @@ Public-facing analytics endpoint that stores a search record against an org. Int
   "stateProvince": "Auckland",
   "country": "New Zealand",
   "coordinates": [174.7633, -36.8485],
-  "nearestLocations": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "nearestLocations": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
 ### Notes
 
-* endpoint accepts raw JSON string body as typically sent by `navigator.sendBeacon()`
-* org is resolved from `shop`
-* `coordinates` must be `[longitude, latitude]` when provided
-* `nearestLocations` may contain at most `10` ids
-* every `nearestLocations` id must belong to same org or event is dropped
-* payload must include meaningful search signal such as address text or coordinates plus nearest locations
-* duplicate submissions within short rolling window are ignored using normalized payload fingerprinting
-* endpoint intentionally returns `204` even when payload is invalid or dropped, to avoid giving abuse feedback
+- endpoint accepts raw JSON string body as typically sent by `navigator.sendBeacon()`
+- org is resolved from `shop`
+- `coordinates` must be `[longitude, latitude]` when provided
+- `nearestLocations` may contain at most `10` ids
+- every `nearestLocations` id must belong to same org or event is dropped
+- payload must include meaningful search signal such as address text or coordinates plus nearest locations
+- duplicate submissions within short rolling window are ignored using normalized payload fingerprinting
+- endpoint intentionally returns `204` even when payload is invalid or dropped, to avoid giving abuse feedback
 
 ### Success response
 
@@ -741,7 +739,7 @@ Public-facing support endpoint that emails internal team with storefront logs fo
 
 ### Query parameters
 
-* `shop: string` (required, must end with `myshopify.com`)
+- `shop: string` (required, must end with `myshopify.com`)
 
 ### Request body
 
@@ -761,9 +759,9 @@ Public-facing support endpoint that emails internal team with storefront logs fo
 
 ### Notes
 
-* payload must be valid JSON object
-* `logs` must be JSON array
-* email is sent to internal `ADMIN_EMAIL`
+- payload must be valid JSON object
+- `logs` must be JSON array
+- email is sent to internal `ADMIN_EMAIL`
 
 ### Success response
 
@@ -782,22 +780,22 @@ Returns search analytics records owned by authenticated org for a requested time
 
 ### Query parameters
 
-* `shop: string` (required)
-* `from: string` (required, ISO date/datetime)
-* `to: string` (required, ISO date/datetime)
-* `nearestLocationsMode: BOTH | EMPTY | HAS_VALUES` (optional, defaults to `BOTH`)
-* `limit: number` (optional, max `100`; enables pagination)
-* `page: number` (optional, defaults to `1`; when provided without `limit`, uses default page size `50`)
+- `shop: string` (required)
+- `from: string` (required, ISO date/datetime)
+- `to: string` (required, ISO date/datetime)
+- `nearestLocationsMode: BOTH | EMPTY | HAS_VALUES` (optional, defaults to `BOTH`)
+- `limit: number` (optional, max `100`; enables pagination)
+- `page: number` (optional, defaults to `1`; when provided without `limit`, uses default page size `50`)
 
 ### Rules
 
-* request uses standard authenticated admin flow and Shopify HMAC verification
-* `to` must be greater than or equal to `from`
-* requested time period must be `90` days or less
-* response includes only first nearest location from stored `nearestLocations` array
-* first nearest location is returned as `nearestLocation` with `id` and resolved location `name`
-* `nearestLocationsMode=EMPTY` returns only searches without any nearest locations
-* `nearestLocationsMode=HAS_VALUES` returns only searches with at least one nearest location
+- request uses standard authenticated admin flow and Shopify HMAC verification
+- `to` must be greater than or equal to `from`
+- requested time period must be `90` days or less
+- response includes only first nearest location from stored `nearestLocations` array
+- first nearest location is returned as `nearestLocation` with `id` and resolved location `name`
+- `nearestLocationsMode=EMPTY` returns only searches without any nearest locations
+- `nearestLocationsMode=HAS_VALUES` returns only searches with at least one nearest location
 
 ### Success response
 
@@ -845,17 +843,17 @@ Returns only coordinates for search records owned by authenticated org for a req
 
 ### Query parameters
 
-* `shop: string` (required)
-* `from: string` (required, ISO date/datetime)
-* `to: string` (required, ISO date/datetime)
-* `nearestLocationsMode: BOTH | EMPTY | HAS_VALUES` (optional, defaults to `BOTH`)
+- `shop: string` (required)
+- `from: string` (required, ISO date/datetime)
+- `to: string` (required, ISO date/datetime)
+- `nearestLocationsMode: BOTH | EMPTY | HAS_VALUES` (optional, defaults to `BOTH`)
 
 ### Rules
 
-* request uses standard authenticated admin flow and Shopify HMAC verification
-* `to` must be greater than or equal to `from`
-* requested time period must be `90` days or less
-* results preserve stored search ordering by newest first
+- request uses standard authenticated admin flow and Shopify HMAC verification
+- `to` must be greater than or equal to `from`
+- requested time period must be `90` days or less
+- results preserve stored search ordering by newest first
 
 ### Success response
 
@@ -883,20 +881,20 @@ Returns how many searches for authenticated org include a given location inside 
 
 ### Query parameters
 
-* `shop: string` (required)
-* `from: string` (required, ISO date/datetime)
-* `to: string` (required, ISO date/datetime)
+- `shop: string` (required)
+- `from: string` (required, ISO date/datetime)
+- `to: string` (required, ISO date/datetime)
 
 ### Path parameters
 
-* `id: string` (required, must be valid ObjectId string for location owned by authenticated org)
+- `id: string` (required, must be valid ObjectId string for location owned by authenticated org)
 
 ### Rules
 
-* request uses standard authenticated admin flow and Shopify HMAC verification
-* `to` must be greater than or equal to `from`
-* requested time period must be `90` days or less
-* location must belong to authenticated org
+- request uses standard authenticated admin flow and Shopify HMAC verification
+- `to` must be greater than or equal to `from`
+- requested time period must be `90` days or less
+- location must belong to authenticated org
 
 ### Success response
 
@@ -920,11 +918,11 @@ Deletes one location owned by authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Path parameters
 
-* `id: string` (required, must be valid ObjectId string)
+- `id: string` (required, must be valid ObjectId string)
 
 ### Success response
 
@@ -946,7 +944,7 @@ Imports many locations for authenticated org in one request. Backend may create 
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -990,27 +988,27 @@ Imports many locations for authenticated org in one request. Backend may create 
 
 ### Rules
 
-* `locations` array must contain at least one item
-* every item must include `name`
-* `id`, when provided, must be valid ObjectId string and takes priority over non-id matching
-* `formattedAddress` is optional and may be used by backend to derive structured address fields
-* `options.matchExistingByAddressOrCoordinates=true` allows backend to update an existing location when no `id` is supplied and a unique existing match is found
-* backend matching priority should be:
-  * explicit `id`
-  * exact normalized address match
-  * unique coordinate proximity match
-* ambiguous non-id matches should be skipped rather than auto-updated
-* `options.resolveCoordinatesFromAddress=true` allows backend to geocode rows that have address data but no coordinates
-* `options.parseFormattedAddress=true` allows backend to split `formattedAddress` into `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, and `country`
-* when parsing `formattedAddress`, explicitly provided structured address fields should win and parsed values should only fill blanks
-* request pre-validates rows before queueing, including `id` validation, existing-record matching, document-shape validation, and billing-plan limit checks
-* rows that fail pre-validation are stored on the job as `skipped` and are not queued for execution
-* import writes run asynchronously through a dedicated backend SNS worker; endpoint returns after job creation, not after location writes or geocoding finish
-* once the import worker writes locations, any required geocoding/parsing follow-up is queued through backend geocode jobs
-* queued geocode work is processed in batches of up to `10` location ids per job
-* request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
-* only net-new created locations count against billing plan limit; updates do not
-* request is rejected before writing when created rows would exceed authenticated org's billing plan location limit
+- `locations` array must contain at least one item
+- every item must include `name`
+- `id`, when provided, must be valid ObjectId string and takes priority over non-id matching
+- `formattedAddress` is optional and may be used by backend to derive structured address fields
+- `options.matchExistingByAddressOrCoordinates=true` allows backend to update an existing location when no `id` is supplied and a unique existing match is found
+- backend matching priority should be:
+  - explicit `id`
+  - exact normalized address match
+  - unique coordinate proximity match
+- ambiguous non-id matches should be skipped rather than auto-updated
+- `options.resolveCoordinatesFromAddress=true` allows backend to geocode rows that have address data but no coordinates
+- `options.parseFormattedAddress=true` allows backend to split `formattedAddress` into `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, and `country`
+- when parsing `formattedAddress`, explicitly provided structured address fields should win and parsed values should only fill blanks
+- request pre-validates rows before queueing, including `id` validation, existing-record matching, document-shape validation, and billing-plan limit checks
+- rows that fail pre-validation are stored on the job as `skipped` and are not queued for execution
+- import writes run asynchronously through a dedicated backend SNS worker; endpoint returns after job creation, not after location writes or geocoding finish
+- once the import worker writes locations, any required geocoding/parsing follow-up is queued through backend geocode jobs
+- queued geocode work is processed in batches of up to `10` location ids per job
+- request may return mixed outcomes per row; backend should not fail the entire import solely because one row is skipped as ambiguous or unresolvable
+- only net-new created locations count against billing plan limit; updates do not
+- request is rejected before writing when created rows would exceed authenticated org's billing plan location limit
 
 ### Location limit response
 
@@ -1048,10 +1046,10 @@ Returns paginated location import jobs for authenticated org, newest first.
 
 ### Query parameters
 
-* `shop: string` (required)
-* `limit: number` (optional, defaults to `50`, max `100`)
-* `page: number` (optional, defaults to `1`)
-* `status: PENDING | PROCESSING | COMPLETED | FAILED` (optional)
+- `shop: string` (required)
+- `limit: number` (optional, defaults to `50`, max `100`)
+- `page: number` (optional, defaults to `1`)
+- `status: PENDING | PROCESSING | COMPLETED | FAILED` (optional)
 
 ### Success response
 
@@ -1101,11 +1099,11 @@ Returns one location import job owned by authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Path parameters
 
-* `id: string` (required, must be valid ObjectId string)
+- `id: string` (required, must be valid ObjectId string)
 
 ### Success response
 
@@ -1150,28 +1148,26 @@ Reverses one completed location import job owned by authenticated org by deletin
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Path parameters
 
-* `id: string` (required, must be valid ObjectId string)
+- `id: string` (required, must be valid ObjectId string)
 
 ### Rules
 
-* import job must belong to authenticated org
-* import job must have `status=COMPLETED`
-* only queued rows with `operation=CREATE` are reversed
-* locations already deleted elsewhere are skipped
-* locations updated by import are not rolled back
+- import job must belong to authenticated org
+- import job must have `status=COMPLETED`
+- only queued rows with `operation=CREATE` are reversed
+- locations already deleted elsewhere are skipped
+- locations updated by import are not rolled back
 
 ### Success response
 
 ```json
 {
   "deleted": true,
-  "ids": [
-    "665f0d3f4f9a9b0012345679"
-  ],
+  "ids": ["665f0d3f4f9a9b0012345679"],
   "deletedCount": 1
 }
 ```
@@ -1187,36 +1183,30 @@ Queues existing locations for address parsing and coordinate resolution using th
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
 ```json
 {
-  "locationIds": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "locationIds": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
 ### Rules
 
-* `locationIds` array must contain at least one item
-* every `locationId` must be a valid ObjectId string
-* every targeted location must belong to authenticated org
-* queueing creates async geocode job records and publishes SNS work in batches of up to `50` location ids per job
-* queued geocode work may fill missing `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, `country`, and `coordinates`
-* explicitly stored location fields still win; geocode data only fills blanks
+- `locationIds` array must contain at least one item
+- every `locationId` must be a valid ObjectId string
+- every targeted location must belong to authenticated org
+- queueing creates async geocode job records and publishes SNS work in batches of up to `50` location ids per job
+- queued geocode work may fill missing `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, `country`, and `coordinates`
+- explicitly stored location fields still win; geocode data only fills blanks
 
 ### Success response
 
 ```json
 {
-  "queuedLocationIds": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "queuedLocationIds": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
@@ -1231,35 +1221,29 @@ Sets `suppressWarnings=true` on existing locations owned by authenticated org so
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
 ```json
 {
-  "locationIds": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "locationIds": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
 ### Rules
 
-* `locationIds` array must contain at least one item
-* every `locationId` must be a valid ObjectId string
-* every targeted location must belong to authenticated org
-* endpoint only sets `suppressWarnings` to `true`
-* suppressed locations are ignored by `getLocationMaintenanceAudit`, including missing address, missing coordinates, and duplicate-location checks
+- `locationIds` array must contain at least one item
+- every `locationId` must be a valid ObjectId string
+- every targeted location must belong to authenticated org
+- endpoint only sets `suppressWarnings` to `true`
+- suppressed locations are ignored by `getLocationMaintenanceAudit`, including missing address, missing coordinates, and duplicate-location checks
 
 ### Success response
 
 ```json
 {
-  "suppressedLocationIds": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "suppressedLocationIds": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
@@ -1274,22 +1258,19 @@ Retries previously failed geocode jobs for authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Rules
 
-* request retries all geocode jobs currently in `FAILED` status for authenticated org
-* retry resets those jobs to `PENDING` and republishes their saved SNS payload
-* geocode job records are source of truth for status; organisation model does not expose separate geocode summary fields
+- request retries all geocode jobs currently in `FAILED` status for authenticated org
+- retry resets those jobs to `PENDING` and republishes their saved SNS payload
+- geocode job records are source of truth for status; organisation model does not expose separate geocode summary fields
 
 ### Success response
 
 ```json
 {
-  "retriedJobIds": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "retriedJobIds": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
@@ -1304,42 +1285,65 @@ Returns maintenance-oriented location issue lists for authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Rules
 
-* `missingAddressParts` contains location ids that have some structured address data but are missing one or more of `addressLine1`, `city`, `postalCode`, `stateProvince`, or `country`
-* `missingCoordinates` contains location ids that have some structured address data but no `coordinates`
-* locations with `suppressWarnings=true` are excluded from all audit result sets
-* `duplicateLocations` contains one object per duplicate pair with:
-  * `recommendedDelete`: weaker duplicate using existing scoring rules
-  * `recommendedKeep`: other location in that pair
-  * `oldestLocation`: older record by `createdAt`
-  * `newestLocation`: newer record by `createdAt`
-* duplicate detection uses:
-  * exact normalized structured address match
-  * or coordinate proximity within the same near-match threshold used by import matching
-* weaker duplicate means record with fewer filled information fields
-* if both duplicates have same filled-field count, older record becomes `recommendedDelete`
+- `missingAddressParts` contains location ids that have some structured address data but are missing one or more of `addressLine1`, `city`, `postalCode`, `stateProvince`, or `country`
+- `missingCoordinates` contains location ids that have some structured address data but no `coordinates`
+- locations with `suppressWarnings=true` are excluded from all audit result sets
+- `duplicateLocationGroupCount` contains total connected duplicate groups
+- duplicate detection uses:
+  - exact normalized structured address match
+  - or coordinate proximity within the same near-match threshold used by import matching
+- weaker duplicate means record with fewer filled information fields
+- if both duplicates have same filled-field count, older record becomes `recommendedDelete`
 
 ### Success response
 
 ```json
 {
-  "missingAddressParts": [
-    "665f0d3f4f9a9b0012345678"
-  ],
-  "missingCoordinates": [
-    "665f0d3f4f9a9b0012345679"
-  ],
-  "duplicateLocations": [
+  "missingAddressParts": ["665f0d3f4f9a9b0012345678"],
+  "missingCoordinates": ["665f0d3f4f9a9b0012345679"],
+  "duplicateLocationGroupCount": 1
+}
+```
+
+\---
+
+## Get Location Duplicate Audit
+
+**Method:** `GET`
+**Route:** `locations/getLocationDuplicateAudit`
+
+Returns paginated connected duplicate groups. Each group includes all location ids and delete ids
+for recommended, oldest, and newest strategies. Response stays linear when many locations match.
+
+### Query parameters
+
+- `shop: string` (required)
+- `page: number` (optional, default `1`)
+- `limit: number` (optional, default and maximum `100`)
+
+### Success response
+
+```json
+{
+  "groups": [
     {
-      "recommendedKeep": "665f0d3f4f9a9b0012345681",
-      "recommendedDelete": "665f0d3f4f9a9b0012345680",
-      "oldestLocation": "665f0d3f4f9a9b0012345680",
-      "newestLocation": "665f0d3f4f9a9b0012345681"
+      "locationIds": ["665f0d3f4f9a9b0012345680", "665f0d3f4f9a9b0012345681"],
+      "recommendedDelete": ["665f0d3f4f9a9b0012345680"],
+      "oldestDelete": ["665f0d3f4f9a9b0012345680"],
+      "newestDelete": ["665f0d3f4f9a9b0012345681"]
     }
-  ]
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 100,
+    "total": 1,
+    "totalPages": 1,
+    "hasNextPage": false
+  }
 }
 ```
 
@@ -1354,13 +1358,13 @@ Returns geocode job summary counts for authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Rules
 
-* `processing` includes both `PENDING` and `PROCESSING` jobs
-* `failed` includes jobs currently in `FAILED` status
-* use this endpoint as source of truth for geocode queue status
+- `processing` includes both `PENDING` and `PROCESSING` jobs
+- `failed` includes jobs currently in `FAILED` status
+- use this endpoint as source of truth for geocode queue status
 
 ### Success response
 
@@ -1382,7 +1386,7 @@ Updates many locations owned by authenticated org in one request.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -1408,11 +1412,11 @@ Updates many locations owned by authenticated org in one request.
 
 ### Rules
 
-* `locations` array must contain at least one item
-* every `id` must be valid ObjectId string
-* every targeted location must belong to authenticated org
-* every item must include at least one field besides `id`
-* request is all-or-nothing; if any id is missing or invalid, nothing is updated
+- `locations` array must contain at least one item
+- every `id` must be valid ObjectId string
+- every targeted location must belong to authenticated org
+- every item must include at least one field besides `id`
+- request is all-or-nothing; if any id is missing or invalid, nothing is updated
 
 ### Success response
 
@@ -1429,35 +1433,29 @@ Deletes many locations owned by authenticated org in one request.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
 ```json
 {
-  "ids": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ]
+  "ids": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"]
 }
 ```
 
 ### Rules
 
-* `ids` array must contain at least one item
-* every `id` must be valid ObjectId string
-* every targeted location must belong to authenticated org
-* request is all-or-nothing; if any id is missing or invalid, nothing is deleted
+- `ids` array must contain at least one item
+- every `id` must be valid ObjectId string
+- every targeted location must belong to authenticated org
+- request is all-or-nothing; if any id is missing or invalid, nothing is deleted
 
 ### Success response
 
 ```json
 {
   "deleted": true,
-  "ids": [
-    "665f0d3f4f9a9b0012345678",
-    "665f0d3f4f9a9b0012345679"
-  ],
+  "ids": ["665f0d3f4f9a9b0012345678", "665f0d3f4f9a9b0012345679"],
   "deletedCount": 2
 }
 ```
@@ -1477,17 +1475,17 @@ The `settings` payload is grouped by feature area so frontend and backend can sh
 
 Supported groups:
 
-* `categoriesAndFilters`
+- `categoriesAndFilters`
   Covers category/filter definitions, optional category-level pin style overrides, and whether multiple selections use AND or OR matching.
-* `customFields`
+- `customFields`
   Covers reusable location custom field definitions, their names, field types (`TEXT`, `TEXT_MULTILINE`, `LINK`), and whether they appear in storefront listings.
-* `dealerForms`
+- `dealerForms`
   Covers public dealer application form field definitions, supported field types (`TEXT`, `TEXT_MULTILINE`, `SELECT`, `CONTACT`, `EMAIL`, `PHONE`, `ADDRESS`, `CHECKBOX`, `FILE_UPLOAD`, `IMAGE_UPLOAD`, `NUMBER`, `LINK`), whether each field is required, whether core fields are `locked` in admin UI, structured object storage for `CONTACT` and `ADDRESS` fields, admin notification email preferences, shared notification accent color, dealer confirmation email enablement, dealer email subject/body templates for both submission and published notifications with `{name}` placeholder support, and optional reCAPTCHA site key, secret key, and version settings for public form submission protection.
-* `language`
+- `language`
   Covers primary language, translated languages, editable user-facing locator text, and per-language label overrides for categories/filters and custom fields.
-* `provider`
+- `provider`
   Covers map provider selection (`LEAFLET`, `MAPBOX`, `GOOGLE_MAPS`), provider-specific theme/style settings, and the required default map pin style. `LEAFLET` does not require an API key; the other providers do.
-* `searchBehaviour`
+- `searchBehaviour`
   Covers initial map position, clustering, geolocation method/button/icon color, distance rules, result limits, units, autocomplete, and country locking.
 
 ### Converter behavior
@@ -1496,9 +1494,9 @@ Each settings group has its own converter in `models/OrganisationSettings.ts` an
 
 Those converters are used to:
 
-* parse unknown frontend/backend input with Zod
-* normalize entity data when reading from MongoDB
-* normalize API payloads before persisting organisation settings
+- parse unknown frontend/backend input with Zod
+- normalize entity data when reading from MongoDB
+- normalize API payloads before persisting organisation settings
 
 `shopify/updateOrg` performs a partial top-level merge on `settings`, so sending one group does not overwrite unrelated groups already stored on the organisation.
 
@@ -1508,15 +1506,15 @@ Those converters are used to:
 
 Each completion record stores:
 
-* `completedAt`
+- `completedAt`
   ISO timestamp for when completion was last recorded.
-* `install`
+- `install`
   Optional install metadata for storefront install steps.
-* `install.themeId`
+- `install.themeId`
   Shopify theme ID used for install.
-* `install.template`
+- `install.template`
   Template used for install, for example `index` or `page.stockists`.
-* `install.pageHandle`
+- `install.pageHandle`
   Shopify page handle when completion applies to a page install.
 
 Frontend completion resolution now follows this order:
@@ -1529,7 +1527,7 @@ Legacy localStorage values like `"1"` still count as completed for fallback chec
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -1552,9 +1550,9 @@ Legacy localStorage values like `"1"` still count as completed for fallback chec
       "provider": "LEAFLET",
       "mapThemeMode": "PROVIDER_DEFAULT",
       "defaultPinStyle": {
-          "name": "Default pin",
-          "pinType": "STANDARD_PIN_ICON",
-          "pinColor": "#EA4335"
+        "name": "Default pin",
+        "pinType": "STANDARD_PIN_ICON",
+        "pinColor": "#EA4335"
       }
     },
     "categoriesAndFilters": {
@@ -1647,13 +1645,13 @@ Legacy localStorage values like `"1"` still count as completed for fallback chec
 
 ### Rules
 
-* `contactEmail` must be email-shaped when provided
-* `subscribed` controls marketing email eligibility only and does not affect transactional emails
-* `settings` is optional
-* every provided settings group must match its shared Zod schema
-* omitted top-level settings groups keep their existing stored values
-* the response returns the full `OrganisationModel` with normalized `settings`
-* `billingPlanStatus` remains `ACTIVE` or `INACTIVE`; over-limit downgrade tracking lives in separate enforcement fields on the response model
+- `contactEmail` must be email-shaped when provided
+- `subscribed` controls marketing email eligibility only and does not affect transactional emails
+- `settings` is optional
+- every provided settings group must match its shared Zod schema
+- omitted top-level settings groups keep their existing stored values
+- the response returns the full `OrganisationModel` with normalized `settings`
+- `billingPlanStatus` remains `ACTIVE` or `INACTIVE`; over-limit downgrade tracking lives in separate enforcement fields on the response model
 
 \---
 
@@ -1666,12 +1664,12 @@ Returns paginated dealer form submissions owned by authenticated org, newest fir
 
 ### Query parameters
 
-* `shop: string` (required)
-* `limit: number` (optional, max `100`, default `50`)
-* `page: number` (optional, default `1`)
-* `search: string` (optional, searches contact name, contact email, location name, and stored field values)
-* `status: OPEN | PUBLISHED | ARCHIVED` (optional)
-* when `status` is omitted, endpoint includes open and published submissions but excludes archived ones
+- `shop: string` (required)
+- `limit: number` (optional, max `100`, default `50`)
+- `page: number` (optional, default `1`)
+- `search: string` (optional, searches contact name, contact email, location name, and stored field values)
+- `status: OPEN | PUBLISHED | ARCHIVED` (optional)
+- when `status` is omitted, endpoint includes open and published submissions but excludes archived ones
 
 ### Success response
 
@@ -1722,7 +1720,7 @@ Publishes one dealer form submission into a location. Can optionally email deale
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -1730,27 +1728,27 @@ Publishes one dealer form submission into a location. Can optionally email deale
 {
   "id": "6820adf54f9a9b0012345678",
   "status": "ACTIVE",
-  "sendEmail": true,
+  "sendEmail": true
 }
 ```
 
 ### Rules
 
-* `id` must be valid ObjectId string for submission owned by authenticated org
-* `status` must be `ACTIVE` or `UNLISTED`
-* archived submissions cannot be published
-* published submissions cannot be published again
-* mapped location fields use reserved dealer field keys:
+- `id` must be valid ObjectId string for submission owned by authenticated org
+- `status` must be `ACTIVE` or `UNLISTED`
+- archived submissions cannot be published
+- published submissions cannot be published again
+- mapped location fields use reserved dealer field keys:
   `name`, `address`, `phoneNumber`, `website`, `emailAddress`, `logoUrl`
-* `contact` field stores structured contact parts inside one value object:
+- `contact` field stores structured contact parts inside one value object:
   `name`, `email`
-* `address` field stores structured address parts inside one value object:
+- `address` field stores structured address parts inside one value object:
   `addressLine1`, `addressLine2`, `city`, `postalCode`, `stateProvince`, `country`
-* all other populated dealer form fields are stored as location `customFields`
-* dealer email is only sent when `sendEmail` is truthy
-* dealer publish email subject/body come from org `dealerForms.dealerPublishedSubject` and `dealerForms.dealerPublishedBody`
-* dealer unsubscribe list suppresses optional publish emails
-* publish is rejected when creating the location would exceed authenticated org's billing plan location limit
+- all other populated dealer form fields are stored as location `customFields`
+- dealer email is only sent when `sendEmail` is truthy
+- dealer publish email subject/body come from org `dealerForms.dealerPublishedSubject` and `dealerForms.dealerPublishedBody`
+- dealer unsubscribe list suppresses optional publish emails
+- publish is rejected when creating the location would exceed authenticated org's billing plan location limit
 
 ### Location limit response
 
@@ -1788,7 +1786,7 @@ Sets `archived` flag on one dealer form submission.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -1801,10 +1799,10 @@ Sets `archived` flag on one dealer form submission.
 
 ### Rules
 
-* `id` must be valid ObjectId string for submission owned by authenticated org
-* published submissions cannot be archived
-* archived submissions can be unarchived by sending `"archived": false`
-* archiving never sends email
+- `id` must be valid ObjectId string for submission owned by authenticated org
+- published submissions cannot be archived
+- archived submissions can be unarchived by sending `"archived": false`
+- archiving never sends email
 
 ### Success response
 
@@ -1821,7 +1819,7 @@ Deletes one dealer form submission owned by authenticated org.
 
 ### Query parameters
 
-* `shop: string` (required)
+- `shop: string` (required)
 
 ### Request body
 
@@ -1853,7 +1851,7 @@ This endpoint does **not** require HMAC verification.
 
 ### Query parameters
 
-* `shop: string` (required, must end with `myshopify.com`)
+- `shop: string` (required, must end with `myshopify.com`)
 
 ### Request body
 
@@ -1901,26 +1899,26 @@ This endpoint does **not** require HMAC verification.
 
 ### Rules
 
-* request body must include at least one field
-* submitted fields are validated against resolved org `dealerForms.fields`
-* `required` fields must be present and non-empty
-* `CONTACT` fields must be submitted as structured objects with `name` and `email` inside one field value
-* `ADDRESS` fields must be submitted as structured objects with address parts nested inside one field value
-* `EMAIL` fields must be email-shaped
-* `LINK` fields must be valid URLs
-* `FILE_UPLOAD` and `IMAGE_UPLOAD` fields can be sent as:
-  * Shopify/public URL strings
-  * data URL strings (`data:<mime>;base64,...`)
-  * objects with `base64`, optional `fileName`, and optional `mimeType`
-* base64 file/image uploads are uploaded to the organisation's Shopify Files and stored in MongoDB as the resulting Shopify URL
-* `SELECT` fields must match one configured option value
-* when org `dealerForms.recaptchaSiteKey`, `dealerForms.recaptchaSecretKey`, and `dealerForms.recaptchaVersion` are configured, `recaptchaToken` is required and validated server-side with Google reCAPTCHA before the submission is stored
-* dealer confirmation email can be disabled with org `dealerForms.dealerNotificationEnabled`
-* dealer confirmation email subject/body use org settings templates and replace `{name}` with submitted contact name or empty string
-* dealer confirmation email is suppressed when dealer email is unsubscribed
-* org admin notification email is suppressed when org dealer notifications are disabled
-* endpoint applies public abuse rate limits
-* when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
+- request body must include at least one field
+- submitted fields are validated against resolved org `dealerForms.fields`
+- `required` fields must be present and non-empty
+- `CONTACT` fields must be submitted as structured objects with `name` and `email` inside one field value
+- `ADDRESS` fields must be submitted as structured objects with address parts nested inside one field value
+- `EMAIL` fields must be email-shaped
+- `LINK` fields must be valid URLs
+- `FILE_UPLOAD` and `IMAGE_UPLOAD` fields can be sent as:
+  - Shopify/public URL strings
+  - data URL strings (`data:<mime>;base64,...`)
+  - objects with `base64`, optional `fileName`, and optional `mimeType`
+- base64 file/image uploads are uploaded to the organisation's Shopify Files and stored in MongoDB as the resulting Shopify URL
+- `SELECT` fields must match one configured option value
+- when org `dealerForms.recaptchaSiteKey`, `dealerForms.recaptchaSecretKey`, and `dealerForms.recaptchaVersion` are configured, `recaptchaToken` is required and validated server-side with Google reCAPTCHA before the submission is stored
+- dealer confirmation email can be disabled with org `dealerForms.dealerNotificationEnabled`
+- dealer confirmation email subject/body use org settings templates and replace `{name}` with submitted contact name or empty string
+- dealer confirmation email is suppressed when dealer email is unsubscribed
+- org admin notification email is suppressed when org dealer notifications are disabled
+- endpoint applies public abuse rate limits
+- when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
 
 ### Success response
 
@@ -1944,8 +1942,8 @@ This endpoint does **not** require HMAC verification.
 
 ### Query parameters
 
-* `orgId: string` (required)
-* `token: string` (required)
+- `orgId: string` (required)
+- `token: string` (required)
 
 ### Success response
 
@@ -1968,9 +1966,9 @@ This endpoint does **not** require HMAC verification.
 
 ### Query parameters
 
-* `orgId: string` (required)
-* `email: string` (required)
-* `token: string` (required)
+- `orgId: string` (required)
+- `email: string` (required)
+- `token: string` (required)
 
 ### Success response
 
@@ -1991,8 +1989,8 @@ Primary Google Sheets connect endpoint for browser popup auth code flow. Fronten
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Request body
 
@@ -2004,13 +2002,13 @@ Primary Google Sheets connect endpoint for browser popup auth code flow. Fronten
 
 ### Rules
 
-* request uses standard authenticated admin flow and Shopify HMAC verification
-* popup code exchange uses browser page origin as Google OAuth `redirect_uri`
-* backend exchanges code for Google access/refresh tokens and stores them on existing sync record
-* if Google does not return new refresh token, backend preserves previously stored refresh token when present
-* backend records Google account email from Google userinfo endpoint
-* sync record is moved to `CONNECTED` status after successful exchange
-* response payload intentionally matches `getSync` so frontend can open Picker immediately without another auth prompt
+- request uses standard authenticated admin flow and Shopify HMAC verification
+- popup code exchange uses browser page origin as Google OAuth `redirect_uri`
+- backend exchanges code for Google access/refresh tokens and stores them on existing sync record
+- if Google does not return new refresh token, backend preserves previously stored refresh token when present
+- backend records Google account email from Google userinfo endpoint
+- sync record is moved to `CONNECTED` status after successful exchange
+- response payload intentionally matches `getSync` so frontend can open Picker immediately without another auth prompt
 
 ### Success response
 
@@ -2065,8 +2063,8 @@ Response also includes Google Picker configuration for the frontend. When `conne
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Success response
 
@@ -2130,20 +2128,20 @@ Returns Google Sheets sync operation log records for authenticated org. Results 
 
 ### Query parameters
 
-* `shop: string` (required)
-* `limit: number` (optional, defaults to `50`, max `100`)
-* `page: number` (optional, defaults to `1`)
-* `syncId: string` (optional)
-* `operation: CREATE | UPDATE | DELETE` (optional)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- `limit: number` (optional, defaults to `50`, max `100`)
+- `page: number` (optional, defaults to `1`)
+- `syncId: string` (optional)
+- `operation: CREATE | UPDATE | DELETE` (optional)
+- standard Shopify HMAC params for verification
 
 ### Rules
 
-* request uses standard authenticated admin flow and Shopify HMAC verification
-* all returned records are scoped to authenticated org
-* `syncId` filters to one Google Sheets sync record
-* `operation` filters to one operation type
-* default sort order is newest to oldest using operation timestamp
+- request uses standard authenticated admin flow and Shopify HMAC verification
+- all returned records are scoped to authenticated org
+- `syncId` filters to one Google Sheets sync record
+- `operation` filters to one operation type
+- default sort order is newest to oldest using operation timestamp
 
 ### Success response
 
@@ -2264,15 +2262,15 @@ Lists sheets/tabs inside a selected Google spreadsheet.
 
 ### Query parameters
 
-* `shop: string` (required)
-* `spreadsheetId: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- `spreadsheetId: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Rules
 
-* org must already have completed Google OAuth
-* spreadsheet must already have been explicitly selected by the user in Google Picker on the frontend
-* backend reads spreadsheet tabs using authenticated Google token for org
+- org must already have completed Google OAuth
+- spreadsheet must already have been explicitly selected by the user in Google Picker on the frontend
+- backend reads spreadsheet tabs using authenticated Google token for org
 
 ### Success response
 
@@ -2302,22 +2300,22 @@ Returns header values and sample preview rows for selected spreadsheet tab so fr
 
 ### Query parameters
 
-* `shop: string` (required)
-* `spreadsheetId: string` (required)
-* `sheetId: number` (required)
-* `headerRow: number` (optional, defaults to `1`)
-* `dataStartRow: number` (optional, defaults to `headerRow + 1`)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- `spreadsheetId: string` (required)
+- `sheetId: number` (required)
+- `headerRow: number` (optional, defaults to `1`)
+- `dataStartRow: number` (optional, defaults to `headerRow + 1`)
+- standard Shopify HMAC params for verification
 
 ### Rules
 
-* org must already have completed Google OAuth
-* spreadsheet must already have been explicitly selected by the user in Google Picker on the frontend
-* backend reads selected tab using authenticated Google token for org
-* `headerRow` determines which row becomes mapping source column names
-* backend should trim blank trailing columns from header list
-* duplicate or blank header cells should be normalized into unique non-empty labels before response
-* `sampleRows` should include small preview window from first data rows after `dataStartRow`
+- org must already have completed Google OAuth
+- spreadsheet must already have been explicitly selected by the user in Google Picker on the frontend
+- backend reads selected tab using authenticated Google token for org
+- `headerRow` determines which row becomes mapping source column names
+- backend should trim blank trailing columns from header list
+- duplicate or blank header cells should be normalized into unique non-empty labels before response
+- `sampleRows` should include small preview window from first data rows after `dataStartRow`
 
 ### Success response
 
@@ -2354,8 +2352,8 @@ Stores spreadsheet selection and column mapping for org, then queues a sync job 
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Request body
 
@@ -2416,23 +2414,23 @@ Stores spreadsheet selection and column mapping for org, then queues a sync job 
 
 ### Rules
 
-* spreadsheet metadata in request body should come from the spreadsheet the user explicitly selected in Google Picker
-* `externalIdColumn` is required and is used as stable row identity for update/delete behavior
-* rows missing an external id are skipped and reported as sync errors
-* duplicated external ids are treated as invalid source data:
-  * all rows with that duplicated id are skipped for the run
-  * existing linked location for that id is not updated or deleted during that run
-* at least one mapping is required
-* `LOCATION_FIELD` mappings target built-in location fields such as `name`, `formattedAddress`, `city`, `status`, `latitude`, or `longitude`
-* `CUSTOM_FIELD` mappings create location `customFields` entries
-* `FILTER` mappings create location `filters` entries
-* first successful save queues a sync job against current sheet contents
-* sync may create, update, and optionally delete locations
-* if `deleteMissingRows=true`, any previously linked row absent from current sheet snapshot deletes corresponding location
-* if `matchExistingByAddressOrCoordinates=true`, unmatched external ids can attach to existing locations using same import matching rules as bulk import
-* net-new synced locations are checked against authenticated org's billing plan location limit after planned deletions are subtracted
-* when sync would exceed location limit, no location writes are persisted, sync records an error, and the configured Google Sheets sync error email is sent unless notifications are disabled
-* response includes sync summary plus whether queueing succeeded immediately
+- spreadsheet metadata in request body should come from the spreadsheet the user explicitly selected in Google Picker
+- `externalIdColumn` is required and is used as stable row identity for update/delete behavior
+- rows missing an external id are skipped and reported as sync errors
+- duplicated external ids are treated as invalid source data:
+  - all rows with that duplicated id are skipped for the run
+  - existing linked location for that id is not updated or deleted during that run
+- at least one mapping is required
+- `LOCATION_FIELD` mappings target built-in location fields such as `name`, `formattedAddress`, `city`, `status`, `latitude`, or `longitude`
+- `CUSTOM_FIELD` mappings create location `customFields` entries
+- `FILTER` mappings create location `filters` entries
+- first successful save queues a sync job against current sheet contents
+- sync may create, update, and optionally delete locations
+- if `deleteMissingRows=true`, any previously linked row absent from current sheet snapshot deletes corresponding location
+- if `matchExistingByAddressOrCoordinates=true`, unmatched external ids can attach to existing locations using same import matching rules as bulk import
+- net-new synced locations are checked against authenticated org's billing plan location limit after planned deletions are subtracted
+- when sync would exceed location limit, no location writes are persisted, sync records an error, and the configured Google Sheets sync error email is sent unless notifications are disabled
+- response includes sync summary plus whether queueing succeeded immediately
 
 ### Success response
 
@@ -2460,8 +2458,8 @@ Disconnects current org Google Sheets sync, clears stored Google token/polling s
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Success response
 
@@ -2484,8 +2482,8 @@ This endpoint does **not** require HMAC verification.
 
 ### Query parameters
 
-* `syncId: string` (required)
-* `token: string` (required)
+- `syncId: string` (required)
+- `token: string` (required)
 
 ### Success response
 
@@ -2506,16 +2504,16 @@ Schedules a full org rebuild for authenticated shop. This rebuild refreshes deri
 
 ### Query parameters
 
-* `shop: string` (required)
-* standard Shopify HMAC params for verification
+- `shop: string` (required)
+- standard Shopify HMAC params for verification
 
 ### Rules
 
-* request uses standard authenticated admin flow and Shopify HMAC verification
-* rebuild is scheduled asynchronously; endpoint does not wait for full rebuild completion
-* only one rebuild can run at a time per org
-* if rebuild is already running, endpoint returns success with `scheduled: false`
-* if a rebuild completed within last `2` minutes, request is rejected by cooldown protection
+- request uses standard authenticated admin flow and Shopify HMAC verification
+- rebuild is scheduled asynchronously; endpoint does not wait for full rebuild completion
+- only one rebuild can run at a time per org
+- if rebuild is already running, endpoint returns success with `scheduled: false`
+- if a rebuild completed within last `2` minutes, request is rejected by cooldown protection
 
 ### Success response when new rebuild is scheduled
 
@@ -2546,8 +2544,8 @@ Processes Shopify `APP_SUBSCRIPTIONS_UPDATE` webhook. Verifies webhook HMAC, ref
 
 ### Headers
 
-* `X-Shopify-Shop-Domain: string` (required)
-* Shopify webhook HMAC headers
+- `X-Shopify-Shop-Domain: string` (required)
+- Shopify webhook HMAC headers
 
 ### Success response
 
@@ -2566,8 +2564,8 @@ Processes Shopify `APP_UNINSTALLED` webhook. Verifies webhook HMAC, keeps the or
 
 ### Headers
 
-* `X-Shopify-Shop-Domain: string` (required)
-* Shopify webhook HMAC headers
+- `X-Shopify-Shop-Domain: string` (required)
+- Shopify webhook HMAC headers
 
 ### Success response
 
@@ -2586,8 +2584,8 @@ Processes Shopify GDPR webhooks. Verifies webhook HMAC and emails admin for non-
 
 ### Headers
 
-* `X-Shopify-Topic: string` (required)
-* Shopify webhook HMAC headers
+- `X-Shopify-Topic: string` (required)
+- Shopify webhook HMAC headers
 
 ### Success response
 
