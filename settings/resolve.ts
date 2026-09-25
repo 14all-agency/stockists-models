@@ -125,7 +125,7 @@ const DEFAULT_LANGUAGE_CONTENT: Omit<LanguageContent, "locale"> = {
   debugReportBugCloseDialogLabel: "Close report bug popup",
   debugReportBugDialogTitle: "Report bug",
   debugReportBugDialogDescription:
-    "If you have encountered a bug with your map please leave a message describing your issue and our team will be notified.",
+    "Use this form to report technical problems with the map. For corrections to locations, marker positions, or other map content, please contact the website owner directly. We can’t respond to reports submitted here.",
   debugReportBugMessageLabel: "Message",
   debugReportBugConsentPrefix:
     "By submitting your bug you consent to your app usage logs and user agent details being shared with our team, see our",
