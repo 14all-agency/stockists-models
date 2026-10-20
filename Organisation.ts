@@ -4,40 +4,65 @@ import { z } from "zod";
 import { ObjectIdSchema } from "./ObjectId";
 import { SettingsConverter, SettingsResult } from "./OrganisationSettings";
 
-export const ShopifyConnectionResult = z.object({
-  apiKey: z.string(),
-  domain: z.string(),
-  scopes: z.string().nullable().optional().describe("The scopes approved (comma seperated string)"),
-  tokenMode: z
-    .union([z.literal("NON_EXPIRING_OFFLINE"), z.literal("EXPIRING_OFFLINE")])
-    .optional()
-    .nullable()
-    .describe("Whether stored offline Shopify token is legacy non-expiring or expiring"),
-  accessTokenExpiresAt: z
-    .date()
-    .optional()
-    .nullable()
-    .describe("When expiring offline access token expires"),
-  refreshToken: z
-    .string()
-    .optional()
-    .nullable()
-    .describe("Refresh token used to rotate expiring offline access tokens"),
-  refreshTokenExpiresAt: z
-    .date()
-    .optional()
-    .nullable()
-    .describe("When expiring offline refresh token expires")
-}).optional().nullable();
+export const ShopifyConnectionResult = z
+  .object({
+    apiKey: z.string(),
+    domain: z.string(),
+    scopes: z
+      .string()
+      .nullable()
+      .optional()
+      .describe("The scopes approved (comma seperated string)"),
+    tokenMode: z
+      .union([z.literal("NON_EXPIRING_OFFLINE"), z.literal("EXPIRING_OFFLINE")])
+      .optional()
+      .nullable()
+      .describe("Whether stored offline Shopify token is legacy non-expiring or expiring"),
+    accessTokenExpiresAt: z
+      .date()
+      .optional()
+      .nullable()
+      .describe("When expiring offline access token expires"),
+    refreshToken: z
+      .string()
+      .optional()
+      .nullable()
+      .describe("Refresh token used to rotate expiring offline access tokens"),
+    refreshTokenExpiresAt: z
+      .date()
+      .optional()
+      .nullable()
+      .describe("When expiring offline refresh token expires"),
+    tokenGeneration: z
+      .number()
+      .int()
+      .nonnegative()
+      .optional()
+      .nullable()
+      .describe("Monotonic generation used to coordinate Shopify token rotation"),
+    refreshLeaseId: z
+      .string()
+      .optional()
+      .nullable()
+      .describe("Short-lived owner identifier for a Shopify token refresh"),
+    refreshLeaseExpiresAt: z
+      .date()
+      .optional()
+      .nullable()
+      .describe("When the current Shopify token refresh lease expires"),
+    lastRefreshedAt: z.date().optional().nullable(),
+    reauthorizationRequiredAt: z.date().optional().nullable(),
+    reauthorizationReason: z.string().optional().nullable(),
+  })
+  .optional()
+  .nullable();
 
 export type ShopifyConnection = z.infer<typeof ShopifyConnectionResult>;
 
-export const ShopifyStatusResult = z.union([
-  z.literal("ACTIVE"),
-  z.literal("PENDING"),
-  z.literal("INACTIVE"),
-  z.literal("ERROR"),
-]).optional().nullable();
+export const ShopifyStatusResult = z
+  .union([z.literal("ACTIVE"), z.literal("PENDING"), z.literal("INACTIVE"), z.literal("ERROR")])
+  .optional()
+  .nullable();
 
 export const OnboardingCompletionInstallResult = z.object({
   pageHandle: z.string().optional().nullable(),
@@ -67,8 +92,16 @@ export const OrganisationResult = z.object({
     .nullable()
     .describe("Whether organisation is subscribed to marketing emails"),
   locale: z.string().optional().nullable().describe("shop locale / language"),
-  passwordProtected: z.boolean().optional().nullable().describe("whether or not store is password protected"),
-  reviewed: z.boolean().optional().nullable().describe("whether or not store has engaged with review element"),
+  passwordProtected: z
+    .boolean()
+    .optional()
+    .nullable()
+    .describe("whether or not store is password protected"),
+  reviewed: z
+    .boolean()
+    .optional()
+    .nullable()
+    .describe("whether or not store has engaged with review element"),
   reviewSurface: z.string().optional().nullable().describe("where they left a review"),
   rating: z.number().optional().nullable().describe("rating score"),
   plan: z.string().optional().nullable().describe("shopify plan"),
@@ -86,7 +119,11 @@ export const OrganisationResult = z.object({
   orgRebuildLastCompletedAt: z.date().nullable().optional(),
   orgRebuildLeaseToken: z.string().optional().nullable(),
   createdAt: z.date().nullable().optional(),
-  activeClusterVersion: z.string().optional().nullable().describe("Active precomputed cluster dataset version for public map queries"),
+  activeClusterVersion: z
+    .string()
+    .optional()
+    .nullable()
+    .describe("Active precomputed cluster dataset version for public map queries"),
   shopifyConnection: ShopifyConnectionResult,
   shopifyConnectionStatus: ShopifyStatusResult,
   name: z.string().optional().nullable().describe("Org/brand name"),
@@ -96,10 +133,10 @@ export const OrganisationResult = z.object({
   // Custom
   settings: SettingsResult,
   // Billing stuff
-  billingPlanStatus: z.union([
-    z.literal("INACTIVE"),
-    z.literal("ACTIVE"),
-  ]).optional().nullable(),
+  billingPlanStatus: z
+    .union([z.literal("INACTIVE"), z.literal("ACTIVE")])
+    .optional()
+    .nullable(),
   billingSubscriptionId: z.string().optional().nullable(),
   billingPlanHandle: z.string().optional().nullable(),
   billingUpdatedAt: z.date().nullable().optional(),
@@ -176,8 +213,11 @@ export const OrganisationModelSchema = z.object({
 export type OrganisationModel = z.infer<typeof OrganisationModelSchema>;
 
 export const OrganisationModel = {
-  convertFromEntity(entity: OrganisationResultEntity, includeCredentials = false): OrganisationModel {
-    if(includeCredentials) {
+  convertFromEntity(
+    entity: OrganisationResultEntity,
+    includeCredentials = false,
+  ): OrganisationModel {
+    if (includeCredentials) {
       console.log("includeCredentials IS TRUE");
     }
 
