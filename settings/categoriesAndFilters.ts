@@ -30,6 +30,12 @@ export const CategoryFilterDefinitionSchema = z
 		showOnListing: NullableBoolean.describe(
 			"Whether this category/filter should be shown on each assigned location listing in the locator results.",
 		),
+		selectedByDefault: NullableBoolean.describe(
+			"Whether this category/filter should be selected when the locator first loads.",
+		),
+		group: NullableLabelString.describe(
+			"Optional heading used to group related category/filter options in the locator interface.",
+		),
 		pinStyle: MapPinStyleSchema.optional().nullable().describe(
 			"Optional category/filter-specific map pin style override. If omitted, the default map pin style from provider settings is used.",
 		),

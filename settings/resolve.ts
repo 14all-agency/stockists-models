@@ -207,6 +207,8 @@ function resolveCategoriesAndFiltersSettings(
       label: category.label ?? "",
       showInSearch: category.showInSearch ?? true,
       showOnListing: category.showOnListing ?? true,
+      selectedByDefault: category.selectedByDefault ?? false,
+      group: category.group ?? "",
       pinStyle: category.pinStyle
         ? {
             name: category.pinStyle.name ?? "",
