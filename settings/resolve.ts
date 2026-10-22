@@ -171,6 +171,10 @@ function resolveSearchBehaviourSettings(
     searchSuggestionMode: settings?.searchSuggestionMode ?? "REGIONS_AND_ADDRESSES",
     countryLockMode: settings?.countryLockMode ?? "DISABLED",
     countryCodes: settings?.countryCodes ?? [],
+    geocoderMode: settings?.geocoderMode ?? "USE_PROVIDER",
+    autocompleteFormat: settings?.autocompleteFormat ?? "PLACE_STATE_COUNTRY",
+    showSearchOriginPin: settings?.showSearchOriginPin ?? true,
+    disableLocationRefreshing: settings?.disableLocationRefreshing ?? false,
   };
 }
 
@@ -215,6 +219,8 @@ function resolveCategoriesAndFiltersSettings(
         : null,
     })),
     multipleSelectionMode: settings?.multipleSelectionMode ?? "MATCH_ANY",
+    limitCategoryFiltersToCurrentViewport:
+      settings?.limitCategoryFiltersToCurrentViewport ?? true,
   };
 }
 

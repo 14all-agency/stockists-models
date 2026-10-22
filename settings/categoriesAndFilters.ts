@@ -51,6 +51,9 @@ export const CategoriesAndFiltersSettingsSchema = z
 				"Administrator-managed category/filter definitions that can be assigned to locations to refine locator results.",
 			),
 		multipleSelectionMode: CategoriesAndFiltersMatchModeSchema,
+		limitCategoryFiltersToCurrentViewport: NullableBoolean.describe(
+			"Whether category and filter selections should only match locations already loaded in the current map viewport.",
+		),
 	})
 	.describe(
 		"Search categories and filters settings group for managing category/filter definitions and defining how multiple selections affect results.",

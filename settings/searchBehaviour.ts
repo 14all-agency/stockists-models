@@ -58,6 +58,27 @@ export const SearchCountryLockModeSchema = z
   .nullable()
   .describe("Whether search should be unrestricted across countries or locked to a specific administrator-defined country list.");
 
+export const SearchGeocoderModeSchema = z
+  .enum(["USE_PROVIDER", "USE_NOMINATIM", "DISABLED"])
+  .optional()
+  .nullable()
+  .describe("Geocoding service used to suggest and resolve visitor searches, or whether geocoding is disabled.");
+
+export const SearchAutocompleteFormatSchema = z
+  .enum([
+    "PLACE_STATE_COUNTRY",
+    "FULL_ADDRESS",
+    "PLACE_ONLY",
+    "PLACE_CITY_STATE_COUNTRY",
+    "PLACE_POSTCODE_COUNTRY",
+    "PLACE_COUNTRY",
+    "PLACE_STATE_CODE_COUNTRY_CODE",
+    "PLACE_COUNTRY_CODE",
+  ])
+  .optional()
+  .nullable()
+  .describe("Address format used when displaying autocomplete suggestions in the locator search field.");
+
 export const SearchStartingAreaSchema = z.object({
   label: NullableLabelString.describe("Administrative label for the predefined area used when the map starts focused on a specific region."),
   lat: NullableNumber.describe("Latitude for the predefined starting area center point."),
@@ -83,6 +104,10 @@ export const SearchBehaviourSettingsSchema = z.object({
   searchSuggestionMode: SearchSuggestionModeSchema,
   countryLockMode: SearchCountryLockModeSchema,
   countryCodes: z.array(z.string().max(3)).max(250).optional().nullable().describe("Allowed country codes when search is restricted to specific countries for accuracy and relevance."),
+  geocoderMode: SearchGeocoderModeSchema,
+  autocompleteFormat: SearchAutocompleteFormatSchema,
+  showSearchOriginPin: NullableBoolean.describe("Whether a marker should identify the place selected or entered by a visitor."),
+  disableLocationRefreshing: NullableBoolean.describe("Whether panning or zooming should keep the initially loaded locations instead of refreshing results for the current viewport."),
 }).describe("Search behavior settings group for initial map positioning, clustering, geolocation, distance rules, result limits, and search suggestion constraints.");
 
 export type SearchBehaviourSettings = z.infer<typeof SearchBehaviourSettingsSchema>;
