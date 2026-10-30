@@ -527,6 +527,7 @@ This endpoint does **not** require HMAC verification.
 - backend handles dateline splitting internally
 - endpoint applies public abuse rate limits
 - when rate limit is exceeded, endpoint returns HTTP `429` with body `"Please try again later."`
+- invalid query parameters return HTTP `400` and are not retryable
 - if `search` or `categories` are provided, precomputed cluster cache is skipped
 - at zoom levels above org `clusteringZoomLevel`, raw points are returned instead of clusters
 - if `source`, `lng`, and `lat` are provided **and** request zoom is not clustering, results are returned as raw points sorted nearest-first
@@ -720,7 +721,7 @@ Public-facing analytics endpoint that stores a search record against an org. Int
 - `coordinates` must be `[longitude, latitude]` when provided
 - `nearestLocations` may contain at most `10` ids
 - every `nearestLocations` id must belong to same org or event is dropped
-- payload must include meaningful search signal such as address text or coordinates plus nearest locations
+- payload must include coordinates plus either meaningful address text or at least one nearest location
 - duplicate submissions within short rolling window are ignored using normalized payload fingerprinting
 - endpoint intentionally returns `204` even when payload is invalid or dropped, to avoid giving abuse feedback
 
