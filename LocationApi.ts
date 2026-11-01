@@ -27,7 +27,7 @@ import {
   throwZodQueryError,
 } from "./apiParsing";
 
-const BULK_LOCATION_BODY_MAX_BYTES = 5 * 1024 * 1024;
+export const BULK_LOCATION_BODY_MAX_BYTES = 5 * 1024 * 1024;
 const NullableNumberInput = z.number().optional().nullable();
 
 export const CreateLocationBodySchema = z.object({

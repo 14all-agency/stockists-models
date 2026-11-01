@@ -991,6 +991,7 @@ Imports many locations for authenticated org in one request. Backend may create 
 
 - `locations` array must contain at least one item
 - every item must include `name`
+- `postalCode` and `phoneNumber` must be at most 40 characters; the import UI validates all bounded text fields before submission and reports source spreadsheet rows
 - `id`, when provided, must be valid ObjectId string and takes priority over non-id matching
 - `formattedAddress` is optional and may be used by backend to derive structured address fields
 - `options.matchExistingByAddressOrCoordinates=true` allows backend to update an existing location when no `id` is supplied and a unique existing match is found
@@ -1004,6 +1005,7 @@ Imports many locations for authenticated org in one request. Backend may create 
 - when parsing `formattedAddress`, explicitly provided structured address fields should win and parsed values should only fill blanks
 - request pre-validates rows before queueing, including `id` validation, existing-record matching, document-shape validation, and billing-plan limit checks
 - rows that fail pre-validation are stored on the job as `skipped` and are not queued for execution
+- mixed-validity requests retain valid rows and record invalid row numbers and field names in `skipped`; a request with no valid rows returns HTTP 400 with `message` and `skipped`
 - import writes run asynchronously through a dedicated backend SNS worker; endpoint returns after job creation, not after location writes or geocoding finish
 - once the import worker writes locations, any required geocoding/parsing follow-up is queued through backend geocode jobs
 - queued geocode work is processed in batches of up to `10` location ids per job
